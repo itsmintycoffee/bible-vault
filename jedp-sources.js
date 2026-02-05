@@ -102,6 +102,7 @@ async function initializeJEDP() {
 
 // Export for use in bible.js
 if (typeof window !== 'undefined') {
+    window.loadJEDPData = loadJEDPData;
     window.initializeJEDP = initializeJEDP;
     window.applyJEDPSources = applyJEDPSources;
 }
