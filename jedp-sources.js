@@ -3,7 +3,6 @@
 // Format: {"Book Chapter": {"Source": [verses...], ...}, ...}
 
 let jedpData = {};
-let currentBook = null;
 
 // Load JEDP source data for a specific book
 async function loadJEDPData(book) {
@@ -90,8 +89,8 @@ async function initializeJEDP() {
     if (firstChapter) {
         const chapterRef = firstChapter.textContent.trim();
         const parts = chapterRef.split(' ');
-        currentBook = parts.slice(0, -1).join(' ');
-        await loadJEDPData(currentBook);
+        const book = parts.slice(0, -1).join(' ');
+        await loadJEDPData(book);
     }
 
     // Apply to existing verses

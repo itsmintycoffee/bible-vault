@@ -64,7 +64,9 @@ async function displayVerse(data, append = false) {
     }
 
     // Apply JEDP source color-coding
-    if (typeof applyJEDPSources === 'function') {
+    if (typeof loadJEDPData === 'function' && typeof applyJEDPSources === 'function') {
+        // Load JEDP data for current book first
+        await loadJEDPData(currentBook);
         const verses = verseContent.querySelectorAll('.verse');
         applyJEDPSources(verses);
     }

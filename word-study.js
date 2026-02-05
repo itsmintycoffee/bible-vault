@@ -178,17 +178,17 @@ function initWordStudy() {
 
     // Handle word hover events
     document.addEventListener('mouseenter', async (e) => {
-        if (e.target.classList.contains('word')) {
+        if (e.target && e.target.classList && e.target.classList.contains('word')) {
             const word = e.target.dataset.word;
             await showTooltip(word, e);
         }
     }, true); // Use capture phase to catch events on dynamically added elements
 
     document.addEventListener('mouseleave', (e) => {
-        if (e.target.classList.contains('word')) {
+        if (e.target && e.target.classList && e.target.classList.contains('word')) {
             // Delay hiding to allow moving mouse to tooltip
             setTimeout(() => {
-                if (!tooltip.matches(':hover')) {
+                if (tooltip && !tooltip.matches(':hover')) {
                     hideTooltip();
                 }
             }, 100);
