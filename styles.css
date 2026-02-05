@@ -332,23 +332,23 @@ body {
 }
 
 /* Documentary Hypothesis Source Color-Coding - Marker Highlight Style */
-.verse.source-J {
+.source-J {
     background-color: rgba(220, 53, 69, 0.15);
 }
 
-.verse.source-E {
+.source-E {
     background-color: rgba(13, 110, 253, 0.15);
 }
 
-.verse.source-P {
+.source-P {
     background-color: rgba(111, 66, 193, 0.15);
 }
 
-.verse.source-D {
+.source-D {
     background-color: rgba(25, 135, 84, 0.15);
 }
 
-.verse.source-R {
+.source-R {
     background-color: rgba(253, 126, 20, 0.15);
 }
 
