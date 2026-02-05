@@ -130,7 +130,7 @@ async function makeWordsClickable(verseElement) {
 
         // Only make it clickable if we have a definition for it
         if (hasDefinition(cleanWord)) {
-            return `<span class="word" data-word="${token}">${token}</span>`;
+            return `<span class="word" data-word="${cleanWord}">${token}</span>`;
         }
 
         // Return as plain text if no definition available
