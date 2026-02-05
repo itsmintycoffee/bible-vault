@@ -176,15 +176,33 @@ function initWordStudy() {
     `;
     document.body.appendChild(tooltip);
 
-    // Handle word clicks (not hover - to conserve API quota)
-    document.addEventListener('click', async (e) => {
+    // Handle word hover events
+    document.addEventListener('mouseenter', async (e) => {
         if (e.target.classList.contains('word')) {
             const word = e.target.dataset.word;
             await showTooltip(word, e);
-        } else if (!e.target.closest('.word-tooltip')) {
-            // Click outside word or tooltip - hide tooltip
-            hideTooltip();
         }
+    }, true); // Use capture phase to catch events on dynamically added elements
+
+    document.addEventListener('mouseleave', (e) => {
+        if (e.target.classList.contains('word')) {
+            // Delay hiding to allow moving mouse to tooltip
+            setTimeout(() => {
+                if (!tooltip.matches(':hover')) {
+                    hideTooltip();
+                }
+            }, 100);
+        }
+    }, true);
+
+    // Keep tooltip visible when hovering over it
+    tooltip.addEventListener('mouseenter', () => {
+        tooltip.dataset.hovering = 'true';
+    });
+
+    tooltip.addEventListener('mouseleave', () => {
+        tooltip.dataset.hovering = 'false';
+        hideTooltip();
     });
 }
 
@@ -236,7 +254,7 @@ async function showTooltip(word, event) {
         wordInfo = parseAPIResponse(apiData, word);
     } else {
         // Fall back to local database
-        wordInfo = getWordInfo(word);
+        wordInfo = await getWordInfo(word);
     }
 
     // Update tooltip with actual data (only if still showing same word)
@@ -264,7 +282,7 @@ function parseAPIResponse(data, word) {
 
 // Hide tooltip
 function hideTooltip() {
-    if (tooltip) {
+    if (tooltip && tooltip.dataset.hovering !== 'true') {
         tooltip.style.opacity = '0';
         currentTooltipWord = null;
     }
