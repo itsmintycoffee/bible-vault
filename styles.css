@@ -333,33 +333,33 @@ body {
 
 /* Documentary Hypothesis Source Color-Coding - Marker Highlight Style */
 .source-J {
-    background-color: rgba(220, 53, 69, 0.15);
-    padding: 0 3px;
-    margin: 0 -3px;
+    background-color: rgba(230, 150, 150, 0.25);
+    padding: 0 2px;
+    margin: 0 -1px;
 }
 
 .source-E {
-    background-color: rgba(13, 110, 253, 0.15);
-    padding: 0 3px;
-    margin: 0 -3px;
+    background-color: rgba(150, 180, 255, 0.25);
+    padding: 0 2px;
+    margin: 0 -1px;
 }
 
 .source-P {
-    background-color: rgba(111, 66, 193, 0.15);
-    padding: 0 3px;
-    margin: 0 -3px;
+    background-color: rgba(200, 170, 230, 0.25);
+    padding: 0 2px;
+    margin: 0 -1px;
 }
 
 .source-D {
-    background-color: rgba(25, 135, 84, 0.15);
-    padding: 0 3px;
-    margin: 0 -3px;
+    background-color: rgba(150, 200, 150, 0.25);
+    padding: 0 2px;
+    margin: 0 -1px;
 }
 
 .source-R {
-    background-color: rgba(253, 126, 20, 0.15);
-    padding: 0 3px;
-    margin: 0 -3px;
+    background-color: rgba(255, 200, 130, 0.25);
+    padding: 0 2px;
+    margin: 0 -1px;
 }
 
 /* JEDP Legend */
