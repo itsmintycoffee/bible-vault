@@ -47,31 +47,53 @@ function getVerseSource(book, chapter, verse) {
     return null;
 }
 
-// Helper: Wrap all text in an element with source-specific spans for word-level highlighting
+// Helper: Add source class to words while preserving word-study markup
 function wrapWordsWithSource(container, source) {
-    // Get all text content
-    const text = container.textContent;
+    // Build a new fragment while preserving existing structure
+    const walker = document.createTreeWalker(
+        container,
+        NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT,
+        null,
+        false
+    );
     
-    // Clear container
-    container.innerHTML = '';
+    const nodesToProcess = [];
+    let node;
+    while (node = walker.nextNode()) {
+        nodesToProcess.push(node);
+    }
     
-    // Split text into words and spaces (preserving spaces)
-    // Match words or whitespace
-    const regex = /(\S+|\s+)/g;
-    let match;
-    
-    while ((match = regex.exec(text)) !== null) {
-        const token = match[0];
+    // Process in reverse to avoid invalidating walker
+    for (let i = nodesToProcess.length - 1; i >= 0; i--) {
+        node = nodesToProcess[i];
         
-        if (/\s/.test(token)) {
-            // It's whitespace, add as text node
-            container.appendChild(document.createTextNode(token));
-        } else {
-            // It's a word, wrap in span with source class
-            const span = document.createElement('span');
-            span.className = `source-${source}`;
-            span.textContent = token;
-            container.appendChild(span);
+        if (node.nodeType === 3) {
+            // Text node: split into words and spaces, wrap in spans
+            const text = node.textContent;
+            const regex = /(\S+|\s+)/g;
+            let match;
+            const fragment = document.createDocumentFragment();
+            
+            while ((match = regex.exec(text)) !== null) {
+                const token = match[0];
+                
+                if (/\s/.test(token)) {
+                    // Whitespace
+                    fragment.appendChild(document.createTextNode(token));
+                } else {
+                    // Word: wrap in source span
+                    const span = document.createElement('span');
+                    span.className = `source-${source}`;
+                    span.textContent = token;
+                    fragment.appendChild(span);
+                }
+            }
+            
+            // Replace text node with fragment
+            node.parentNode.replaceChild(fragment, node);
+        } else if (node.nodeType === 1 && node.classList && node.classList.contains('word')) {
+            // Existing word span: add source class to it
+            node.classList.add(`source-${source}`);
         }
     }
 }
