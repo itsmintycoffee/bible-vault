@@ -47,10 +47,13 @@ function getVerseSource(book, chapter, verse) {
     return null;
 }
 
-// Helper: Wrap text with source-specific spans for word-level highlighting
-function wrapWordsWithSource(textNode, source) {
-    const text = textNode.textContent;
-    const fragment = document.createDocumentFragment();
+// Helper: Wrap all text in an element with source-specific spans for word-level highlighting
+function wrapWordsWithSource(container, source) {
+    // Get all text content
+    const text = container.textContent;
+    
+    // Clear container
+    container.innerHTML = '';
     
     // Split text into words and spaces (preserving spaces)
     // Match words or whitespace
@@ -62,18 +65,15 @@ function wrapWordsWithSource(textNode, source) {
         
         if (/\s/.test(token)) {
             // It's whitespace, add as text node
-            fragment.appendChild(document.createTextNode(token));
+            container.appendChild(document.createTextNode(token));
         } else {
             // It's a word, wrap in span with source class
             const span = document.createElement('span');
             span.className = `source-${source}`;
             span.textContent = token;
-            fragment.appendChild(span);
+            container.appendChild(span);
         }
     }
-    
-    // Replace text node with fragment
-    textNode.parentNode.replaceChild(fragment, textNode);
 }
 
 // Apply JEDP color-coding to individual words in verses
@@ -115,11 +115,10 @@ function applyJEDPSources(verseElements) {
         const source = getVerseSource(book, chapter, verseNum);
 
         if (source) {
-            // Get the verse text span and wrap words with source class
+            // Get the verse text span and wrap all words with source class
             const verseTextSpan = verseElement.querySelector('.verse-text');
-            if (verseTextSpan && verseTextSpan.firstChild && verseTextSpan.firstChild.nodeType === 3) {
-                // Only wrap if it's a text node (not already processed)
-                wrapWordsWithSource(verseTextSpan.firstChild, source);
+            if (verseTextSpan) {
+                wrapWordsWithSource(verseTextSpan, source);
                 verseElement.dataset.source = source;
                 coloredCount++;
             }
