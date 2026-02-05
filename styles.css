@@ -257,7 +257,7 @@ body {
     margin-top: -1rem;
     padding-top: 0;
     box-shadow: 0 2px 8px rgba(44, 42, 39, 0.05);
-    transition: all 0.3s ease;
+    will-change: transform;
 }
 
 /* First chapter title - large headline style */

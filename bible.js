@@ -97,8 +97,9 @@ function setupFirstChapterObserver() {
     const firstChapterTitle = document.querySelector('.chapter-section:first-child .chapter-title');
     if (!firstChapterTitle) return;
 
-    // Store the initial offset of the title from the top of the scrollable container
+    // Store the initial offset and track current state to avoid redundant class operations
     let initialOffsetTop = null;
+    let isCurrentlyStuck = false;
 
     // Use scroll event to detect sticky state more reliably
     const checkStickyState = () => {
@@ -114,15 +115,18 @@ function setupFirstChapterObserver() {
         const scrollTop = mainContent.scrollTop;
         const isStuck = scrollTop > initialOffsetTop;
 
-        if (isStuck) {
+        // Only update class if state actually changed (avoid redundant DOM operations)
+        if (isStuck && !isCurrentlyStuck) {
             firstChapterTitle.classList.add('sticky-active');
-        } else {
+            isCurrentlyStuck = true;
+        } else if (!isStuck && isCurrentlyStuck) {
             firstChapterTitle.classList.remove('sticky-active');
+            isCurrentlyStuck = false;
         }
     };
 
-    // Check on scroll
-    mainContent.addEventListener('scroll', checkStickyState);
+    // Use passive listener for better scroll performance
+    mainContent.addEventListener('scroll', checkStickyState, { passive: true });
 
     // Initial check
     checkStickyState();
