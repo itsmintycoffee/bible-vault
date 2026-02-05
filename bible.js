@@ -55,34 +55,22 @@ async function displayVerse(data, append = false) {
     // Update current reading position
     updateCurrentPosition(data.reference);
 
-    // Make words clickable for word study (wait for concordance to load)
-    const verseTexts = verseContent.querySelectorAll('.verse-text');
-    if (typeof makeWordsClickable === 'function') {
-        for (const verseText of verseTexts) {
-            await makeWordsClickable(verseText);
-        }
-    }
-
-    // Apply JEDP source color-coding asynchronously to avoid blocking scrolling
+    // Apply JEDP source color-coding FIRST on plain text (before word study markup)
     if (typeof loadJEDPData === 'function' && typeof applyJEDPSources === 'function') {
         // Load JEDP data for current book first
         console.log('Loading JEDP data and applying colors...');
         await loadJEDPData(currentBook);
         
-        // Defer color application to avoid blocking the main thread
-        if (typeof requestIdleCallback !== 'undefined') {
-            requestIdleCallback(() => {
-                const verses = verseContent.querySelectorAll('.verse');
-                console.log(`Found ${verses.length} verse elements to color`);
-                applyJEDPSources(verses);
-            });
-        } else {
-            // Fallback for browsers that don't support requestIdleCallback
-            setTimeout(() => {
-                const verses = verseContent.querySelectorAll('.verse');
-                console.log(`Found ${verses.length} verse elements to color`);
-                applyJEDPSources(verses);
-            }, 100);
+        const verses = verseContent.querySelectorAll('.verse');
+        console.log(`Found ${verses.length} verse elements to color`);
+        applyJEDPSources(verses);
+    }
+
+    // Then make words clickable for word study (after JEDP highlighting)
+    const verseTexts = verseContent.querySelectorAll('.verse-text');
+    if (typeof makeWordsClickable === 'function') {
+        for (const verseText of verseTexts) {
+            await makeWordsClickable(verseText);
         }
     }
 

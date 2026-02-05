@@ -113,29 +113,59 @@ async function makeWordsClickable(verseElement) {
         await loadConcordanceIndex();
     }
 
-    const text = verseElement.textContent;
-    const words = text.split(/(\s+)/);
+    // Use TreeWalker to process text nodes while preserving JEDP highlighting
+    const walker = document.createTreeWalker(
+        verseElement,
+        NodeFilter.SHOW_TEXT,
+        null,
+        false
+    );
 
-    verseElement.innerHTML = words.map(token => {
-        // If it's whitespace, return as is
-        if (/^\s+$/.test(token)) return token;
+    const textNodesToReplace = [];
+    let textNode;
+    while (textNode = walker.nextNode()) {
+        textNodesToReplace.push(textNode);
+    }
 
-        // Clean the word (remove punctuation for checking)
-        const cleanWord = token.toLowerCase().replace(/[.,;:!?'"()]/g, '');
+    // Process text nodes in reverse to avoid invalidating walker
+    for (let i = textNodesToReplace.length - 1; i >= 0; i--) {
+        textNode = textNodesToReplace[i];
+        const text = textNode.textContent;
+        const tokens = text.split(/(\s+)/);
 
-        // If it's a stop word or very short, don't make it clickable
-        if (stopWords.has(cleanWord) || cleanWord.length <= 2) {
-            return token;
+        const fragment = document.createDocumentFragment();
+        
+        for (const token of tokens) {
+            // If it's whitespace, keep as text node
+            if (/^\s+$/.test(token)) {
+                fragment.appendChild(document.createTextNode(token));
+                continue;
+            }
+
+            // Clean the word (remove punctuation for checking)
+            const cleanWord = token.toLowerCase().replace(/[.,;:!?'"()]/g, '');
+
+            // If it's a stop word or very short, don't make it clickable
+            if (stopWords.has(cleanWord) || cleanWord.length <= 2) {
+                fragment.appendChild(document.createTextNode(token));
+                continue;
+            }
+
+            // Only make it clickable if we have a definition for it
+            if (hasDefinition(cleanWord)) {
+                const span = document.createElement('span');
+                span.className = 'word';
+                span.setAttribute('data-word', cleanWord);
+                span.textContent = token;
+                fragment.appendChild(span);
+            } else {
+                fragment.appendChild(document.createTextNode(token));
+            }
         }
 
-        // Only make it clickable if we have a definition for it
-        if (hasDefinition(cleanWord)) {
-            return `<span class="word" data-word="${cleanWord}">${token}</span>`;
-        }
-
-        // Return as plain text if no definition available
-        return token;
-    }).join('');
+        // Replace text node with fragment
+        textNode.parentNode.replaceChild(fragment, textNode);
+    }
 }
 
 // IQ Bible API configuration
