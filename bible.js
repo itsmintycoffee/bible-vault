@@ -63,6 +63,12 @@ async function displayVerse(data, append = false) {
         }
     }
 
+    // Apply JEDP source color-coding
+    if (typeof applyJEDPSources === 'function') {
+        const verses = verseContent.querySelectorAll('.verse');
+        applyJEDPSources(verses);
+    }
+
     // Setup sticky observer for first chapter title
     if (!append) {
         setupFirstChapterObserver();

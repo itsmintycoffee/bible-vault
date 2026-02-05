@@ -331,6 +331,91 @@ body {
     color: #c75146;
 }
 
+/* Documentary Hypothesis Source Color-Coding */
+.verse.source-J {
+    background: linear-gradient(to right, rgba(220, 53, 69, 0.08) 0%, rgba(220, 53, 69, 0.08) 100%);
+    border-left: 3px solid rgba(220, 53, 69, 0.4);
+    padding-left: 0.75rem;
+    margin-left: -0.75rem;
+}
+
+.verse.source-E {
+    background: linear-gradient(to right, rgba(13, 110, 253, 0.08) 0%, rgba(13, 110, 253, 0.08) 100%);
+    border-left: 3px solid rgba(13, 110, 253, 0.4);
+    padding-left: 0.75rem;
+    margin-left: -0.75rem;
+}
+
+.verse.source-P {
+    background: linear-gradient(to right, rgba(111, 66, 193, 0.08) 0%, rgba(111, 66, 193, 0.08) 100%);
+    border-left: 3px solid rgba(111, 66, 193, 0.4);
+    padding-left: 0.75rem;
+    margin-left: -0.75rem;
+}
+
+.verse.source-D {
+    background: linear-gradient(to right, rgba(25, 135, 84, 0.08) 0%, rgba(25, 135, 84, 0.08) 100%);
+    border-left: 3px solid rgba(25, 135, 84, 0.4);
+    padding-left: 0.75rem;
+    margin-left: -0.75rem;
+}
+
+.verse.source-R {
+    background: linear-gradient(to right, rgba(253, 126, 20, 0.08) 0%, rgba(253, 126, 20, 0.08) 100%);
+    border-left: 3px solid rgba(253, 126, 20, 0.4);
+    padding-left: 0.75rem;
+    margin-left: -0.75rem;
+}
+
+/* JEDP Legend */
+.jedp-legend {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    font-size: 0.85rem;
+}
+
+.jedp-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.jedp-legend-color {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    border: 2px solid;
+}
+
+.jedp-legend-color.J {
+    background: rgba(220, 53, 69, 0.2);
+    border-color: rgba(220, 53, 69, 0.6);
+}
+
+.jedp-legend-color.E {
+    background: rgba(13, 110, 253, 0.2);
+    border-color: rgba(13, 110, 253, 0.6);
+}
+
+.jedp-legend-color.P {
+    background: rgba(111, 66, 193, 0.2);
+    border-color: rgba(111, 66, 193, 0.6);
+}
+
+.jedp-legend-color.D {
+    background: rgba(25, 135, 84, 0.2);
+    border-color: rgba(25, 135, 84, 0.6);
+}
+
+.jedp-legend-color.R {
+    background: rgba(253, 126, 20, 0.2);
+    border-color: rgba(253, 126, 20, 0.6);
+}
+
 /* Right Panel */
 .right-panel {
     width: 33vw;
