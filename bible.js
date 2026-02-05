@@ -61,13 +61,17 @@ async function displayVerse(data, append = false) {
         console.log('Loading JEDP data and applying colors...');
         await loadJEDPData(currentBook);
         
-        const verses = verseContent.querySelectorAll('.verse');
+        // Only highlight verses in the newly loaded chapter (not all verses on page)
+        const lastChapterSection = verseContent.querySelector('.chapter-section:last-child');
+        const verses = lastChapterSection ? lastChapterSection.querySelectorAll('.verse') : [];
         console.log(`Found ${verses.length} verse elements to color`);
         applyJEDPSources(verses);
     }
 
     // Then make words clickable for word study (after JEDP highlighting)
-    const verseTexts = verseContent.querySelectorAll('.verse-text');
+    // Only process the newly loaded chapter
+    const lastChapterSection = verseContent.querySelector('.chapter-section:last-child');
+    const verseTexts = lastChapterSection ? lastChapterSection.querySelectorAll('.verse-text') : [];
     if (typeof makeWordsClickable === 'function') {
         for (const verseText of verseTexts) {
             await makeWordsClickable(verseText);
