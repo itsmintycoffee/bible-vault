@@ -27,7 +27,7 @@ async function loadJEDPData(book) {
 
 // Get source for a specific verse reference
 function getVerseSource(book, chapter, verse) {
-    const chapterKey = `${chapter}`;
+    const chapterKey = `${book} ${chapter}`;  // Key format: "Genesis 1"
     const chapterData = jedpData[book]?.[chapterKey];
     
     if (!chapterData) return null;
