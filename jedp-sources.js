@@ -1,36 +1,49 @@
 // Documentary Hypothesis Source Attribution
 // Color-codes verses according to JEDP theory
+// Format: {"Book Chapter": {"Source": [verses...], ...}, ...}
 
-let jedpData = null;
+let jedpData = {};
+let currentBook = null;
 
-// Load JEDP source data
-async function loadJEDPData() {
-    if (jedpData) return jedpData;
+// Load JEDP source data for a specific book
+async function loadJEDPData(book) {
+    if (jedpData[book]) return jedpData[book];
 
     try {
-        const response = await fetch('sources/genesis-jedp.json');
-        jedpData = await response.json();
-        console.log('JEDP source data loaded:', Object.keys(jedpData).length, 'verses');
-        return jedpData;
+        const bookLower = book.toLowerCase();
+        const response = await fetch(`sources/${bookLower}-jedp.json`);
+        if (!response.ok) {
+            console.log(`JEDP data not available for ${book}`);
+            return {};
+        }
+        const data = await response.json();
+        jedpData[book] = data;
+        console.log(`JEDP source data loaded for ${book}:`, Object.keys(data).length, 'chapters');
+        return data;
     } catch (error) {
-        console.log('JEDP data not available:', error);
+        console.log(`JEDP data error for ${book}:`, error);
         return {};
     }
 }
 
 // Get source for a specific verse reference
-function getVerseSource(reference) {
-    if (!jedpData) return null;
-
-    // Normalize reference (e.g., "Genesis 1:1" -> "Genesis 1:1")
-    const normalized = reference.trim();
-    return jedpData[normalized] || null;
+function getVerseSource(book, chapter, verse) {
+    const chapterKey = `${chapter}`;
+    const chapterData = jedpData[book]?.[chapterKey];
+    
+    if (!chapterData) return null;
+    
+    // Find which source contains this verse
+    for (const [source, verses] of Object.entries(chapterData)) {
+        if (Array.isArray(verses) && verses.includes(verse)) {
+            return source;
+        }
+    }
+    return null;
 }
 
 // Apply JEDP color-coding to verses
 function applyJEDPSources(verseElements) {
-    if (!jedpData) return;
-
     verseElements.forEach(verseElement => {
         // Try to extract verse reference from context
         // The verse element is within a chapter, and has a verse number
@@ -46,13 +59,18 @@ function applyJEDPSources(verseElements) {
 
         // Extract book and chapter (e.g., "Genesis 1")
         const chapterRef = chapterTitle.textContent.trim();
-        const verseNum = verseNumber.textContent.trim();
+        const verseNumText = verseNumber.textContent.trim();
+        const verseNum = parseInt(verseNumText, 10);
 
-        // Build full reference (e.g., "Genesis 1:1")
-        const fullReference = `${chapterRef}:${verseNum}`;
+        // Parse book and chapter from "Genesis 1" format
+        const parts = chapterRef.split(' ');
+        let chapter = parts[parts.length - 1];
+        let book = parts.slice(0, -1).join(' ');
+        
+        chapter = parseInt(chapter, 10);
 
         // Get source
-        const source = getVerseSource(fullReference);
+        const source = getVerseSource(book, chapter, verseNum);
 
         if (source) {
             // Add source class to verse
@@ -64,13 +82,17 @@ function applyJEDPSources(verseElements) {
     });
 }
 
-// Initialize JEDP on page load
-loadJEDPData();
-
-// Observe when verses are loaded and apply sources
+// Initialize JEDP on page load with current book
 // This function should be called after verses are displayed
 async function initializeJEDP() {
-    await loadJEDPData();
+    // Extract book name from the page (from first chapter title)
+    const firstChapter = document.querySelector('.chapter-title');
+    if (firstChapter) {
+        const chapterRef = firstChapter.textContent.trim();
+        const parts = chapterRef.split(' ');
+        currentBook = parts.slice(0, -1).join(' ');
+        await loadJEDPData(currentBook);
+    }
 
     // Apply to existing verses
     const verses = document.querySelectorAll('.verse');
