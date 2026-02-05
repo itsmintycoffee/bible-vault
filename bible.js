@@ -66,8 +66,10 @@ async function displayVerse(data, append = false) {
     // Apply JEDP source color-coding
     if (typeof loadJEDPData === 'function' && typeof applyJEDPSources === 'function') {
         // Load JEDP data for current book first
+        console.log('Loading JEDP data and applying colors...');
         await loadJEDPData(currentBook);
         const verses = verseContent.querySelectorAll('.verse');
+        console.log(`Found ${verses.length} verse elements to color`);
         applyJEDPSources(verses);
     }
 

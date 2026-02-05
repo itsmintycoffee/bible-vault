@@ -57,20 +57,36 @@ function getVerseSource(book, chapter, verse) {
 
 // Apply JEDP color-coding to verses
 function applyJEDPSources(verseElements) {
+    console.log(`applyJEDPSources called with ${verseElements ? verseElements.length : 0} verse elements`);
+    
+    if (!verseElements || verseElements.length === 0) {
+        console.log('No verse elements found!');
+        return;
+    }
+    
     let coloredCount = 0;
     
-    verseElements.forEach(verseElement => {
+    verseElements.forEach((verseElement, index) => {
         // Try to extract verse reference from context
         // The verse element is within a chapter, and has a verse number
         const verseNumber = verseElement.querySelector('.verse-number');
-        if (!verseNumber) return;
+        if (!verseNumber) {
+            console.log(`Verse ${index}: No .verse-number found`);
+            return;
+        }
 
         // Get chapter reference from parent
         const chapterSection = verseElement.closest('.chapter-section');
-        if (!chapterSection) return;
+        if (!chapterSection) {
+            console.log(`Verse ${index}: No .chapter-section found`);
+            return;
+        }
 
         const chapterTitle = chapterSection.querySelector('.chapter-title');
-        if (!chapterTitle) return;
+        if (!chapterTitle) {
+            console.log(`Verse ${index}: No .chapter-title found`);
+            return;
+        }
 
         // Extract book and chapter (e.g., "Genesis 1")
         const chapterRef = chapterTitle.textContent.trim();
@@ -92,10 +108,12 @@ function applyJEDPSources(verseElements) {
             verseElement.classList.add(`source-${source}`);
             verseElement.dataset.source = source;
             coloredCount++;
+        } else {
+            if (index < 5) console.log(`Verse ${verseNum} (${book} ${chapter}): No source found`);
         }
     });
     
-    console.log(`JEDP: Colored ${coloredCount} of ${verseElements.length} verses`);
+    console.log(`✓ JEDP: Colored ${coloredCount} of ${verseElements.length} verses`);
 }
 
 // Initialize JEDP on page load with current book
