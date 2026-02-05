@@ -63,14 +63,27 @@ async function displayVerse(data, append = false) {
         }
     }
 
-    // Apply JEDP source color-coding
+    // Apply JEDP source color-coding asynchronously to avoid blocking scrolling
     if (typeof loadJEDPData === 'function' && typeof applyJEDPSources === 'function') {
         // Load JEDP data for current book first
         console.log('Loading JEDP data and applying colors...');
         await loadJEDPData(currentBook);
-        const verses = verseContent.querySelectorAll('.verse');
-        console.log(`Found ${verses.length} verse elements to color`);
-        applyJEDPSources(verses);
+        
+        // Defer color application to avoid blocking the main thread
+        if (typeof requestIdleCallback !== 'undefined') {
+            requestIdleCallback(() => {
+                const verses = verseContent.querySelectorAll('.verse');
+                console.log(`Found ${verses.length} verse elements to color`);
+                applyJEDPSources(verses);
+            });
+        } else {
+            // Fallback for browsers that don't support requestIdleCallback
+            setTimeout(() => {
+                const verses = verseContent.querySelectorAll('.verse');
+                console.log(`Found ${verses.length} verse elements to color`);
+                applyJEDPSources(verses);
+            }, 100);
+        }
     }
 
     // Setup sticky observer for first chapter title

@@ -33,17 +33,10 @@ function getVerseSource(book, chapter, verse) {
     const chapterKey = `${book} ${chapter}`;  // Key format: "Genesis 1"
     const bookData = jedpData[book];
     
-    if (!bookData) {
-        console.log(`No JEDP data loaded for ${book}`);
-        return null;
-    }
+    if (!bookData) return null;
     
     const chapterData = bookData[chapterKey];
-    
-    if (!chapterData) {
-        console.log(`No chapter data for ${chapterKey}. Available keys:`, Object.keys(bookData).slice(0, 3));
-        return null;
-    }
+    if (!chapterData) return null;
     
     // Find which source contains this verse
     for (const [source, verses] of Object.entries(chapterData)) {
@@ -51,13 +44,12 @@ function getVerseSource(book, chapter, verse) {
             return source;
         }
     }
-    console.log(`No source found for ${chapterKey}:${verse}. Chapter data keys:`, Object.keys(chapterData));
     return null;
 }
 
 // Apply JEDP color-coding to verses
 function applyJEDPSources(verseElements) {
-    console.log(`applyJEDPSources called with ${verseElements ? verseElements.length : 0} verse elements`);
+    console.log(`applyJEDPSources: Processing ${verseElements ? verseElements.length : 0} verses`);
     
     if (!verseElements || verseElements.length === 0) {
         console.log('No verse elements found!');
@@ -66,27 +58,17 @@ function applyJEDPSources(verseElements) {
     
     let coloredCount = 0;
     
-    verseElements.forEach((verseElement, index) => {
+    verseElements.forEach((verseElement) => {
         // Try to extract verse reference from context
-        // The verse element is within a chapter, and has a verse number
         const verseNumber = verseElement.querySelector('.verse-number');
-        if (!verseNumber) {
-            console.log(`Verse ${index}: No .verse-number found`);
-            return;
-        }
+        if (!verseNumber) return;
 
         // Get chapter reference from parent
         const chapterSection = verseElement.closest('.chapter-section');
-        if (!chapterSection) {
-            console.log(`Verse ${index}: No .chapter-section found`);
-            return;
-        }
+        if (!chapterSection) return;
 
         const chapterTitle = chapterSection.querySelector('.chapter-title');
-        if (!chapterTitle) {
-            console.log(`Verse ${index}: No .chapter-title found`);
-            return;
-        }
+        if (!chapterTitle) return;
 
         // Extract book and chapter (e.g., "Genesis 1")
         const chapterRef = chapterTitle.textContent.trim();
@@ -108,12 +90,10 @@ function applyJEDPSources(verseElements) {
             verseElement.classList.add(`source-${source}`);
             verseElement.dataset.source = source;
             coloredCount++;
-        } else {
-            if (index < 5) console.log(`Verse ${verseNum} (${book} ${chapter}): No source found`);
         }
     });
     
-    console.log(`✓ JEDP: Colored ${coloredCount} of ${verseElements.length} verses`);
+    console.log(`✓ JEDP: Colored ${coloredCount}/${verseElements.length} verses`);
 }
 
 // Initialize JEDP on page load with current book
