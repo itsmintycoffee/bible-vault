@@ -171,3 +171,8 @@ function loadChapter(bookName, chapterNum) {
 
 // Initialize on page load
 init();
+
+// Load Genesis 1 by default when page loads
+document.addEventListener('DOMContentLoaded', () => {
+    loadChapter('Genesis', 1);
+});
