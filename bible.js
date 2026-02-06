@@ -147,14 +147,25 @@ function setupFirstChapterObserver() {
             isCurrentlyStuck = false;
         }
 
-        // Update header title to match visible chapter
+        // Update header title to match visible chapter (find the one stuck at top)
         const chapters = document.querySelectorAll('.chapter-section .chapter-title');
+        let closestChapter = null;
+        let closestDistance = Infinity;
+
         for (const chapter of chapters) {
             const rect = chapter.getBoundingClientRect();
-            if (rect.top >= 0 && rect.top <= 200) {
-                headerChapterTitle.textContent = chapter.textContent;
-                break;
+            // Check if title is at or near the top (sticky position)
+            if (rect.top >= -10 && rect.top <= 100) {
+                const distance = Math.abs(rect.top);
+                if (distance < closestDistance) {
+                    closestDistance = distance;
+                    closestChapter = chapter;
+                }
             }
+        }
+
+        if (closestChapter) {
+            headerChapterTitle.textContent = closestChapter.textContent;
         }
     };
 
@@ -297,21 +308,30 @@ function handleScroll() {
 
 // Update chapter selector based on visible chapter
 function updateChapterSelector() {
-    const chapters = document.querySelectorAll('.chapter-section');
+    const chapterTitles = document.querySelectorAll('.chapter-title');
     const currentChapterDisplay = document.getElementById('current-chapter');
 
     if (!currentChapterDisplay) return;
 
-    chapters.forEach(chapter => {
-        const rect = chapter.getBoundingClientRect();
-        // Check if chapter is in viewport (top portion visible)
-        if (rect.top >= 0 && rect.top <= window.innerHeight / 2) {
-            const title = chapter.querySelector('.chapter-title');
-            if (title) {
-                currentChapterDisplay.textContent = title.textContent;
+    // Find the chapter title that's currently stuck at the top (or closest to top)
+    let closestTitle = null;
+    let closestDistance = Infinity;
+
+    chapterTitles.forEach(title => {
+        const rect = title.getBoundingClientRect();
+        // Check if title is at or near the top (sticky position)
+        if (rect.top >= -10 && rect.top <= 100) {
+            const distance = Math.abs(rect.top);
+            if (distance < closestDistance) {
+                closestDistance = distance;
+                closestTitle = title;
             }
         }
     });
+
+    if (closestTitle) {
+        currentChapterDisplay.textContent = closestTitle.textContent;
+    }
 }
 
 // Add scroll event listener with debounce
