@@ -25,9 +25,14 @@ function initializeTranslationSelector() {
             const newTranslation = e.target.value;
             translationManager.setTranslation(newTranslation);
 
-            // Reload current chapter with new translation
-            const currentRef = `${currentBook} ${currentChapter}`;
-            await fetchVerse(currentRef);
+            // Check if parallel mode is active
+            if (readingControls && readingControls.isParallelMode && readingControls.parallelTranslation) {
+                await readingControls.refreshParallelView();
+            } else {
+                // Reload current chapter with new translation
+                const currentRef = `${currentBook} ${currentChapter}`;
+                await fetchVerse(currentRef);
+            }
         });
     }
 }
