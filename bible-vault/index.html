@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bible Study Tool</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://pixijs.download/release/pixi.js"></script>
+</head>
+<body>
+    <div id="pixi-container"></div>
+
+    <div class="app-container">
+        <!-- Left Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <div class="logo-icon">📖</div>
+            </div>
+            <nav class="sidebar-nav">
+                <button class="nav-item active" title="Read">
+                    <span>📚</span>
+                </button>
+                <button class="nav-item" title="Search">
+                    <span>🔍</span>
+                </button>
+                <button class="nav-item" title="Bookmarks">
+                    <span>🔖</span>
+                </button>
+                <button class="nav-item" title="Settings">
+                    <span>⚙️</span>
+                </button>
+            </nav>
+        </aside>
+
+        <!-- Main Content (Bible Text) -->
+        <main class="main-content">
+            <header class="content-header">
+                <div class="header-top">
+                    <h1>Bible Study</h1>
+                    <button id="chapter-selector-btn" class="chapter-selector-btn">
+                        <span id="current-chapter">Genesis 1</span>
+                        <span class="dropdown-arrow">▼</span>
+                    </button>
+                </div>
+                <div class="search-section">
+                    <input
+                        type="text"
+                        id="verse-input"
+                        placeholder="Search passage..."
+                    >
+                    <button id="search-btn">Go</button>
+                </div>
+            </header>
+
+            <div class="bible-content">
+                <div id="loading" class="hidden">Loading...</div>
+                <div id="error" class="hidden"></div>
+                <div id="verse-content"></div>
+            </div>
+        </main>
+
+        <!-- Right Panel (Tools & Info) -->
+        <aside class="right-panel" id="right-panel">
+            <div class="resize-handle" id="resize-handle"></div>
+            <div class="panel-header">
+                <h2>Study Tools</h2>
+                <button class="mobile-close-btn" id="mobile-close-btn">&times;</button>
+            </div>
+
+            <div class="tool-section">
+                <h3>Sources</h3>
+                <div class="info-card">
+                    <div class="jedp-legend">
+                        <div class="jedp-legend-item">
+                            <div class="jedp-legend-color J"></div>
+                            <span><strong>J</strong> Jahwist</span>
+                        </div>
+                        <div class="jedp-legend-item">
+                            <div class="jedp-legend-color E"></div>
+                            <span><strong>E</strong> Elohist</span>
+                        </div>
+                        <div class="jedp-legend-item">
+                            <div class="jedp-legend-color P"></div>
+                            <span><strong>P</strong> Priestly</span>
+                        </div>
+                        <div class="jedp-legend-item">
+                            <div class="jedp-legend-color D"></div>
+                            <span><strong>D</strong> Deuteronomist</span>
+                        </div>
+                        <div class="jedp-legend-item">
+                            <div class="jedp-legend-color R"></div>
+                            <span><strong>R</strong> Redactor</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tool-section">
+                <h3>Quick Info</h3>
+                <div class="info-card">
+                    <div class="creation-days">
+                        <div class="day-icon-row">
+                            <img src="chapters/genesis/resources/day01.png" alt="Day 1" class="day-icon">
+                        </div>
+                        <div class="day-icon-row three-icons">
+                            <img src="chapters/genesis/resources/day02.png" alt="Day 2" class="day-icon">
+                            <img src="chapters/genesis/resources/day03.png" alt="Day 3" class="day-icon">
+                            <img src="chapters/genesis/resources/day04.png" alt="Day 4" class="day-icon">
+                        </div>
+                        <div class="day-icon-row">
+                            <img src="chapters/genesis/resources/day05.png" alt="Day 5" class="day-icon">
+                        </div>
+                        <div class="day-icon-row">
+                            <img src="chapters/genesis/resources/day06.png" alt="Day 6" class="day-icon">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tool-section">
+                <h3>Maps</h3>
+                <div class="map-placeholder">
+                    <p>📍 Biblical location maps</p>
+                </div>
+            </div>
+
+            <div class="tool-section">
+                <h3>Cross References</h3>
+                <div class="references-list">
+                    <p>Related verses will appear here</p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Mobile Sidebar Toggle Button -->
+        <button class="mobile-sidebar-toggle" id="mobile-sidebar-toggle">
+            ☰
+        </button>
+    </div>
+
+    <!-- Word Study Modal -->
+    <div id="word-study-modal" class="modal hidden">
+        <div class="modal-content word-study-content">
+            <div class="modal-header">
+                <h3 id="word-study-title">Word Study</h3>
+                <button class="close-btn" id="word-study-close">&times;</button>
+            </div>
+            <div class="word-study-body">
+                <div class="word-info">
+                    <div class="info-row">
+                        <span class="info-label">English:</span>
+                        <span id="word-english" class="info-value"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Original Language:</span>
+                        <span id="word-language" class="info-value"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Original Spelling:</span>
+                        <span id="word-original" class="info-value original-text"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Transliteration:</span>
+                        <span id="word-transliteration" class="info-value"></span>
+                    </div>
+                    <div class="info-section">
+                        <span class="info-label">Definition:</span>
+                        <p id="word-definition" class="info-description"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chapter Selector Modal -->
+    <div id="chapter-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="testament-tabs">
+                    <button class="tab-btn active" data-testament="old">Old Testament</button>
+                    <button class="tab-btn" data-testament="new">New Testament</button>
+                </div>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="books-list" id="books-list"></div>
+                <div class="chapters-grid" id="chapters-grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="particles.js"></script>
+    <script src="jedp-sources.js"></script>
+    <script src="word-study.js"></script>
+    <script src="bible.js"></script>
+    <script src="chapter-selector.js"></script>
+</body>
+</html>
