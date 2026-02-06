@@ -1,0 +1,292 @@
+/* Home Page Styles */
+:root {
+    --bg-primary: #fdfaf4;
+    --bg-secondary: #f5f1e8;
+    --text-primary: #2c2a27;
+    --text-secondary: #6b6966;
+    --accent: #8b7355;
+    --accent-light: #a68968;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+}
+
+#pixi-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.home-container {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.home-header {
+    text-align: center;
+    margin-bottom: 4rem;
+}
+
+.home-header h1 {
+    font-family: 'Crimson Text', Georgia, serif;
+    font-size: 4rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    letter-spacing: -0.02em;
+}
+
+.home-header p {
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    font-weight: 400;
+}
+
+/* Bookshelf */
+.bookshelf {
+    display: flex;
+    gap: 3rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-end;
+    perspective: 2000px;
+    max-width: 1400px;
+}
+
+/* Book Container */
+.book-container {
+    position: relative;
+    width: 200px;
+    height: 280px;
+    transition: transform 0.3s ease;
+}
+
+.book-container:hover {
+    transform: translateY(-10px);
+}
+
+/* 3D Book */
+.book {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.8s cubic-bezier(0.645, 0.045, 0.355, 1);
+    cursor: pointer;
+}
+
+.book-container.open .book {
+    transform: rotateY(-160deg) translateX(-50%);
+}
+
+/* Book Spine */
+.book-spine {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 40px;
+    height: 100%;
+    background: linear-gradient(to right, rgba(0,0,0,0.2), rgba(0,0,0,0.05));
+    transform-origin: left;
+    transform: rotateY(90deg) translateX(-40px);
+    border-radius: 0 4px 4px 0;
+}
+
+/* Book Covers */
+.book-cover {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 4px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    overflow: hidden;
+}
+
+.book-cover.front {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+    transform: translateZ(20px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    border: 2px solid rgba(255,255,255,0.1);
+}
+
+.book-cover.back {
+    background: var(--bg-secondary);
+    transform: rotateY(180deg) translateZ(20px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+/* Book Title on Cover */
+.book-title {
+    text-align: center;
+    color: white;
+}
+
+.book-title h2 {
+    font-family: 'Crimson Text', Georgia, serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+
+.book-title p {
+    font-size: 0.9rem;
+    font-weight: 500;
+    opacity: 0.95;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.book-title.hebrew h2,
+.book-title.greek h2 {
+    font-family: 'Crimson Text', Georgia, serif;
+    font-size: 3rem;
+}
+
+/* Book Page Content */
+.book-page {
+    text-align: center;
+    max-width: 100%;
+}
+
+.book-page h3 {
+    font-family: 'Crimson Text', Georgia, serif;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+}
+
+.book-page p {
+    font-size: 0.85rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+}
+
+.open-bible-btn {
+    padding: 0.75rem 1.5rem;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(139, 115, 85, 0.3);
+}
+
+.open-bible-btn:hover {
+    background: var(--accent-light);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(139, 115, 85, 0.4);
+}
+
+/* Color variations for different books */
+.book-container[data-translation="esv"] .book-cover.front {
+    background: linear-gradient(135deg, #2c5f77 0%, #4a8ca8 100%);
+}
+
+.book-container[data-translation="kjv"] .book-cover.front {
+    background: linear-gradient(135deg, #7c2d12 0%, #a0522d 100%);
+}
+
+.book-container[data-translation="bulgarian"] .book-cover.front {
+    background: linear-gradient(135deg, #166534 0%, #22c55e 100%);
+}
+
+.book-container[data-translation="wlca"] .book-cover.front {
+    background: linear-gradient(135deg, #4c1d95 0%, #7c3aed 100%);
+}
+
+.book-container[data-translation="lxx"] .book-cover.front {
+    background: linear-gradient(135deg, #991b1b 0%, #dc2626 100%);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .bookshelf {
+        gap: 2rem;
+    }
+
+    .book-container {
+        width: 180px;
+        height: 250px;
+    }
+}
+
+@media (max-width: 768px) {
+    .home-header h1 {
+        font-size: 3rem;
+    }
+
+    .bookshelf {
+        gap: 1.5rem;
+    }
+
+    .book-container {
+        width: 150px;
+        height: 210px;
+    }
+
+    .book-title h2 {
+        font-size: 2rem;
+    }
+
+    .book-title p {
+        font-size: 0.75rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .home-header h1 {
+        font-size: 2.5rem;
+    }
+
+    .bookshelf {
+        gap: 1rem;
+    }
+
+    .book-container {
+        width: 130px;
+        height: 180px;
+    }
+
+    .book-cover.front {
+        padding: 1rem;
+    }
+
+    .book-title h2 {
+        font-size: 1.5rem;
+    }
+}

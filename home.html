@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bible Study Tool - Choose Your Translation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="home-styles.css">
+    <script src="https://pixijs.download/release/pixi.js"></script>
+</head>
+<body>
+    <div id="pixi-container"></div>
+
+    <div class="home-container">
+        <header class="home-header">
+            <h1>Bible Study Tool</h1>
+            <p>Choose your translation to begin</p>
+        </header>
+
+        <div class="bookshelf">
+            <!-- ESV Book -->
+            <div class="book-container" data-translation="esv">
+                <div class="book">
+                    <div class="book-spine"></div>
+                    <div class="book-cover front">
+                        <div class="book-title">
+                            <h2>ESV</h2>
+                            <p>English Standard Version</p>
+                        </div>
+                    </div>
+                    <div class="book-cover back">
+                        <div class="book-page">
+                            <h3>English Standard Version</h3>
+                            <p>A modern, word-for-word translation emphasizing accuracy and literary excellence.</p>
+                            <button class="open-bible-btn">Open Bible</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- KJV Book -->
+            <div class="book-container" data-translation="kjv">
+                <div class="book">
+                    <div class="book-spine"></div>
+                    <div class="book-cover front">
+                        <div class="book-title">
+                            <h2>KJV</h2>
+                            <p>King James Version</p>
+                        </div>
+                    </div>
+                    <div class="book-cover back">
+                        <div class="book-page">
+                            <h3>King James Version</h3>
+                            <p>The classic 1611 translation, renowned for its majestic language and poetic beauty.</p>
+                            <button class="open-bible-btn">Open Bible</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bulgarian Book -->
+            <div class="book-container" data-translation="bulgarian">
+                <div class="book">
+                    <div class="book-spine"></div>
+                    <div class="book-cover front">
+                        <div class="book-title">
+                            <h2>Библия</h2>
+                            <p>Bulgarian 1940</p>
+                        </div>
+                    </div>
+                    <div class="book-cover back">
+                        <div class="book-page">
+                            <h3>Българска Библия</h3>
+                            <p>Протестантски превод от 1940 година, класическо издание на Свещеното Писание.</p>
+                            <button class="open-bible-btn">Open Bible</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hebrew Book -->
+            <div class="book-container" data-translation="wlca">
+                <div class="book">
+                    <div class="book-spine"></div>
+                    <div class="book-cover front">
+                        <div class="book-title hebrew">
+                            <h2>תנ״ך</h2>
+                            <p>Westminster Leningrad</p>
+                        </div>
+                    </div>
+                    <div class="book-cover back">
+                        <div class="book-page">
+                            <h3>Hebrew Bible (WLC)</h3>
+                            <p>The Westminster Leningrad Codex - the complete Hebrew Scriptures in original language.</p>
+                            <button class="open-bible-btn">Open Bible</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Greek Book -->
+            <div class="book-container" data-translation="lxx">
+                <div class="book">
+                    <div class="book-spine"></div>
+                    <div class="book-cover front">
+                        <div class="book-title greek">
+                            <h2>LXX</h2>
+                            <p>Septuagint</p>
+                        </div>
+                    </div>
+                    <div class="book-cover back">
+                        <div class="book-page">
+                            <h3>Septuagint (LXX)</h3>
+                            <p>The ancient Greek translation of the Hebrew Scriptures, widely used in early Christianity.</p>
+                            <button class="open-bible-btn">Open Bible</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="particles.js"></script>
+    <script src="home-script.js"></script>
+</body>
+</html>
