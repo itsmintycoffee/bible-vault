@@ -188,10 +188,18 @@ function updateCurrentPosition(reference) {
 // Format verse text with verse numbers
 function formatVerseText(data) {
     if (data.verses && data.verses.length > 0) {
-        return data.verses.map(verse => {
+        // Check if this is chapter 1 (for drop cap on first verse)
+        const isChapterOne = data.reference && data.reference.match(/\s+1$/);
+
+        return data.verses.map((verse, index) => {
             const verseNumber = verse.verse;
             const verseText = verse.text;
-            return `<div class="verse"><sup class="verse-number">${verseNumber}</sup><span class="verse-text">${verseText}</span></div>`;
+
+            // Apply drop-cap to first verse of chapter 1 of any book
+            const isFirstVerse = isChapterOne && verseNumber === 1;
+            const dropCapClass = isFirstVerse ? ' drop-cap' : '';
+
+            return `<div class="verse"><sup class="verse-number">${verseNumber}</sup><span class="verse-text${dropCapClass}">${verseText}</span></div>`;
         }).join('');
     }
     return `${data.text}`;

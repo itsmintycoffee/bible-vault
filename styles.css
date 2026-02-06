@@ -446,6 +446,10 @@ body {
 }
 
 /* Hebrew text font and RTL direction */
+.bible-content.lang-english .chapter-content {
+    font-family: 'Literata', Georgia, serif;
+}
+
 .bible-content.lang-hebrew .chapter-content {
     font-family: 'Noto Sans Hebrew', Arial, sans-serif;
     direction: rtl;
@@ -516,6 +520,31 @@ body {
     text-decoration-thickness: 2px;
     text-underline-offset: 2px;
     color: #c75146;
+}
+
+/* Drop Cap for first word of each book */
+.drop-cap::first-letter {
+    float: left;
+    font-size: 5.5em;
+    line-height: 0.85;
+    margin-right: 0.1em;
+    margin-top: 0.1em;
+    font-weight: 700;
+    color: var(--accent);
+}
+
+/* Handle ascenders spacing with :before */
+.drop-cap::before {
+    content: '';
+    display: block;
+    margin-top: -0.25em;
+}
+
+/* Handle descenders spacing with :after */
+.drop-cap::after {
+    content: '';
+    display: table;
+    clear: both;
 }
 
 /* Documentary Hypothesis Source Color-Coding - Marker Highlight Style */
