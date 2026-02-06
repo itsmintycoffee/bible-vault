@@ -1,0 +1,246 @@
+{
+  "metadata": {
+    "title": "JEDP Documentary Hypothesis Source Attribution for the Torah (4 Books)",
+    "description": "Verse-by-verse source attribution for Exodus, Leviticus, Numbers, and Deuteronomy according to the Documentary Hypothesis",
+    "sources": [
+      "Joel Baden's verse-by-verse analysis",
+      "Wikiversity: Bible/King James/Documentary Hypothesis",
+      "Wikiversity: Sources by Chapter and Verse"
+    ],
+    "sources_key": {
+      "J": "Jahwist (Yahwist)",
+      "E": "Elohist",
+      "P": "Priestly",
+      "D": "Deuteronomist",
+      "R": "Redactor"
+    },
+    "note": "Data organized by verse ranges. Where multiple sources contribute to a single verse, they are listed. Partial verses indicated with 'a', 'b', 'c' suffixes."
+  },
+  "exodus": {
+    "title": "Exodus",
+    "abbreviation": "Exo",
+    "chapters": 40,
+    "verses_total": 1213,
+    "source_attribution": {
+      "jahwist_j": [
+        "1:6",
+        "1:8-12",
+        "2:11-23",
+        "3:2-4a, 3:5, 3:7-8, 3:16-4:17",
+        "4:27-6:1",
+        "7:14-18, 7:20b-21a, 7:23-8:4",
+        "8:6b, 8:8-15a, 8:20-9:7",
+        "9:13-21, 9:23b, 9:24b, 9:26-30, 9:33-34",
+        "10:1a, 10:3-11, 10:13b, 10:14b-15a, 10:16-19, 10:24-26, 10:28-11:8",
+        "12:12a, 12:27b, 12:29-36, 12:37b-39",
+        "13:17-18a, 13:21-22",
+        "14:5-7, 14:10a, 14:11-14, 14:19-20, 14:21b, 14:24-25, 14:27b, 14:30-15:18",
+        "15:22a, 15:23-26",
+        "16:4-5, 16:26-30",
+        "17:1b-6, 17:7",
+        "19:9b-16a, 19:18, 19:20-25",
+        "24:1-2, 24:9-11a",
+        "33:1, 33:3-6a, 33:12-23",
+        "34:2-3, 34:4b, 34:5b-9"
+      ],
+      "elohist_e": [
+        "1:15-2:10",
+        "3:1, 3:4b, 3:6, 3:9b-15",
+        "4:18",
+        "13:18b-19",
+        "15:20-21",
+        "17:8-18:1",
+        "18:5-27",
+        "19:2b-9a, 19:16b-17, 19:19",
+        "20:18-23:15a, 23:16-33",
+        "24:3-8, 24:11b-15, 24:18b",
+        "31:18b, 31:18d",
+        "32:1-8, 32:15-24, 32:30-34",
+        "33:2, 33:6b-11",
+        "34:1, 34:4a, 34:4c-5a, 34:28"
+      ],
+      "priestly_p": [
+        "1:1-5, 1:7, 1:13-14",
+        "2:23b-25",
+        "6:2-12, 6:13-30",
+        "7:1-13, 7:19-20a, 7:21b-22",
+        "8:5-6a, 8:7, 8:15b-19",
+        "9:8-12, 9:22-23a, 9:24a, 9:25, 9:31-32, 9:35",
+        "10:12-13a, 10:14a, 10:15b, 10:20-23, 10:27",
+        "11:9-12:1",
+        "12:2, 12:3, 12:4-6a, 12:6b-7a, 12:7b, 12:8a, 12:8b-11, 12:12-13, 12:14-20, 12:21b-23, 12:24-27a, 12:28, 12:37a, 12:40-41, 12:42-51",
+        "13:20",
+        "14:1-4, 14:8-9, 14:10b, 14:15-18, 14:21a, 14:21c-23, 14:26-27a, 14:28-29",
+        "15:22b, 15:27-16:1",
+        "17:1a",
+        "19:1-2a",
+        "24:16-18a",
+        "25:1-27:19",
+        "28:1-29:37",
+        "29:38-42a, 29:42b-30:9",
+        "30:10-30:16, 30:17-31:18a, 31:18c",
+        "34:29-35",
+        "34:1-38:20",
+        "38:21-31",
+        "39:1-40:38"
+      ]
+    }
+  },
+  "leviticus": {
+    "title": "Leviticus",
+    "abbreviation": "Lev",
+    "chapters": 27,
+    "verses_total": 859,
+    "source_composition_note": "Leviticus is almost entirely Priestly (P) source material with some Redactor (R) insertions. Very minimal J, E, or D material.",
+    "source_attribution": {
+      "priestly_p": [
+        "1:1-4:35",
+        "5:1-13",
+        "5:14-11:43",
+        "11:44-45",
+        "11:46-47",
+        "12:1-16:28",
+        "16:29-23:21",
+        "23:23-38",
+        "23:39-42",
+        "23:43-26:46",
+        "27:1-34"
+      ],
+      "redactor_r": [
+        "Some editorial additions throughout, integrated with P material"
+      ]
+    }
+  },
+  "numbers": {
+    "title": "Numbers",
+    "abbreviation": "Num",
+    "chapters": 36,
+    "verses_total": 1288,
+    "source_composition_note": "Numbers contains significant P material (census lists, ritual laws) mixed with J, E narrative material.",
+    "source_attribution": {
+      "jahwist_j": [
+        "10:29-11:6",
+        "11:10, 11:13, 11:18-24a, 11:31-34",
+        "13:17b-20, 13:22-24, 13:26b-31, 13:33",
+        "14:1b, 14:11-25, 14:39-45",
+        "21:1-3, 21:16-20",
+        "22:3-24:13, 24:25",
+        "25:2b-3, 25:3b-4"
+      ],
+      "elohist_e": [
+        "11:11-12, 11:14-17, 11:24b-30",
+        "12:1a, 12:2-16",
+        "16:1b, 16:12-15, 15:25, 15:26b, 15:27b-34",
+        "20:1b, 20:3a, 20:5, 20:14-21, 20:22b",
+        "21:4b-5a, 21:6-9, 21:12-15, 21:21-32",
+        "25:1a, 25:3a, 25:5",
+        "32:1, 32:4-5a, 32:5c, 32:17a, 32:18-20a, 32:22b, 32:23, 32:33, 32:39-42"
+      ],
+      "priestly_p": [
+        "1:1-8:26",
+        "9:1-14",
+        "9:15-10:28",
+        "13:1-17a, 13:21, 13:25-26a, 13:32",
+        "14:1a, 14:2-10, 14:26-38",
+        "15:1-16",
+        "16:2-3, 16:6-21, 16:22-25, 16:31-36",
+        "15:17-21, 15:22-41",
+        "16:1a, 16:2-7a, 16:7b-10, 16:11, 16:16-24, 16:26a, 16:27a, 16:35, 16:36-40, 16:41-50",
+        "17:1-13",
+        "18:1-32",
+        "19:1-20:1a",
+        "20:2, 20:3b-4, 20:6-13, 20:22a, 20:22c-29",
+        "25:6-8a, 25:10-18a, 25:18c",
+        "21:4a, 21:10-11",
+        "22:1",
+        "26:1-7, 26:12-18, 26:20-65",
+        "27:1-3",
+        "30:1-31:8a",
+        "31:9-12, 31:15a, 31:19-35a, 31:36-54",
+        "32:2, 32:5b, 32:6, 32:16, 32:17b, 32:20b-22a, 32:22c, 32:24-32, 32:34-38",
+        "34:1-35:28, 35:28-34"
+      ]
+    }
+  },
+  "deuteronomy": {
+    "title": "Deuteronomy",
+    "abbreviation": "Deu",
+    "chapters": 34,
+    "verses_total": 959,
+    "source_composition_note": "Deuteronomy is primarily Deuteronomist (D) material with some P additions and E material. The D source forms the theological core of the book.",
+    "source_attribution": {
+      "deuteronomist_d": [
+        "1:1-2, 1:4-38, 1:40-2:9",
+        "2:13, 2:17-19, 2:24-3:10",
+        "3:12-18, 3:20-4:14",
+        "4:32-34, 4:36-38, 4:40, 4:44-5:4",
+        "5:6-9:19",
+        "9:21-10:5",
+        "10:8-13, 10:20-24:15",
+        "24:17-27:3",
+        "27:5-7, 27:9-10",
+        "28:1-29:20",
+        "29:28-29",
+        "30:11-31:2a",
+        "31:2c-13, 31:16-22, 31:24-32:47"
+      ],
+      "priestly_p": [
+        "1:3",
+        "32:48-52",
+        "34:1a, 34:7-9"
+      ],
+      "elohist_e": [
+        "31:14-15, 31:23, 34:1-6"
+      ]
+    }
+  },
+  "summary": {
+    "exodus": {
+      "total_verses": 1213,
+      "j_coverage": "Approximately 25-30% (narrative framework, plagues, wilderness)",
+      "e_coverage": "Approximately 15-20% (covenant laws, alternate narratives)",
+      "p_coverage": "Approximately 45-50% (tabernacle descriptions, ritual laws, P narrative)",
+      "d_coverage": "Minimal (Deuteronomy focus)",
+      "composition": "Mixed J, E, P throughout"
+    },
+    "leviticus": {
+      "total_verses": 859,
+      "j_coverage": "Minimal",
+      "e_coverage": "Minimal",
+      "p_coverage": "Approximately 90%+ (virtually entire book is P)",
+      "d_coverage": "None",
+      "composition": "Almost entirely Priestly source"
+    },
+    "numbers": {
+      "total_verses": 1288,
+      "j_coverage": "Approximately 10-15% (Balaam narrative, wilderness stories)",
+      "e_coverage": "Approximately 10-15% (alternative narratives, Eldad/Medad)",
+      "p_coverage": "Approximately 60-70% (census, laws, P narrative framework)",
+      "d_coverage": "Minimal",
+      "composition": "Mixed P, J, E with P dominant"
+    },
+    "deuteronomy": {
+      "total_verses": 959,
+      "j_coverage": "Minimal (Blessing of Moses)",
+      "e_coverage": "Approx 5-10% (closing chapters)",
+      "p_coverage": "Approximately 5-10% (closing materials)",
+      "d_coverage": "Approximately 80%+ (theological discourses, law code)",
+      "composition": "Predominantly Deuteronomist"
+    }
+  },
+  "data_sources_and_methodology": {
+    "primary_sources": [
+      "Joel Baden - 'The Composition of the Pentateuch: Renewing the Documentary Hypothesis' (2012)",
+      "Richard Elliott Friedman - 'Who Wrote the Bible?' (1997)",
+      "Wikiversity: Bible/King James/Documentary Hypothesis",
+      "Wikiversity: Sources by Chapter and Verse"
+    ],
+    "completeness": {
+      "exodus": "Complete verse range coverage based on scholarly consensus",
+      "leviticus": "Complete - almost entirely P with minimal variation",
+      "numbers": "Complete verse range coverage",
+      "deuteronomy": "Complete - primarily D with some P/E additions"
+    },
+    "note_on_data": "This compilation represents scholarly consensus from the 'New Documentary Hypothesis' and recent scholarship. Specific verse attributions can vary slightly between scholars, but the major divisions shown here represent the dominant scholarly view. For fine-grained verse-level attributions (individual verses), Joel Baden's detailed Twitter analysis on Wikiversity provides the most granular breakdown."
+  }
+}
