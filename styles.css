@@ -319,6 +319,15 @@ body {
     max-width: 600px;
 }
 
+/* Reset chapter title width in parallel view - don't break out of columns */
+.parallel-column .chapter-title {
+    width: 100%;
+    margin-left: 0;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    font-size: 1.8rem !important;
+}
+
 .parallel-column-header {
     position: sticky;
     top: 0;
