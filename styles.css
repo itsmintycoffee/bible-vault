@@ -317,6 +317,9 @@ body {
 .parallel-column {
     flex: 1;
     max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 /* Reset chapter title width in parallel view - don't break out of columns */
@@ -326,6 +329,22 @@ body {
     padding-left: 1rem;
     padding-right: 1rem;
     font-size: 1.8rem !important;
+}
+
+/* Center align chapter content in parallel view */
+.parallel-column .chapter-content {
+    text-align: center;
+    width: 100%;
+}
+
+/* Hide verse numbers in parallel view - they don't work well with centered text */
+.parallel-column .verse-number {
+    display: none;
+}
+
+/* Adjust verse padding in parallel view */
+.parallel-column .verse {
+    padding-left: 0;
 }
 
 .parallel-column-header {
