@@ -67,24 +67,41 @@ async function getWordInfo(word, verseRef = null, wordIndex = null) {
     // Check current translation
     const currentTranslation = translationManager.getCurrentTranslation();
 
-    // For non-English translations, show a message about concordance availability
-    // Note: Cross-translation lookup disabled due to CORS restrictions on Bolls.life API
+    // For Bulgarian and other non-English/Hebrew/Greek translations, use Hebrew/Greek bridge
     if (currentTranslation.language !== 'English' &&
         currentTranslation.language !== 'Hebrew' &&
         currentTranslation.language !== 'Greek') {
 
-        // Return informational message for non-English translations
+        // Attempt to fetch Strong's number via Hebrew/Greek alignment
+        if (verseRef && wordIndex !== null) {
+            try {
+                const strongsNumber = await getStrongsFromAlignment(verseRef, wordIndex);
+                if (strongsNumber) {
+                    const entry = await loadConcordanceEntry(strongsNumber);
+                    if (entry) {
+                        return {
+                            english: entry.word || word,
+                            translatedWord: word,
+                            language: strongsNumber.startsWith('H') ? 'Hebrew' : 'Greek',
+                            original: entry.original,
+                            transliteration: entry.transliteration,
+                            definition: entry.definition
+                        };
+                    }
+                }
+            } catch (error) {
+                console.warn('Failed to fetch Strong\'s via alignment:', error);
+            }
+        }
+
+        // Fallback message if alignment fails
         return {
             english: word,
             translatedWord: word,
             language: 'Not available',
             original: '—',
             transliteration: '—',
-            definition: `Word study is currently only available for English, Hebrew, and Greek translations.
-
-To see Hebrew/Greek definitions:
-• Switch to Hebrew (WLC) or Greek (LXX) translations
-• Or use the Parallel View to compare with English`
+            definition: 'Word study data not available for this word.'
         };
     }
 
@@ -113,6 +130,68 @@ To see Hebrew/Greek definitions:
         transliteration: '—',
         definition: 'Word study data not available for this word.'
     };
+}
+
+// Get Strong's number by aligning with Hebrew/Greek verse
+async function getStrongsFromAlignment(verseRef, wordIndex) {
+    try {
+        // Parse verse reference (e.g., "Genesis 1:1")
+        const match = verseRef.match(/^(.+?)\s+(\d+)(?::(\d+))?$/);
+        if (!match) return null;
+
+        const bookName = match[1];
+        const chapter = match[2];
+        const verse = match[3] || '1';
+
+        // Determine if OT or NT to select Hebrew or Greek
+        const bookNum = translationManager.getBookNumber(bookName);
+        const isOldTestament = bookNum <= 39;
+        const originalTranslation = isOldTestament ? 'wlca' : 'lxx';
+
+        // Fetch original language verse
+        const originalData = await translationManager.fetchVerse(verseRef);
+
+        // Temporarily switch to original language to fetch that verse
+        const savedTranslation = translationManager.currentTranslation;
+        translationManager.currentTranslation = originalTranslation;
+        const originalVerseData = await translationManager.fetchVerse(verseRef);
+        translationManager.currentTranslation = savedTranslation;
+
+        // Extract the specific verse text
+        let originalVerseText = '';
+        if (originalVerseData.verses && originalVerseData.verses.length > 0) {
+            const verseNum = parseInt(verse);
+            const verseObj = originalVerseData.verses.find(v => v.verse === verseNum);
+            if (verseObj) {
+                originalVerseText = verseObj.text;
+            }
+        }
+
+        if (!originalVerseText) return null;
+
+        // Parse Strong's numbers from the text
+        // Hebrew/Greek text format: "וַיֹּ֤אמֶר H559 אֱלֹהִ֔ים H430"
+        const words = originalVerseText.split(/\s+/);
+        const strongsNumbers = [];
+
+        for (const word of words) {
+            // Check if word contains Strong's number (H#### or G####)
+            const strongsMatch = word.match(/[HG]\d+/);
+            if (strongsMatch) {
+                strongsNumbers.push(strongsMatch[0]);
+            }
+        }
+
+        // Return the Strong's number at the given word index
+        if (wordIndex < strongsNumbers.length) {
+            return strongsNumbers[wordIndex];
+        }
+
+        return null;
+    } catch (error) {
+        console.error('Error in getStrongsFromAlignment:', error);
+        return null;
+    }
 }
 
 // Common words to exclude from word study (stop words)
@@ -187,14 +266,15 @@ async function makeWordsClickable(verseElement) {
                 continue;
             }
 
-            // Only make words clickable for English, Hebrew, and Greek
-            // Note: Cross-translation lookup disabled due to API CORS restrictions
+            // Make words clickable for all translations
+            // English: direct lookup in concordance index
+            // Hebrew/Greek: direct lookup
+            // Other languages (Bulgarian): alignment with Hebrew/Greek
             const currentTranslation = translationManager.getCurrentTranslation();
-            const supportedLanguages = ['English', 'Hebrew', 'Greek'];
-            const isSupported = supportedLanguages.includes(currentTranslation.language);
-            const shouldMakeClickable = isSupported && (currentTranslation.language !== 'English' || hasDefinition(cleanWord));
+            const isEnglish = currentTranslation.language === 'English';
+            const shouldMakeClickable = !isEnglish || hasDefinition(cleanWord);
 
-            if (shouldMakeClickable && isSupported) {
+            if (shouldMakeClickable) {
                 const span = document.createElement('span');
                 span.className = 'word';
                 span.setAttribute('data-word', cleanWord);
