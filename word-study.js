@@ -67,11 +67,42 @@ async function getWordInfo(word, verseRef = null, wordIndex = null) {
     // Check current translation
     const currentTranslation = translationManager.getCurrentTranslation();
 
-    // For Bulgarian and other non-English/Hebrew/Greek translations, use Hebrew/Greek bridge
-    if (currentTranslation.language !== 'English' &&
-        currentTranslation.language !== 'Hebrew' &&
-        currentTranslation.language !== 'Greek') {
+    // For Hebrew/Greek, extract Strong's number from rawText using word position
+    if (currentTranslation.language === 'Hebrew' || currentTranslation.language === 'Greek') {
+        if (verseRef && wordIndex !== null) {
+            try {
+                const strongsNumber = await getStrongsFromAlignment(verseRef, wordIndex);
+                if (strongsNumber) {
+                    const entry = await loadConcordanceEntry(strongsNumber);
+                    if (entry) {
+                        return {
+                            english: entry.word || word,
+                            translatedWord: word,
+                            language: strongsNumber.startsWith('H') ? 'Hebrew' : 'Greek',
+                            original: entry.original,
+                            transliteration: entry.transliteration,
+                            definition: entry.definition
+                        };
+                    }
+                }
+            } catch (error) {
+                console.warn('Failed to fetch Strong\'s for Hebrew/Greek:', error);
+            }
+        }
 
+        // Fallback for Hebrew/Greek
+        return {
+            english: word,
+            translatedWord: word,
+            language: 'Not available',
+            original: '—',
+            transliteration: '—',
+            definition: 'Word study data not available for this word.'
+        };
+    }
+
+    // For Bulgarian and other non-English translations, use Hebrew/Greek bridge
+    if (currentTranslation.language !== 'English') {
         // Attempt to fetch Strong's number via Hebrew/Greek alignment
         if (verseRef && wordIndex !== null) {
             try {
@@ -105,7 +136,7 @@ async function getWordInfo(word, verseRef = null, wordIndex = null) {
         };
     }
 
-    // Direct lookup for English/Hebrew/Greek
+    // For English, use direct concordance index lookup
     const strongsNumber = concordanceIndex.hebrew[cleanWord] || concordanceIndex.greek[cleanWord];
 
     if (strongsNumber) {
