@@ -360,21 +360,23 @@ body {
 
 .chapter-title {
     font-family: 'Crimson Text', Georgia, serif;
-    font-weight: 700;
+    font-weight: 800;
     color: var(--text-primary);
     margin-bottom: 2.5rem;
-    font-size: 1.5rem;
+    font-size: 2rem;
     text-transform: none;
-    letter-spacing: 0;
+    letter-spacing: -0.02em;
     position: sticky;
     top: 0;
     z-index: 50;
     background: rgba(253, 250, 244, 0.85);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    height: 50px;
+    height: 60px;
     display: flex;
     align-items: center;
+    justify-content: center;
+    text-align: center;
     width: 100vw;
     margin-left: calc(-6rem + (-50vw + 50%));
     padding-left: calc(6rem + (50vw - 50%));
@@ -387,7 +389,9 @@ body {
 
 /* First chapter title - large headline style */
 .chapter-section:first-child .chapter-title {
-    font-size: 3.5rem;
+    font-size: 4rem;
+    font-weight: 900;
+    letter-spacing: -0.03em;
     height: auto;
     padding-top: 2rem;
     padding-bottom: 2rem;
@@ -401,8 +405,10 @@ body {
 
 /* First chapter title when sticky - shrink to normal size */
 .chapter-section:first-child .chapter-title.sticky-active {
-    font-size: 1.5rem;
-    height: 50px;
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    height: 60px;
     padding-top: 0;
     padding-bottom: 0;
     margin-top: -1rem;
