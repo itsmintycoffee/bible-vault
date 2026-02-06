@@ -217,20 +217,20 @@ class TranslationManager {
         // Remove HTML tags
         let text = html.replace(/<[^>]*>/g, '').trim();
 
-        // Remove Strong's numbers (H#### or G####) for clean display
-        // Try multiple patterns to catch all variations
+        // Remove Strong's numbers - they come in two formats:
+        // Format 1: "word H1234" or "word G1234" (with H/G prefix)
+        // Format 2: "בָּרָ֣א1254" (digits directly attached to Hebrew/Greek, no prefix)
 
-        // Pattern 1: Strong's number with surrounding whitespace (most common)
+        // Pattern 1: Strong's with H/G prefix and surrounding whitespace
         text = text.replace(/\s+[HG]\d+\s+/g, ' ');
-
-        // Pattern 2: Strong's number at end of text
         text = text.replace(/\s+[HG]\d+$/g, '');
-
-        // Pattern 3: Strong's number at start of text
         text = text.replace(/^[HG]\d+\s+/g, '');
-
-        // Pattern 4: Standalone Strong's number
         text = text.replace(/[HG]\d+/g, '');
+
+        // Pattern 2: Digits directly attached to Hebrew/Greek Unicode characters (no H/G prefix)
+        // Hebrew Unicode range: \u0590-\u05FF
+        // Greek Unicode range: \u0370-\u03FF, \u1F00-\u1FFF
+        text = text.replace(/([\u0590-\u05FF\u0370-\u03FF\u1F00-\u1FFF]+)\d+/g, '$1');
 
         // Clean up any multiple spaces created by removal
         text = text.replace(/\s{2,}/g, ' ').trim();

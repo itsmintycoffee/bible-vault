@@ -72,6 +72,24 @@ async function displayVerse(data, append = false) {
     // Update current reading position
     updateCurrentPosition(data.reference);
 
+    // Add language class to bible-content for font styling
+    const bibleContent = document.querySelector('.bible-content');
+    const currentTranslation = translationManager.getCurrentTranslation();
+
+    // Remove any existing language classes
+    bibleContent.classList.remove('lang-hebrew', 'lang-greek', 'lang-english', 'lang-bulgarian');
+
+    // Add current language class
+    if (currentTranslation.language === 'Hebrew') {
+        bibleContent.classList.add('lang-hebrew');
+    } else if (currentTranslation.language === 'Greek') {
+        bibleContent.classList.add('lang-greek');
+    } else if (currentTranslation.language === 'Bulgarian') {
+        bibleContent.classList.add('lang-bulgarian');
+    } else {
+        bibleContent.classList.add('lang-english');
+    }
+
     // Apply JEDP source color-coding FIRST on plain text (before word study markup)
     if (typeof loadJEDPData === 'function' && typeof applyJEDPSources === 'function') {
         // Load JEDP data for current book first

@@ -426,6 +426,20 @@ body {
     letter-spacing: 0.003em;
 }
 
+/* Hebrew text font and RTL direction */
+.bible-content.lang-hebrew .chapter-content {
+    font-family: 'Noto Sans Hebrew', Arial, sans-serif;
+    direction: rtl;
+    text-align: right;
+    line-height: 2;
+    font-size: 1.4rem;
+}
+
+.bible-content.lang-hebrew .chapter-title {
+    direction: rtl;
+    text-align: right;
+}
+
 /* Text Size Variations */
 .bible-content.text-small .chapter-content {
     font-size: 1.1rem;
