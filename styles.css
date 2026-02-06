@@ -669,11 +669,15 @@ body.study-mode .source-R {
     z-index: 101;
 }
 
-/* When panel is expanded, position button on the panel edge */
-.right-panel.expanded .sidebar-toggle {
-    position: absolute;
-    right: auto;
-    left: -32px;
+/* When panel is expanded, move button to the left edge of the panel */
+body.study-mode .sidebar-toggle {
+    right: 33vw;
+}
+
+@media (min-width: 1025px) {
+    body.study-mode .sidebar-toggle {
+        right: max(33vw, 400px);
+    }
 }
 
 .sidebar-toggle:hover {
@@ -687,7 +691,7 @@ body.study-mode .source-R {
 }
 
 /* Rotate chevron when expanded */
-.right-panel.expanded .sidebar-toggle svg {
+body.study-mode .sidebar-toggle svg {
     transform: rotate(180deg);
 }
 
