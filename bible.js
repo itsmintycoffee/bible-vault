@@ -395,16 +395,8 @@ if (resizeHandle) {
         }
     });
 
-    // Restore saved width on page load
-    window.addEventListener('load', () => {
-        const savedWidth = localStorage.getItem('rightPanelWidth');
-        if (savedWidth && window.innerWidth > 1024) {
-            const width = parseInt(savedWidth);
-            rightPanel.style.width = `${width}px`;
-            rightPanel.style.minWidth = `${width}px`;
-            rightPanel.style.maxWidth = `${width}px`;
-        }
-    });
+    // Don't restore width on page load - panel starts closed
+    // Width will be restored when user opens the panel
 }
 
 // Sidebar Toggle Functionality
@@ -414,8 +406,11 @@ function setupSidebarToggle() {
 
     if (!sidebarToggle || !rightPanel) return;
 
-    // Start with sidebar closed
+    // Start with sidebar closed and clear any saved inline styles
     let isSidebarOpen = false;
+    rightPanel.style.width = '';
+    rightPanel.style.minWidth = '';
+    rightPanel.style.maxWidth = '';
 
     sidebarToggle.addEventListener('click', () => {
         isSidebarOpen = !isSidebarOpen;
@@ -424,10 +419,24 @@ function setupSidebarToggle() {
             rightPanel.classList.add('expanded');
             document.body.classList.add('study-mode');
             sidebarToggle.setAttribute('title', 'Close sidebar');
+
+            // Restore saved width if exists
+            const savedWidth = localStorage.getItem('rightPanelWidth');
+            if (savedWidth && window.innerWidth > 1024) {
+                const width = parseInt(savedWidth);
+                rightPanel.style.width = `${width}px`;
+                rightPanel.style.minWidth = `${width}px`;
+                rightPanel.style.maxWidth = `${width}px`;
+            }
         } else {
             rightPanel.classList.remove('expanded');
             document.body.classList.remove('study-mode');
             sidebarToggle.setAttribute('title', 'Open sidebar');
+
+            // Clear inline styles when closing
+            rightPanel.style.width = '';
+            rightPanel.style.minWidth = '';
+            rightPanel.style.maxWidth = '';
         }
     });
 }
