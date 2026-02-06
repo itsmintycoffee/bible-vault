@@ -407,11 +407,30 @@ if (resizeHandle) {
     });
 }
 
-// Enable study mode by default (sidebar always open)
-function setupStudyMode() {
-    // Enable study mode features (verse highlighting, word study)
-    document.body.classList.add('study-mode');
+// Sidebar Toggle Functionality
+function setupSidebarToggle() {
+    const rightPanel = document.getElementById('right-panel');
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+
+    if (!sidebarToggle || !rightPanel) return;
+
+    // Start with sidebar closed
+    let isSidebarOpen = false;
+
+    sidebarToggle.addEventListener('click', () => {
+        isSidebarOpen = !isSidebarOpen;
+
+        if (isSidebarOpen) {
+            rightPanel.classList.add('expanded');
+            document.body.classList.add('study-mode');
+            sidebarToggle.setAttribute('title', 'Close sidebar');
+        } else {
+            rightPanel.classList.remove('expanded');
+            document.body.classList.remove('study-mode');
+            sidebarToggle.setAttribute('title', 'Open sidebar');
+        }
+    });
 }
 
 // Call on page load
-window.addEventListener('load', setupStudyMode);
+window.addEventListener('load', setupSidebarToggle);

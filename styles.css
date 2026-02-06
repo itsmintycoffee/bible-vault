@@ -579,19 +579,66 @@ body.study-mode .source-R {
     border-color: rgba(253, 126, 20, 0.6);
 }
 
-/* Right Panel - Always Open */
+/* Right Panel - Collapsible */
 .right-panel {
-    width: 33vw;
-    min-width: 400px;
-    max-width: 600px;
+    width: 0;
+    min-width: 0;
+    max-width: 0;
     background: rgba(245, 241, 232, 0.6);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
+    border-left: none;
+    overflow: hidden;
+    padding: 0;
+    position: relative;
+    z-index: 50;
+    transition: all 0.3s ease;
+}
+
+/* Expanded state */
+.right-panel.expanded {
+    width: 33vw;
+    min-width: 400px;
+    max-width: 600px;
     border-left: 1px solid rgba(232, 227, 216, 0.5);
     overflow-y: auto;
     padding: 2rem 2rem;
-    position: relative;
-    z-index: 50;
+}
+
+/* Sidebar Toggle Button */
+.sidebar-toggle {
+    position: absolute;
+    left: -32px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 32px;
+    height: 64px;
+    background: rgba(245, 241, 232, 0.95);
+    border: 1px solid rgba(232, 227, 216, 0.8);
+    border-right: none;
+    border-radius: 8px 0 0 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+    z-index: 51;
+}
+
+.sidebar-toggle:hover {
+    background: rgba(139, 115, 85, 0.95);
+    color: white;
+    width: 36px;
+}
+
+.sidebar-toggle svg {
+    transition: transform 0.3s ease;
+}
+
+/* Rotate chevron when expanded */
+.right-panel.expanded .sidebar-toggle svg {
+    transform: rotate(180deg);
 }
 
 
@@ -606,6 +653,11 @@ body.study-mode .source-R {
     z-index: 1000;
     background: transparent;
     transition: background 0.2s;
+    display: none;
+}
+
+.right-panel.expanded .resize-handle {
+    display: block;
 }
 
 .resize-handle:hover,
@@ -634,9 +686,13 @@ body.study-mode .source-R {
 
 .panel-header {
     margin-bottom: 2rem;
-    display: flex;
+    display: none;
     justify-content: space-between;
     align-items: center;
+}
+
+.right-panel.expanded .panel-header {
+    display: flex;
 }
 
 .panel-header h2 {
@@ -665,6 +721,11 @@ body.study-mode .source-R {
 
 .tool-section {
     margin-bottom: 2rem;
+    display: none;
+}
+
+.right-panel.expanded .tool-section {
+    display: block;
 }
 
 .tool-section h3 {
