@@ -75,29 +75,44 @@ async function getWordInfo(word, verseRef = null, wordIndex = null) {
 
         try {
             // Determine which original language to use based on testament
-            const bookNum = translationManager.parseReference(verseRef).bookNum;
+            const bookNum = translationManager.getBookNumber(verseRef.split(/[\s:]/)[0]);
             const isOldTestament = bookNum <= 39;
             const originalTranslation = isOldTestament ? 'wlca' : 'lxx';
 
+            // Save current translation
+            const savedTranslation = translationManager.currentTranslation;
+
+            // Temporarily switch to original language
+            translationManager.currentTranslation = originalTranslation;
+
             // Fetch the original language verse
-            const originalManager = new TranslationManager();
-            originalManager.currentTranslation = originalTranslation;
-            const originalData = await originalManager.fetchVerse(verseRef);
+            const originalData = await translationManager.fetchVerse(verseRef);
+
+            // Restore original translation
+            translationManager.currentTranslation = savedTranslation;
 
             // Get the original language words
             if (originalData && originalData.text) {
                 const originalWords = originalData.text.split(/\s+/);
 
+                console.log(`Word alignment: Index ${wordIndex}, Total words: ${originalWords.length}`);
+                console.log(`Original words:`, originalWords);
+
                 // Try to get the word at the same position
                 if (wordIndex < originalWords.length) {
-                    const originalWord = originalWords[wordIndex].toLowerCase().replace(/[.,;:!?'"]/g, '');
+                    const originalWord = originalWords[wordIndex].toLowerCase().replace(/[.,;:!?'"()]/g, '');
+
+                    console.log(`Looking up: "${originalWord}" in concordance`);
 
                     // Look up in concordance
                     const strongsNumber = concordanceIndex.hebrew[originalWord] || concordanceIndex.greek[originalWord];
 
+                    console.log(`Strong's number found: ${strongsNumber}`);
+
                     if (strongsNumber) {
                         const entry = await loadConcordanceEntry(strongsNumber);
                         if (entry) {
+                            console.log(`Entry found:`, entry);
                             return {
                                 english: word,
                                 translatedWord: word,
