@@ -297,6 +297,12 @@ async function loadNextChapter() {
 
 // Infinite scroll handler
 function handleScroll() {
+    // Don't use infinite scroll in parallel view mode
+    const bibleContent = document.querySelector('.bible-content');
+    if (bibleContent && bibleContent.classList.contains('parallel-view')) {
+        return;
+    }
+
     const scrollPosition = mainContent.scrollTop + mainContent.clientHeight;
     const scrollHeight = mainContent.scrollHeight;
 
