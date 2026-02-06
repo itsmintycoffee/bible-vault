@@ -122,6 +122,9 @@ async function displayVerse(data, append = false) {
 // Observe first chapter title to add sticky-active class when it becomes sticky
 function setupFirstChapterObserver() {
     const firstChapterTitle = document.querySelector('.chapter-section:first-child .chapter-title');
+    const contentHeader = document.querySelector('.content-header');
+    const headerChapterTitle = document.getElementById('header-chapter-title');
+
     if (!firstChapterTitle) return;
 
     // Store the initial offset and track current state to avoid redundant class operations
@@ -145,10 +148,17 @@ function setupFirstChapterObserver() {
         // Only update class if state actually changed (avoid redundant DOM operations)
         if (isStuck && !isCurrentlyStuck) {
             firstChapterTitle.classList.add('sticky-active');
+            contentHeader.classList.add('scrolled');
             isCurrentlyStuck = true;
         } else if (!isStuck && isCurrentlyStuck) {
             firstChapterTitle.classList.remove('sticky-active');
+            contentHeader.classList.remove('scrolled');
             isCurrentlyStuck = false;
+        }
+
+        // Update header title to match current chapter
+        if (headerChapterTitle && firstChapterTitle) {
+            headerChapterTitle.textContent = firstChapterTitle.textContent;
         }
     };
 

@@ -119,9 +119,38 @@ body {
 
 .header-top {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
     align-items: center;
     margin-bottom: 1.5rem;
+}
+
+/* Header Chapter Title (shows when scrolled) */
+.header-chapter-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* When scrolled down, show title and controls */
+.content-header.scrolled .header-chapter-title {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* When at top, hide controls */
+.content-header:not(.scrolled) .reading-controls {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.content-header.scrolled .reading-controls {
+    opacity: 1;
+    pointer-events: auto;
+    transition: opacity 0.3s ease;
 }
 
 /* Reading Controls */
