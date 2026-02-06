@@ -67,67 +67,25 @@ async function getWordInfo(word, verseRef = null, wordIndex = null) {
     // Check current translation
     const currentTranslation = translationManager.getCurrentTranslation();
 
-    // For non-English translations, fetch original language and map words
+    // For non-English translations, show a message about concordance availability
+    // Note: Cross-translation lookup disabled due to CORS restrictions on Bolls.life API
     if (currentTranslation.language !== 'English' &&
         currentTranslation.language !== 'Hebrew' &&
-        currentTranslation.language !== 'Greek' &&
-        verseRef && wordIndex !== null) {
+        currentTranslation.language !== 'Greek') {
 
-        try {
-            // Determine which original language to use based on testament
-            const bookNum = translationManager.getBookNumber(verseRef.split(/[\s:]/)[0]);
-            const isOldTestament = bookNum <= 39;
-            const originalTranslation = isOldTestament ? 'wlca' : 'lxx';
+        // Return informational message for non-English translations
+        return {
+            english: word,
+            translatedWord: word,
+            language: 'Not available',
+            original: '—',
+            transliteration: '—',
+            definition: `Word study is currently only available for English, Hebrew, and Greek translations.
 
-            // Save current translation
-            const savedTranslation = translationManager.currentTranslation;
-
-            // Temporarily switch to original language
-            translationManager.currentTranslation = originalTranslation;
-
-            // Fetch the original language verse
-            const originalData = await translationManager.fetchVerse(verseRef);
-
-            // Restore original translation
-            translationManager.currentTranslation = savedTranslation;
-
-            // Get the original language words
-            if (originalData && originalData.text) {
-                const originalWords = originalData.text.split(/\s+/);
-
-                console.log(`Word alignment: Index ${wordIndex}, Total words: ${originalWords.length}`);
-                console.log(`Original words:`, originalWords);
-
-                // Try to get the word at the same position
-                if (wordIndex < originalWords.length) {
-                    const originalWord = originalWords[wordIndex].toLowerCase().replace(/[.,;:!?'"()]/g, '');
-
-                    console.log(`Looking up: "${originalWord}" in concordance`);
-
-                    // Look up in concordance
-                    const strongsNumber = concordanceIndex.hebrew[originalWord] || concordanceIndex.greek[originalWord];
-
-                    console.log(`Strong's number found: ${strongsNumber}`);
-
-                    if (strongsNumber) {
-                        const entry = await loadConcordanceEntry(strongsNumber);
-                        if (entry) {
-                            console.log(`Entry found:`, entry);
-                            return {
-                                english: word,
-                                translatedWord: word,
-                                language: strongsNumber.startsWith('H') ? 'Hebrew' : 'Greek',
-                                original: entry.original,
-                                transliteration: entry.transliteration,
-                                definition: entry.definition
-                            };
-                        }
-                    }
-                }
-            }
-        } catch (error) {
-            console.error('Error fetching original language:', error);
-        }
+To see Hebrew/Greek definitions:
+• Switch to Hebrew (WLC) or Greek (LXX) translations
+• Or use the Parallel View to compare with English`
+        };
     }
 
     // Direct lookup for English/Hebrew/Greek
@@ -229,12 +187,14 @@ async function makeWordsClickable(verseElement) {
                 continue;
             }
 
-            // For non-English translations, make all content words clickable
-            // For English, only if we have a definition
+            // Only make words clickable for English, Hebrew, and Greek
+            // Note: Cross-translation lookup disabled due to API CORS restrictions
             const currentTranslation = translationManager.getCurrentTranslation();
-            const shouldMakeClickable = currentTranslation.language !== 'English' || hasDefinition(cleanWord);
+            const supportedLanguages = ['English', 'Hebrew', 'Greek'];
+            const isSupported = supportedLanguages.includes(currentTranslation.language);
+            const shouldMakeClickable = isSupported && (currentTranslation.language !== 'English' || hasDefinition(cleanWord));
 
-            if (shouldMakeClickable) {
+            if (shouldMakeClickable && isSupported) {
                 const span = document.createElement('span');
                 span.className = 'word';
                 span.setAttribute('data-word', cleanWord);
