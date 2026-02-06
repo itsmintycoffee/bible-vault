@@ -648,15 +648,11 @@ body.study-mode .source-R {
 }
 
 /* Hide toggle button when panel is open */
-.right-panel.study-mode-active .study-mode-toggle {
+.right-panel.study-mode-active ~ .study-mode-toggle,
+body:has(.right-panel.study-mode-active) .study-mode-toggle {
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-}
-
-/* Rotate icon when panel is open */
-.right-panel.study-mode-active .toggle-icon {
-    transform: rotate(180deg);
 }
 
 .toggle-icon {
