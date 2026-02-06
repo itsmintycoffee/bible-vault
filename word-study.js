@@ -170,16 +170,15 @@ async function getStrongsFromAlignment(verseRef, wordIndex) {
         if (!originalVerseText) return null;
 
         // Parse Strong's numbers from the text
-        // Hebrew/Greek text format: "וַיֹּ֤אמֶר H559 אֱלֹהִ֔ים H430"
-        const words = originalVerseText.split(/\s+/);
+        // Text format can be either:
+        // - Plain: "וַיֹּ֤אמֶר H559 אֱלֹהִ֔ים H430"
+        // - HTML wrapped: "וַיֹּ֤אמֶר <span class=\"strongs-num\">H559</span>"
         const strongsNumbers = [];
 
-        for (const word of words) {
-            // Check if word contains Strong's number (H#### or G####)
-            const strongsMatch = word.match(/[HG]\d+/);
-            if (strongsMatch) {
-                strongsNumbers.push(strongsMatch[0]);
-            }
+        // Extract all Strong's numbers using regex (handles both plain and HTML-wrapped)
+        const strongsMatches = originalVerseText.matchAll(/[HG]\d+/g);
+        for (const match of strongsMatches) {
+            strongsNumbers.push(match[0]);
         }
 
         // Return the Strong's number at the given word index

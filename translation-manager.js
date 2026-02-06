@@ -200,10 +200,18 @@ class TranslationManager {
         };
     }
 
-    // Remove HTML tags from text
+    // Remove HTML tags from text and wrap Strong's numbers for styling
     cleanHtmlTags(html) {
         if (!html) return '';
-        return html.replace(/<[^>]*>/g, '').trim();
+
+        // Remove HTML tags
+        let text = html.replace(/<[^>]*>/g, '').trim();
+
+        // Wrap Strong's numbers in spans for CSS styling (makes them hideable)
+        // Pattern matches H#### or G#### (Strong's numbers)
+        text = text.replace(/\s([HG]\d+)/g, ' <span class="strongs-num">$1</span>');
+
+        return text;
     }
 
     // Get all available translations
