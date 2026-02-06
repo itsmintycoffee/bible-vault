@@ -217,20 +217,26 @@ class TranslationManager {
         // Remove HTML tags
         let text = html.replace(/<[^>]*>/g, '').trim();
 
-        // Remove Strong's numbers - they come in two formats:
+        // Remove Strong's numbers - they come in multiple formats:
         // Format 1: "word H1234" or "word G1234" (with H/G prefix)
         // Format 2: "בָּרָ֣א1254" (digits directly attached to Hebrew/Greek, no prefix)
+        // Format 3: Standalone digits like "1234" that might be concordance references
 
-        // Pattern 1: Strong's with H/G prefix and surrounding whitespace
-        text = text.replace(/\s+[HG]\d+\s+/g, ' ');
-        text = text.replace(/\s+[HG]\d+$/g, '');
-        text = text.replace(/^[HG]\d+\s+/g, '');
+        // Pattern 1: Strong's with H/G prefix (most aggressive removal)
         text = text.replace(/[HG]\d+/g, '');
 
         // Pattern 2: Digits directly attached to Hebrew/Greek Unicode characters (no H/G prefix)
         // Hebrew Unicode range: \u0590-\u05FF
         // Greek Unicode range: \u0370-\u03FF, \u1F00-\u1FFF
         text = text.replace(/([\u0590-\u05FF\u0370-\u03FF\u1F00-\u1FFF]+)\d+/g, '$1');
+
+        // Pattern 3: Remove standalone digit sequences that look like concordance numbers
+        // (1-5 digits surrounded by whitespace or punctuation)
+        text = text.replace(/\s+\d{1,5}(?=\s|$|[.,;:!?])/g, '');
+        text = text.replace(/^\d{1,5}\s+/g, '');
+
+        // Pattern 4: Remove digits attached to end of English words (e.g., "created1234")
+        text = text.replace(/([a-zA-Z]+)\d+/g, '$1');
 
         // Clean up any multiple spaces created by removal
         text = text.replace(/\s{2,}/g, ' ').trim();

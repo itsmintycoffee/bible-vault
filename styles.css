@@ -498,25 +498,19 @@ body {
     width: 2em;
 }
 
-/* Word underlines hidden by default */
+/* Word underlines shown by default */
 .word {
-    cursor: default;
-    padding: 2px 0;
-    text-decoration: none;
-    transition: all 0.2s;
-}
-
-/* Show underlines only in study mode */
-body.study-mode .word {
     cursor: pointer;
+    padding: 2px 0;
     text-decoration: underline;
     text-decoration-style: dotted;
     text-decoration-color: rgba(199, 81, 70, 0.4);
     text-decoration-thickness: 1px;
     text-underline-offset: 3px;
+    transition: all 0.2s;
 }
 
-body.study-mode .word:hover {
+.word:hover {
     text-decoration-style: solid;
     text-decoration-color: #c75146;
     text-decoration-thickness: 2px;
