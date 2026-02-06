@@ -7,7 +7,6 @@
 :root {
     --bg-primary: #f5f1e8;
     --bg-secondary: #fdfaf4;
-    --bg-sidebar: #2c2a27;
     --text-primary: #2c2a27;
     --text-secondary: #6b6762;
     --accent: #8b7355;
@@ -40,58 +39,6 @@ body {
     display: flex;
     height: 100vh;
     width: 100%;
-}
-
-/* Left Sidebar */
-.sidebar {
-    width: 70px;
-    background: var(--bg-sidebar);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 1.5rem 0;
-    box-shadow: 2px 0 10px var(--shadow);
-    position: relative;
-    z-index: 100;
-}
-
-.logo {
-    margin-bottom: 2rem;
-}
-
-.logo-icon {
-    font-size: 2rem;
-    cursor: pointer;
-}
-
-.sidebar-nav {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    width: 100%;
-    align-items: center;
-}
-
-.nav-item {
-    width: 45px;
-    height: 45px;
-    border: none;
-    background: transparent;
-    border-radius: 12px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.3rem;
-    transition: background 0.2s;
-}
-
-.nav-item:hover {
-    background: rgba(255, 255, 255, 0.1);
-}
-
-.nav-item.active {
-    background: rgba(255, 255, 255, 0.15);
 }
 
 /* Main Content (Bible) */
@@ -1146,10 +1093,6 @@ body.study-mode .source-R {
 }
 
 @media (max-width: 768px) {
-    .sidebar {
-        width: 60px;
-    }
-
     .content-header {
         padding: 1.5rem;
     }
