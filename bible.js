@@ -93,13 +93,11 @@ async function displayVerse(data, append = false) {
     // Apply JEDP source color-coding FIRST on plain text (before word study markup)
     if (typeof loadJEDPData === 'function' && typeof applyJEDPSources === 'function') {
         // Load JEDP data for current book first
-        console.log('Loading JEDP data and applying colors...');
         await loadJEDPData(currentBook);
-        
+
         // Only highlight verses in the newly loaded chapter (not all verses on page)
         const lastChapterSection = verseContent.querySelector('.chapter-section:last-child');
         const verses = lastChapterSection ? lastChapterSection.querySelectorAll('.verse') : [];
-        console.log(`Found ${verses.length} verse elements to color`);
         applyJEDPSources(verses);
     }
 
@@ -375,7 +373,7 @@ mainContent.addEventListener('scroll', () => {
     scrollTimeout = setTimeout(() => {
         handleScroll();
         updateChapterSelector();
-    }, 200);
+    }, 300);
 });
 
 // Load a default chapter on page load

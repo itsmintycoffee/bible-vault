@@ -13,7 +13,6 @@ async function loadConcordanceIndex() {
         const cacheBuster = Date.now();
         const response = await fetch(`concordance/index.json?v=${cacheBuster}`);
         concordanceIndex = await response.json();
-        console.log('Concordance index loaded:', Object.keys(concordanceIndex.hebrew).length, 'Hebrew words,', Object.keys(concordanceIndex.greek).length, 'Greek words');
         return concordanceIndex;
     } catch (error) {
         console.error('Failed to load concordance index:', error);
@@ -37,12 +36,11 @@ async function loadConcordanceEntry(strongsNumber) {
         concordanceCache[strongsNumber] = data;
         return data;
     } catch (error) {
-        console.log(`Concordance entry not found: ${strongsNumber}`);
         return null;
     }
 }
 
-// Initialize concordance on page load
+// Initialize concordance on page load (silent)
 loadConcordanceIndex();
 
 // Check if word has a definition available
@@ -86,7 +84,7 @@ async function getWordInfo(word, verseRef = null, wordIndex = null) {
                     }
                 }
             } catch (error) {
-                console.warn('Failed to fetch Strong\'s for Hebrew/Greek:', error);
+                // Silent fallback
             }
         }
 
@@ -121,7 +119,7 @@ async function getWordInfo(word, verseRef = null, wordIndex = null) {
                     }
                 }
             } catch (error) {
-                console.warn('Failed to fetch Strong\'s via alignment:', error);
+                // Silent fallback
             }
         }
 
@@ -212,7 +210,6 @@ async function getStrongsFromAlignment(verseRef, wordIndex) {
 
         return null;
     } catch (error) {
-        console.error('Error in getStrongsFromAlignment:', error);
         return null;
     }
 }
@@ -317,10 +314,6 @@ async function makeWordsClickable(verseElement) {
     }
 }
 
-// IQ Bible API configuration
-const RAPIDAPI_KEY = 'b86dd98603msh385efa2e343f5e2p1f52abjsndb6dcffbbe60';
-const RAPIDAPI_HOST = 'iq-bible.p.rapidapi.com';
-
 // Create tooltip element
 let tooltip = null;
 let currentTooltipWord = null;
@@ -387,31 +380,6 @@ function initWordStudy() {
     });
 }
 
-// Fetch word info from IQ Bible API
-async function fetchWordFromAPI(word) {
-    try {
-        // Try to search for the word using GetStrongs endpoint
-        // Note: This is a simplified approach - you may need to adjust based on API response
-        const response = await fetch(`https://${RAPIDAPI_HOST}/GetStrongs?word=${encodeURIComponent(word)}`, {
-            method: 'GET',
-            headers: {
-                'x-rapidapi-host': RAPIDAPI_HOST,
-                'x-rapidapi-key': RAPIDAPI_KEY
-            }
-        });
-
-        if (response.ok) {
-            const data = await response.json();
-            // Parse the API response and return formatted data
-            // This will depend on the actual API response structure
-            return data;
-        }
-    } catch (error) {
-        console.log('API fetch failed, using local database:', error);
-    }
-    return null;
-}
-
 // Show tooltip
 async function showTooltip(word, event, verseRef = null, wordIndex = null) {
     currentTooltipWord = word;
@@ -421,22 +389,13 @@ async function showTooltip(word, event, verseRef = null, wordIndex = null) {
     tooltip.querySelector('#tooltip-language').textContent = 'Loading...';
     tooltip.querySelector('#tooltip-original').textContent = '';
     tooltip.querySelector('#tooltip-transliteration').textContent = '';
-    tooltip.querySelector('#tooltip-definition').textContent = 'Fetching word data...';
+    tooltip.querySelector('#tooltip-definition').textContent = 'Loading...';
 
     positionTooltip(event);
     tooltip.style.opacity = '1';
 
-    // Try to fetch from API first, then fall back to local database
-    const apiData = await fetchWordFromAPI(word);
-
-    let wordInfo;
-    if (apiData) {
-        // Use API data if available
-        wordInfo = parseAPIResponse(apiData, word);
-    } else {
-        // Fall back to local database with verse reference and word index for translation support
-        wordInfo = await getWordInfo(word, verseRef, wordIndex);
-    }
+    // Use local database directly (no API calls)
+    const wordInfo = await getWordInfo(word, verseRef, wordIndex);
 
     // Update tooltip with actual data (only if still showing same word)
     if (currentTooltipWord === word) {
@@ -446,19 +405,6 @@ async function showTooltip(word, event, verseRef = null, wordIndex = null) {
         tooltip.querySelector('#tooltip-transliteration').textContent = wordInfo.transliteration;
         tooltip.querySelector('#tooltip-definition').textContent = wordInfo.definition;
     }
-}
-
-// Parse API response into our format
-function parseAPIResponse(data, word) {
-    // This function will need to be adjusted based on actual API response structure
-    // For now, return a placeholder structure
-    return {
-        english: word,
-        language: data.language || 'Unknown',
-        original: data.original || '—',
-        transliteration: data.transliteration || '—',
-        definition: data.definition || 'Data from IQ Bible API'
-    };
 }
 
 // Hide tooltip
