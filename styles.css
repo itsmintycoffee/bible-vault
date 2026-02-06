@@ -111,8 +111,6 @@ body {
     -webkit-backdrop-filter: blur(12px);
     padding: 0.5rem;
     border-radius: 50px;
-    box-shadow: 0 4px 20px rgba(44, 42, 39, 0.12),
-                0 1px 3px rgba(44, 42, 39, 0.08);
     border: 1px solid rgba(232, 227, 216, 0.6);
 }
 
@@ -581,89 +579,21 @@ body.study-mode .source-R {
     border-color: rgba(253, 126, 20, 0.6);
 }
 
-/* Right Panel */
+/* Right Panel - Always Open */
 .right-panel {
-    display: none;
-    width: 0;
-    min-width: 0;
-    max-width: 0;
+    width: 33vw;
+    min-width: 400px;
+    max-width: 600px;
     background: rgba(245, 241, 232, 0.6);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border-left: none;
-    overflow: hidden;
-    padding: 0;
+    border-left: 1px solid rgba(232, 227, 216, 0.5);
+    overflow-y: auto;
+    padding: 2rem 2rem;
     position: relative;
     z-index: 50;
 }
 
-/* Open state (study mode active) */
-.right-panel.study-mode-active {
-    display: block;
-    width: 33vw;
-    min-width: 400px;
-    max-width: 600px;
-    padding: 2rem 2rem;
-    border-left: 1px solid rgba(232, 227, 216, 0.5);
-    overflow-y: auto;
-    transition: width 0.3s ease, min-width 0.3s ease, max-width 0.3s ease;
-}
-
-/* Study Mode Toggle Button */
-.study-mode-toggle {
-    position: fixed !important;
-    right: 2rem !important;
-    top: 50% !important;
-    transform: translateY(-50%) !important;
-    background: rgba(255, 255, 255, 0.95) !important;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(232, 227, 216, 0.8);
-    border-radius: 50px;
-    padding: 12px 16px;
-    cursor: pointer;
-    font-size: 0.85rem;
-    color: var(--text-primary);
-    transition: all 0.3s ease;
-    z-index: 9999 !important;
-    display: flex !important;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.35rem;
-    box-shadow: 0 4px 20px rgba(44, 42, 39, 0.15),
-                0 1px 3px rgba(44, 42, 39, 0.1);
-    writing-mode: vertical-rl;
-    opacity: 1 !important;
-    visibility: visible !important;
-    pointer-events: auto !important;
-}
-
-.study-mode-toggle:hover {
-    background: rgba(139, 115, 85, 0.95);
-    color: white;
-    transform: translateY(-50%) scale(1.05);
-    box-shadow: 0 6px 24px rgba(44, 42, 39, 0.18);
-}
-
-/* Hide toggle button when panel is open */
-.right-panel.study-mode-active ~ .study-mode-toggle,
-body:has(.right-panel.study-mode-active) .study-mode-toggle {
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-}
-
-.toggle-icon {
-    transition: transform 0.3s ease;
-    width: 20px;
-    height: 20px;
-}
-
-.toggle-label {
-    font-size: 0.7rem;
-    font-weight: 600;
-    letter-spacing: 0.05em;
-}
 
 /* Resize Handle */
 .resize-handle {
@@ -676,12 +606,6 @@ body:has(.right-panel.study-mode-active) .study-mode-toggle {
     z-index: 1000;
     background: transparent;
     transition: background 0.2s;
-    display: none;
-}
-
-/* Show resize handle only when panel is open */
-.right-panel.study-mode-active .resize-handle {
-    display: block;
 }
 
 .resize-handle:hover,
@@ -710,14 +634,9 @@ body:has(.right-panel.study-mode-active) .study-mode-toggle {
 
 .panel-header {
     margin-bottom: 2rem;
-    display: none;
+    display: flex;
     justify-content: space-between;
     align-items: center;
-}
-
-/* Show panel header only when panel is open */
-.right-panel.study-mode-active .panel-header {
-    display: flex;
 }
 
 .panel-header h2 {
@@ -746,12 +665,6 @@ body:has(.right-panel.study-mode-active) .study-mode-toggle {
 
 .tool-section {
     margin-bottom: 2rem;
-    display: none;
-}
-
-/* Show tool sections only when panel is open */
-.right-panel.study-mode-active .tool-section {
-    display: block;
 }
 
 .tool-section h3 {

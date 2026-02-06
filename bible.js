@@ -407,54 +407,11 @@ if (resizeHandle) {
     });
 }
 
-// Study Mode Toggle
-function setupStudyModeToggle() {
-    const rightPanel = document.getElementById('right-panel');
-    const studyModeToggle = document.getElementById('study-mode-toggle');
-    const panelCloseBtn = document.getElementById('panel-close-btn');
-    const mobileToggleBtn = document.getElementById('mobile-sidebar-toggle');
-
-    if (!studyModeToggle && !panelCloseBtn) return;
-
-    // Start with sidebar closed by default
-    let isStudyModeActive = false;
-
-    // Function to open study mode
-    const openStudyMode = () => {
-        isStudyModeActive = true;
-        rightPanel.classList.add('study-mode-active');
-        document.body.classList.add('study-mode');
-        if (studyModeToggle) studyModeToggle.setAttribute('title', 'Close Study Tools');
-        if (mobileToggleBtn) mobileToggleBtn.classList.add('hidden');
-        localStorage.setItem('studyModeActive', 'true');
-    };
-
-    // Function to close study mode
-    const closeStudyMode = () => {
-        isStudyModeActive = false;
-        rightPanel.classList.remove('study-mode-active');
-        document.body.classList.remove('study-mode');
-        if (studyModeToggle) studyModeToggle.setAttribute('title', 'Open Study Tools');
-        if (mobileToggleBtn) mobileToggleBtn.classList.remove('hidden');
-        localStorage.setItem('studyModeActive', 'false');
-    };
-
-    // Toggle button click handler (open button)
-    if (studyModeToggle) {
-        studyModeToggle.addEventListener('click', () => {
-            if (isStudyModeActive) {
-                closeStudyMode();
-            } else {
-                openStudyMode();
-            }
-        });
-    }
-
-    // Close button click handler (inside panel)
-    if (panelCloseBtn) {
-        panelCloseBtn.addEventListener('click', closeStudyMode);
-    }
+// Enable study mode by default (sidebar always open)
+function setupStudyMode() {
+    // Enable study mode features (verse highlighting, word study)
+    document.body.classList.add('study-mode');
 }
 
 // Call on page load
-window.addEventListener('load', setupStudyModeToggle);
+window.addEventListener('load', setupStudyMode);
