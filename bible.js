@@ -378,6 +378,14 @@ mainContent.addEventListener('scroll', () => {
 
 // Load a default chapter on page load
 window.addEventListener('load', () => {
+    // Check for translation parameter in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const translation = urlParams.get('translation');
+
+    if (translation && TRANSLATIONS[translation]) {
+        translationManager.setTranslation(translation);
+    }
+
     initializeTranslationSelector();
     fetchVerse('Genesis 1');
 });
