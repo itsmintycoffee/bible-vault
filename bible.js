@@ -134,7 +134,7 @@ function setupFirstChapterObserver() {
     const checkStickyState = () => {
         // Check if we've scrolled past the header (simple threshold)
         const scrollTop = mainContent.scrollTop;
-        const isStuck = scrollTop > 50; // Show header controls after 50px scroll
+        const isStuck = scrollTop > 0; // Show header controls immediately when scrolling
 
         // Only update class if state actually changed (avoid redundant DOM operations)
         if (isStuck && !isCurrentlyStuck) {
@@ -414,3 +414,38 @@ if (resizeHandle) {
         }
     });
 }
+
+// Study Mode Toggle
+function setupStudyModeToggle() {
+    const rightPanel = document.getElementById('right-panel');
+    const studyModeToggle = document.getElementById('study-mode-toggle');
+
+    if (!studyModeToggle) return;
+
+    let isStudyModeActive = localStorage.getItem('studyModeActive') === 'true';
+
+    // Apply saved state on load
+    if (isStudyModeActive) {
+        rightPanel.classList.add('study-mode-active');
+        document.body.classList.add('study-mode');
+    }
+
+    // Toggle button click handler
+    studyModeToggle.addEventListener('click', () => {
+        isStudyModeActive = !isStudyModeActive;
+
+        if (isStudyModeActive) {
+            rightPanel.classList.add('study-mode-active');
+            document.body.classList.add('study-mode');
+        } else {
+            rightPanel.classList.remove('study-mode-active');
+            document.body.classList.remove('study-mode');
+        }
+
+        // Save state
+        localStorage.setItem('studyModeActive', isStudyModeActive);
+    });
+}
+
+// Call on page load
+window.addEventListener('load', setupStudyModeToggle);

@@ -73,10 +73,13 @@ function wrapWordsWithSource(container, source) {
         
         while ((match = regex.exec(text)) !== null) {
             const token = match[0];
-            
+
             if (/\s/.test(token)) {
-                // Whitespace
-                fragment.appendChild(document.createTextNode(token));
+                // Whitespace - wrap in source span too
+                const span = document.createElement('span');
+                span.className = `source-${source}`;
+                span.textContent = token;
+                fragment.appendChild(span);
             } else {
                 // Word: wrap in source span
                 const span = document.createElement('span');

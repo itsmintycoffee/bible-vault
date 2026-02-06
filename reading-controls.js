@@ -63,10 +63,33 @@ class ReadingControls {
         this.isParallelMode = !this.isParallelMode;
         const parallelToggle = document.getElementById('parallel-toggle');
         const parallelSelector = document.getElementById('parallel-selector');
+        const parallelTranslationSelector = document.getElementById('parallel-translation-selector');
 
         if (this.isParallelMode) {
+            // Auto-select comparison translation based on current selection
+            const currentTranslation = translationManager.getCurrentTranslation().id;
+            let autoCompareTranslation;
+
+            if (currentTranslation === 'esv' || currentTranslation === 'kjv') {
+                autoCompareTranslation = 'bulgarian';
+            } else if (currentTranslation === 'bulgarian') {
+                autoCompareTranslation = 'esv';
+            } else {
+                // Hebrew/Greek defaults to ESV
+                autoCompareTranslation = 'esv';
+            }
+
+            // Set parallel translation selector
+            if (parallelTranslationSelector) {
+                parallelTranslationSelector.value = autoCompareTranslation;
+                this.parallelTranslation = autoCompareTranslation;
+            }
+
             parallelToggle.classList.add('active');
             parallelSelector.classList.remove('hidden');
+
+            // Immediately refresh with auto-selected translation
+            this.refreshParallelView();
         } else {
             parallelToggle.classList.remove('active');
             parallelSelector.classList.add('hidden');
