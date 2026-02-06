@@ -55,8 +55,8 @@ function hasDefinition(word) {
     return !!(concordanceIndex.hebrew[cleanWord] || concordanceIndex.greek[cleanWord]);
 }
 
-// Get word info from concordance
-async function getWordInfo(word) {
+// Get word info from concordance (supports multi-translation via Hebrew/Greek bridge)
+async function getWordInfo(word, verseRef = null, wordIndex = null) {
     const cleanWord = word.toLowerCase().replace(/[.,;:!?'"]/g, '');
 
     // Wait for index to load if not already loaded
@@ -64,7 +64,58 @@ async function getWordInfo(word) {
         await loadConcordanceIndex();
     }
 
-    // Find Strong's number
+    // Check current translation
+    const currentTranslation = translationManager.getCurrentTranslation();
+
+    // For non-English translations, fetch original language and map words
+    if (currentTranslation.language !== 'English' &&
+        currentTranslation.language !== 'Hebrew' &&
+        currentTranslation.language !== 'Greek' &&
+        verseRef && wordIndex !== null) {
+
+        try {
+            // Determine which original language to use based on testament
+            const bookNum = translationManager.parseReference(verseRef).bookNum;
+            const isOldTestament = bookNum <= 39;
+            const originalTranslation = isOldTestament ? 'wlca' : 'lxx';
+
+            // Fetch the original language verse
+            const originalManager = new TranslationManager();
+            originalManager.currentTranslation = originalTranslation;
+            const originalData = await originalManager.fetchVerse(verseRef);
+
+            // Get the original language words
+            if (originalData && originalData.text) {
+                const originalWords = originalData.text.split(/\s+/);
+
+                // Try to get the word at the same position
+                if (wordIndex < originalWords.length) {
+                    const originalWord = originalWords[wordIndex].toLowerCase().replace(/[.,;:!?'"]/g, '');
+
+                    // Look up in concordance
+                    const strongsNumber = concordanceIndex.hebrew[originalWord] || concordanceIndex.greek[originalWord];
+
+                    if (strongsNumber) {
+                        const entry = await loadConcordanceEntry(strongsNumber);
+                        if (entry) {
+                            return {
+                                english: word,
+                                translatedWord: word,
+                                language: strongsNumber.startsWith('H') ? 'Hebrew' : 'Greek',
+                                original: entry.original,
+                                transliteration: entry.transliteration,
+                                definition: entry.definition
+                            };
+                        }
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching original language:', error);
+        }
+    }
+
+    // Direct lookup for English/Hebrew/Greek
     const strongsNumber = concordanceIndex.hebrew[cleanWord] || concordanceIndex.greek[cleanWord];
 
     if (strongsNumber) {
@@ -113,6 +164,14 @@ async function makeWordsClickable(verseElement) {
         await loadConcordanceIndex();
     }
 
+    // Get verse reference from parent element
+    const verseDiv = verseElement.closest('.verse');
+    let verseRef = `${currentBook} ${currentChapter}`;
+    if (verseDiv && verseDiv.querySelector('.verse-number')) {
+        const verseNum = verseDiv.querySelector('.verse-number').textContent;
+        verseRef = `${currentBook} ${currentChapter}:${verseNum}`;
+    }
+
     // Use TreeWalker to process text nodes while preserving JEDP highlighting
     const walker = document.createTreeWalker(
         verseElement,
@@ -127,6 +186,9 @@ async function makeWordsClickable(verseElement) {
         textNodesToReplace.push(textNode);
     }
 
+    // Track word index across all text nodes for alignment
+    let wordIndex = 0;
+
     // Process text nodes in reverse to avoid invalidating walker
     for (let i = textNodesToReplace.length - 1; i >= 0; i--) {
         textNode = textNodesToReplace[i];
@@ -134,7 +196,7 @@ async function makeWordsClickable(verseElement) {
         const tokens = text.split(/(\s+)/);
 
         const fragment = document.createDocumentFragment();
-        
+
         for (const token of tokens) {
             // If it's whitespace, keep as text node
             if (/^\s+$/.test(token)) {
@@ -148,19 +210,28 @@ async function makeWordsClickable(verseElement) {
             // If it's a stop word or very short, don't make it clickable
             if (stopWords.has(cleanWord) || cleanWord.length <= 2) {
                 fragment.appendChild(document.createTextNode(token));
+                wordIndex++;
                 continue;
             }
 
-            // Only make it clickable if we have a definition for it
-            if (hasDefinition(cleanWord)) {
+            // For non-English translations, make all content words clickable
+            // For English, only if we have a definition
+            const currentTranslation = translationManager.getCurrentTranslation();
+            const shouldMakeClickable = currentTranslation.language !== 'English' || hasDefinition(cleanWord);
+
+            if (shouldMakeClickable) {
                 const span = document.createElement('span');
                 span.className = 'word';
                 span.setAttribute('data-word', cleanWord);
+                span.setAttribute('data-verse-ref', verseRef);
+                span.setAttribute('data-word-index', wordIndex);
                 span.textContent = token;
                 fragment.appendChild(span);
             } else {
                 fragment.appendChild(document.createTextNode(token));
             }
+
+            wordIndex++;
         }
 
         // Replace text node with fragment
@@ -210,7 +281,9 @@ function initWordStudy() {
     document.addEventListener('mouseenter', async (e) => {
         if (e.target && e.target.classList && e.target.classList.contains('word')) {
             const word = e.target.dataset.word;
-            await showTooltip(word, e);
+            const verseRef = e.target.dataset.verseRef;
+            const wordIndex = parseInt(e.target.dataset.wordIndex);
+            await showTooltip(word, e, verseRef, wordIndex);
         }
     }, true); // Use capture phase to catch events on dynamically added elements
 
@@ -262,7 +335,7 @@ async function fetchWordFromAPI(word) {
 }
 
 // Show tooltip
-async function showTooltip(word, event) {
+async function showTooltip(word, event, verseRef = null, wordIndex = null) {
     currentTooltipWord = word;
 
     // Show loading state
@@ -283,13 +356,13 @@ async function showTooltip(word, event) {
         // Use API data if available
         wordInfo = parseAPIResponse(apiData, word);
     } else {
-        // Fall back to local database
-        wordInfo = await getWordInfo(word);
+        // Fall back to local database with verse reference and word index for translation support
+        wordInfo = await getWordInfo(word, verseRef, wordIndex);
     }
 
     // Update tooltip with actual data (only if still showing same word)
     if (currentTooltipWord === word) {
-        tooltip.querySelector('#tooltip-word').textContent = wordInfo.english;
+        tooltip.querySelector('#tooltip-word').textContent = wordInfo.translatedWord || wordInfo.english;
         tooltip.querySelector('#tooltip-language').textContent = wordInfo.language;
         tooltip.querySelector('#tooltip-original').textContent = wordInfo.original;
         tooltip.querySelector('#tooltip-transliteration').textContent = wordInfo.transliteration;
