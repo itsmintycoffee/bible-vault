@@ -85,14 +85,20 @@
 
         <!-- Right Panel (Tools & Info) -->
         <aside class="right-panel" id="right-panel">
-            <button id="study-mode-toggle" class="study-mode-toggle" title="Toggle Study Mode">
-                <span class="toggle-icon">◄</span>
-                <span class="toggle-label">Study Mode</span>
+            <button id="study-mode-toggle" class="study-mode-toggle" title="Open Study Tools">
+                <svg class="toggle-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 18l6-6-6-6"/>
+                </svg>
+                <span class="toggle-label">Study</span>
             </button>
             <div class="resize-handle" id="resize-handle"></div>
             <div class="panel-header">
                 <h2>Study Tools</h2>
-                <button class="mobile-close-btn" id="mobile-close-btn">&times;</button>
+                <button class="panel-close-btn" id="panel-close-btn" title="Close Study Tools">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                </button>
             </div>
 
             <div class="tool-section">

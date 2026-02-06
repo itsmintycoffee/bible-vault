@@ -333,21 +333,13 @@ window.addEventListener('load', () => {
 // Mobile sidebar toggle functionality
 const rightPanel = document.getElementById('right-panel');
 const mobileToggleBtn = document.getElementById('mobile-sidebar-toggle');
-const mobileCloseBtn = document.getElementById('mobile-close-btn');
 
-// Open sidebar on mobile
+// Open sidebar on mobile (use study mode toggle)
 if (mobileToggleBtn) {
     mobileToggleBtn.addEventListener('click', () => {
-        rightPanel.classList.add('mobile-open');
+        rightPanel.classList.add('study-mode-active');
+        document.body.classList.add('study-mode');
         mobileToggleBtn.classList.add('hidden');
-    });
-}
-
-// Close sidebar on mobile
-if (mobileCloseBtn) {
-    mobileCloseBtn.addEventListener('click', () => {
-        rightPanel.classList.remove('mobile-open');
-        mobileToggleBtn.classList.remove('hidden');
     });
 }
 
@@ -419,32 +411,49 @@ if (resizeHandle) {
 function setupStudyModeToggle() {
     const rightPanel = document.getElementById('right-panel');
     const studyModeToggle = document.getElementById('study-mode-toggle');
+    const panelCloseBtn = document.getElementById('panel-close-btn');
+    const mobileToggleBtn = document.getElementById('mobile-sidebar-toggle');
 
-    if (!studyModeToggle) return;
+    if (!studyModeToggle && !panelCloseBtn) return;
 
-    let isStudyModeActive = localStorage.getItem('studyModeActive') === 'true';
+    // Start with sidebar closed by default
+    let isStudyModeActive = false;
 
-    // Apply saved state on load
-    if (isStudyModeActive) {
+    // Function to open study mode
+    const openStudyMode = () => {
+        isStudyModeActive = true;
         rightPanel.classList.add('study-mode-active');
         document.body.classList.add('study-mode');
+        if (studyModeToggle) studyModeToggle.setAttribute('title', 'Close Study Tools');
+        if (mobileToggleBtn) mobileToggleBtn.classList.add('hidden');
+        localStorage.setItem('studyModeActive', 'true');
+    };
+
+    // Function to close study mode
+    const closeStudyMode = () => {
+        isStudyModeActive = false;
+        rightPanel.classList.remove('study-mode-active');
+        document.body.classList.remove('study-mode');
+        if (studyModeToggle) studyModeToggle.setAttribute('title', 'Open Study Tools');
+        if (mobileToggleBtn) mobileToggleBtn.classList.remove('hidden');
+        localStorage.setItem('studyModeActive', 'false');
+    };
+
+    // Toggle button click handler (open button)
+    if (studyModeToggle) {
+        studyModeToggle.addEventListener('click', () => {
+            if (isStudyModeActive) {
+                closeStudyMode();
+            } else {
+                openStudyMode();
+            }
+        });
     }
 
-    // Toggle button click handler
-    studyModeToggle.addEventListener('click', () => {
-        isStudyModeActive = !isStudyModeActive;
-
-        if (isStudyModeActive) {
-            rightPanel.classList.add('study-mode-active');
-            document.body.classList.add('study-mode');
-        } else {
-            rightPanel.classList.remove('study-mode-active');
-            document.body.classList.remove('study-mode');
-        }
-
-        // Save state
-        localStorage.setItem('studyModeActive', isStudyModeActive);
-    });
+    // Close button click handler (inside panel)
+    if (panelCloseBtn) {
+        panelCloseBtn.addEventListener('click', closeStudyMode);
+    }
 }
 
 // Call on page load
