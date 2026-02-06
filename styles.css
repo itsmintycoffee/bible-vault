@@ -305,9 +305,13 @@ body {
 /* Parallel View Layout */
 .bible-content.parallel-view {
     max-width: none;
+    padding: 4rem 3rem;
+}
+
+.bible-content.parallel-view #verse-content {
     display: flex;
     gap: 2rem;
-    padding: 4rem 3rem;
+    align-items: flex-start;
 }
 
 .parallel-column {
