@@ -589,11 +589,12 @@ body.study-mode .source-R {
     background: rgba(245, 241, 232, 0.6);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border-left: 1px solid rgba(232, 227, 216, 0.5);
+    border-left: none;
     overflow: hidden;
     padding: 0;
     opacity: 0;
-    transition: all 0.3s ease;
+    visibility: hidden;
+    transition: all 0.3s ease, visibility 0s 0.3s;
     position: relative;
     z-index: 50;
 }
@@ -605,7 +606,10 @@ body.study-mode .source-R {
     max-width: 600px;
     padding: 2rem 2rem;
     opacity: 1;
+    visibility: visible;
+    border-left: 1px solid rgba(232, 227, 216, 0.5);
     overflow-y: auto;
+    transition: all 0.3s ease, visibility 0s 0s;
 }
 
 /* Study Mode Toggle Button */
@@ -632,6 +636,8 @@ body.study-mode .source-R {
     box-shadow: 0 4px 20px rgba(44, 42, 39, 0.12),
                 0 1px 3px rgba(44, 42, 39, 0.08);
     writing-mode: vertical-rl;
+    opacity: 1;
+    visibility: visible;
 }
 
 .study-mode-toggle:hover {
@@ -642,9 +648,9 @@ body.study-mode .source-R {
 }
 
 /* Hide toggle button when panel is open */
-.right-panel.study-mode-active + * .study-mode-toggle,
-body:has(.right-panel.study-mode-active) .study-mode-toggle {
+.right-panel.study-mode-active .study-mode-toggle {
     opacity: 0;
+    visibility: hidden;
     pointer-events: none;
 }
 
@@ -676,6 +682,12 @@ body:has(.right-panel.study-mode-active) .study-mode-toggle {
     z-index: 1000;
     background: transparent;
     transition: background 0.2s;
+    display: none;
+}
+
+/* Show resize handle only when panel is open */
+.right-panel.study-mode-active .resize-handle {
+    display: block;
 }
 
 .resize-handle:hover,
@@ -704,9 +716,14 @@ body:has(.right-panel.study-mode-active) .study-mode-toggle {
 
 .panel-header {
     margin-bottom: 2rem;
-    display: flex;
+    display: none;
     justify-content: space-between;
     align-items: center;
+}
+
+/* Show panel header only when panel is open */
+.right-panel.study-mode-active .panel-header {
+    display: flex;
 }
 
 .panel-header h2 {
@@ -735,6 +752,12 @@ body:has(.right-panel.study-mode-active) .study-mode-toggle {
 
 .tool-section {
     margin-bottom: 2rem;
+    display: none;
+}
+
+/* Show tool sections only when panel is open */
+.right-panel.study-mode-active .tool-section {
+    display: block;
 }
 
 .tool-section h3 {
