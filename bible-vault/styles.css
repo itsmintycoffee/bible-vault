@@ -333,35 +333,25 @@ body {
     color: #c75146;
 }
 
-/* Documentary Hypothesis Source Color-Coding - Marker Highlight Style */
+/* Documentary Hypothesis Source Color-Coding - Text Color Style */
 .source-J {
-    background-color: rgba(230, 150, 150, 0.25);
-    padding: 0 2px;
-    margin: 0 -1.5px;
+    color: #c75146;
 }
 
 .source-E {
-    background-color: rgba(150, 180, 255, 0.25);
-    padding: 0 2px;
-    margin: 0 -1.5px;
+    color: #0d6efd;
 }
 
 .source-P {
-    background-color: rgba(244, 236, 244, 0.25);
-    padding: 0 2px;
-    margin: 0 -1.5px;
+    color: #6f42c1;
 }
 
 .source-D {
-    background-color: rgba(150, 200, 150, 0.25);
-    padding: 0 2px;
-    margin: 0 -1.5px;
+    color: #198754;
 }
 
 .source-R {
-    background-color: rgba(255, 200, 130, 0.25);
-    padding: 0 2px;
-    margin: 0 -1.5px;
+    color: #fd7e14;
 }
 
 /* JEDP Legend */
@@ -847,8 +837,9 @@ body {
 
     .panel-header {
         display: flex;
-        justify-content: space-between;
+        justify-content: flex-end;
         align-items: center;
+        position: relative;
     }
 
     .mobile-close-btn {
@@ -866,10 +857,17 @@ body {
         justify-content: center;
         border-radius: 8px;
         transition: background 0.2s;
+        position: absolute;
+        left: -50px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: var(--accent);
+        color: white;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     }
 
     .mobile-close-btn:hover {
-        background: var(--bg-secondary);
+        background: var(--accent-light);
     }
 }
 

@@ -578,10 +578,7 @@ mainContent.addEventListener('scroll', () => {
     }, 200);
 });
 
-// Load a default chapter on page load
-window.addEventListener('load', () => {
-    fetchVerse('Genesis 1');
-});
+// Default chapter is loaded by chapter-selector.js to avoid duplicate loading
 
 // Mobile sidebar toggle functionality
 const rightPanel = document.getElementById('right-panel');
