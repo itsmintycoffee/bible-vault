@@ -62,7 +62,6 @@ class ReadingControls {
     toggleParallelView() {
         this.isParallelMode = !this.isParallelMode;
         const parallelToggle = document.getElementById('parallel-toggle');
-        const parallelSelector = document.getElementById('parallel-selector');
         const parallelTranslationSelector = document.getElementById('parallel-translation-selector');
 
         if (this.isParallelMode) {
@@ -83,16 +82,18 @@ class ReadingControls {
             if (parallelTranslationSelector) {
                 parallelTranslationSelector.value = autoCompareTranslation;
                 this.parallelTranslation = autoCompareTranslation;
+                parallelTranslationSelector.classList.remove('hidden');
             }
 
             parallelToggle.classList.add('active');
-            parallelSelector.classList.remove('hidden');
 
             // Immediately refresh with auto-selected translation
             this.refreshParallelView();
         } else {
             parallelToggle.classList.remove('active');
-            parallelSelector.classList.add('hidden');
+            if (parallelTranslationSelector) {
+                parallelTranslationSelector.classList.add('hidden');
+            }
             // Switch back to single column view
             this.renderSingleView();
         }
@@ -260,8 +261,10 @@ class ReadingControls {
         const savedParallelMode = localStorage.getItem('parallelMode');
         if (savedParallelMode === 'true') {
             this.isParallelMode = true;
-            document.getElementById('parallel-toggle').classList.add('active');
-            document.getElementById('parallel-selector').classList.remove('hidden');
+            const parallelToggle = document.getElementById('parallel-toggle');
+            const parallelTranslationSelector = document.getElementById('parallel-translation-selector');
+            if (parallelToggle) parallelToggle.classList.add('active');
+            if (parallelTranslationSelector) parallelTranslationSelector.classList.remove('hidden');
         }
     }
 }

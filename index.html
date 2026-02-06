@@ -41,6 +41,15 @@
                             <span class="btn-label">Compare</span>
                         </button>
 
+                        <select id="parallel-translation-selector" class="control-btn translation-selector hidden">
+                            <option value="">Select translation...</option>
+                            <option value="esv">ESV</option>
+                            <option value="kjv">KJV</option>
+                            <option value="bulgarian">Bulgarian (1940)</option>
+                            <option value="wlca">Hebrew (WLC)</option>
+                            <option value="lxx">Greek (LXX)</option>
+                        </select>
+
                         <button id="text-size-toggle" class="control-btn icon-btn" title="Text Size">
                             <span class="text-size-icon">Aa</span>
                         </button>
@@ -53,19 +62,6 @@
                         placeholder="Search passage..."
                     >
                     <button id="search-btn">Go</button>
-                </div>
-
-                <!-- Parallel Translation Selector (hidden by default) -->
-                <div id="parallel-selector" class="parallel-selector hidden">
-                    <label>Compare with:</label>
-                    <select id="parallel-translation-selector" class="control-btn translation-selector">
-                        <option value="">Select translation...</option>
-                        <option value="esv">ESV</option>
-                        <option value="kjv">KJV</option>
-                        <option value="bulgarian">Bulgarian (1940)</option>
-                        <option value="wlca">Hebrew (WLC)</option>
-                        <option value="lxx">Greek (LXX)</option>
-                    </select>
                 </div>
 
                 <!-- Text Size Controls (hidden by default) -->
