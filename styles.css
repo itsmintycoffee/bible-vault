@@ -445,9 +445,13 @@ body {
     letter-spacing: 0.003em;
 }
 
-/* Hebrew text font and RTL direction */
+/* Language-specific fonts */
 .bible-content.lang-english .chapter-content {
     font-family: 'Literata', Georgia, serif;
+}
+
+.bible-content.lang-bulgarian .chapter-content {
+    font-family: 'Old Standard TT', Georgia, serif;
 }
 
 .bible-content.lang-hebrew .chapter-content {
