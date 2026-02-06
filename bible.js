@@ -125,25 +125,16 @@ function setupFirstChapterObserver() {
     const contentHeader = document.querySelector('.content-header');
     const headerChapterTitle = document.getElementById('header-chapter-title');
 
-    if (!firstChapterTitle) return;
+    if (!firstChapterTitle || !contentHeader || !headerChapterTitle) return;
 
-    // Store the initial offset and track current state to avoid redundant class operations
-    let initialOffsetTop = null;
+    // Track current state to avoid redundant class operations
     let isCurrentlyStuck = false;
 
     // Use scroll event to detect sticky state more reliably
     const checkStickyState = () => {
-        // Calculate initial offset on first run
-        if (initialOffsetTop === null) {
-            const firstSection = document.querySelector('.chapter-section:first-child');
-            if (firstSection) {
-                initialOffsetTop = firstSection.offsetTop;
-            }
-        }
-
-        // Check if we've scrolled past the initial position
+        // Check if we've scrolled past the header (simple threshold)
         const scrollTop = mainContent.scrollTop;
-        const isStuck = scrollTop > initialOffsetTop;
+        const isStuck = scrollTop > 50; // Show header controls after 50px scroll
 
         // Only update class if state actually changed (avoid redundant DOM operations)
         if (isStuck && !isCurrentlyStuck) {
@@ -156,9 +147,14 @@ function setupFirstChapterObserver() {
             isCurrentlyStuck = false;
         }
 
-        // Update header title to match current chapter
-        if (headerChapterTitle && firstChapterTitle) {
-            headerChapterTitle.textContent = firstChapterTitle.textContent;
+        // Update header title to match visible chapter
+        const chapters = document.querySelectorAll('.chapter-section .chapter-title');
+        for (const chapter of chapters) {
+            const rect = chapter.getBoundingClientRect();
+            if (rect.top >= 0 && rect.top <= 200) {
+                headerChapterTitle.textContent = chapter.textContent;
+                break;
+            }
         }
     };
 

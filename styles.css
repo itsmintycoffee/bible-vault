@@ -141,24 +141,21 @@ body {
     transform: translateY(0);
 }
 
-/* When at top, hide controls */
-.content-header:not(.scrolled) .reading-controls {
-    opacity: 0;
-    pointer-events: none;
-}
-
-.content-header.scrolled .reading-controls {
-    opacity: 1;
-    pointer-events: auto;
-    transition: opacity 0.3s ease;
-}
-
 /* Reading Controls */
 .reading-controls {
     display: flex;
     gap: 0.5rem;
     align-items: center;
     flex-wrap: wrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+/* When scrolled down, show controls */
+.content-header.scrolled .reading-controls {
+    opacity: 1;
+    pointer-events: auto;
 }
 
 .control-btn {
