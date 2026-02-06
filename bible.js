@@ -296,19 +296,39 @@ async function loadNextChapter() {
 }
 
 // Infinite scroll handler
-function handleScroll() {
-    // Don't use infinite scroll in parallel view mode
+async function handleScroll() {
     const bibleContent = document.querySelector('.bible-content');
-    if (bibleContent && bibleContent.classList.contains('parallel-view')) {
-        return;
-    }
-
     const scrollPosition = mainContent.scrollTop + mainContent.clientHeight;
     const scrollHeight = mainContent.scrollHeight;
 
     // Load next chapter when 80% scrolled
     if (scrollPosition >= scrollHeight * 0.8) {
-        loadNextChapter();
+        // Handle parallel view differently
+        if (bibleContent && bibleContent.classList.contains('parallel-view') && readingControls) {
+            if (isLoading) return;
+            isLoading = true;
+
+            try {
+                const nextChapterRef = getNextChapter();
+                if (!nextChapterRef) return;
+
+                // Update current position
+                const match = nextChapterRef.match(/^(.+?)\s+(\d+)/);
+                if (match) {
+                    currentBook = match[1];
+                    currentChapter = parseInt(match[2]);
+                }
+
+                // Load next chapter in parallel view
+                await readingControls.appendParallelChapter(nextChapterRef);
+            } catch (err) {
+                console.error('Error loading next parallel chapter:', err);
+            } finally {
+                isLoading = false;
+            }
+        } else {
+            loadNextChapter();
+        }
     }
 }
 

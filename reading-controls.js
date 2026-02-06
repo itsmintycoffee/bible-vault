@@ -163,6 +163,43 @@ class ReadingControls {
         fetchVerse(currentRef);
     }
 
+    async appendParallelChapter(chapterRef) {
+        if (!this.parallelTranslation) return;
+
+        // Fetch both translations for the new chapter
+        const primaryData = await translationManager.fetchVerse(chapterRef);
+
+        // Temporarily switch translation to fetch parallel
+        const originalTranslation = translationManager.currentTranslation;
+        translationManager.currentTranslation = this.parallelTranslation;
+        const parallelData = await translationManager.fetchVerse(chapterRef);
+        translationManager.currentTranslation = originalTranslation;
+
+        // Append to existing columns
+        const columns = document.querySelectorAll('.parallel-column');
+        if (columns.length === 2) {
+            const primaryColumn = columns[0];
+            const parallelColumn = columns[1];
+
+            const primaryChapterHTML = `
+                <div class="chapter-section">
+                    <div class="chapter-title">${primaryData.reference}</div>
+                    <div class="chapter-content">${formatVerseText(primaryData)}</div>
+                </div>
+            `;
+
+            const parallelChapterHTML = `
+                <div class="chapter-section">
+                    <div class="chapter-title">${parallelData.reference}</div>
+                    <div class="chapter-content">${formatVerseText(parallelData)}</div>
+                </div>
+            `;
+
+            primaryColumn.innerHTML += primaryChapterHTML;
+            parallelColumn.innerHTML += parallelChapterHTML;
+        }
+    }
+
     // Text Size Functions
     setTextSize(size) {
         this.currentTextSize = size;

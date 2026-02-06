@@ -287,20 +287,20 @@ body {
 .bible-content.parallel-view {
     max-width: none;
     padding: 4rem 3rem;
+    display: flex;
+    justify-content: center;
 }
 
 .bible-content.parallel-view #verse-content {
     display: flex;
     gap: 2rem;
     align-items: flex-start;
+    max-width: 1400px;
 }
 
 .parallel-column {
     flex: 1;
     max-width: 600px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
 }
 
 /* Reset chapter title width in parallel view - don't break out of columns */
@@ -312,20 +312,24 @@ body {
     font-size: 1.8rem !important;
 }
 
-/* Center align chapter content in parallel view */
+/* Ensure consistent font sizing in parallel view for alignment */
 .parallel-column .chapter-content {
-    text-align: center;
-    width: 100%;
+    font-size: 1.3rem;
+    line-height: 1.75;
 }
 
-/* Hide verse numbers in parallel view - they don't work well with centered text */
-.parallel-column .verse-number {
-    display: none;
-}
-
-/* Adjust verse padding in parallel view */
+/* Keep verse numbers visible and in margin */
 .parallel-column .verse {
+    position: relative;
     padding-left: 0;
+}
+
+.parallel-column .verse-number {
+    position: absolute;
+    left: -2.5em;
+    top: 0.1em;
+    text-align: right;
+    width: 2em;
 }
 
 .parallel-column-header {
