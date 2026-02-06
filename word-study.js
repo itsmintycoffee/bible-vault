@@ -148,34 +148,27 @@ async function getStrongsFromAlignment(verseRef, wordIndex) {
         const isOldTestament = bookNum <= 39;
         const originalTranslation = isOldTestament ? 'wlca' : 'lxx';
 
-        // Fetch original language verse
-        const originalData = await translationManager.fetchVerse(verseRef);
+        // Fetch original language verse (without changing current translation state)
+        const originalVerseData = await translationManager.fetchVerseForTranslation(verseRef, originalTranslation);
 
-        // Temporarily switch to original language to fetch that verse
-        const savedTranslation = translationManager.currentTranslation;
-        translationManager.currentTranslation = originalTranslation;
-        const originalVerseData = await translationManager.fetchVerse(verseRef);
-        translationManager.currentTranslation = savedTranslation;
-
-        // Extract the specific verse text
+        // Extract the specific verse text (use rawText which has Strong's numbers)
         let originalVerseText = '';
         if (originalVerseData.verses && originalVerseData.verses.length > 0) {
             const verseNum = parseInt(verse);
             const verseObj = originalVerseData.verses.find(v => v.verse === verseNum);
             if (verseObj) {
-                originalVerseText = verseObj.text;
+                // Use rawText if available (contains Strong's numbers), fallback to text
+                originalVerseText = verseObj.rawText || verseObj.text;
             }
         }
 
         if (!originalVerseText) return null;
 
         // Parse Strong's numbers from the text
-        // Text format can be either:
-        // - Plain: "וַיֹּ֤אמֶר H559 אֱלֹהִ֔ים H430"
-        // - HTML wrapped: "וַיֹּ֤אמֶר <span class=\"strongs-num\">H559</span>"
+        // Format: "וַיֹּ֤אמֶר H559 אֱלֹהִ֔ים H430"
         const strongsNumbers = [];
 
-        // Extract all Strong's numbers using regex (handles both plain and HTML-wrapped)
+        // Extract all Strong's numbers using regex
         const strongsMatches = originalVerseText.matchAll(/[HG]\d+/g);
         for (const match of strongsMatches) {
             strongsNumbers.push(match[0]);

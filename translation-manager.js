@@ -78,6 +78,14 @@ class TranslationManager {
     // Fetch verse from appropriate source
     async fetchVerse(reference) {
         const translation = this.getCurrentTranslation();
+        return await this.fetchVerseForTranslation(reference, translation);
+    }
+
+    // Fetch verse for a specific translation (without changing current state)
+    async fetchVerseForTranslation(reference, translation) {
+        if (typeof translation === 'string') {
+            translation = TRANSLATIONS[translation];
+        }
 
         if (translation.source === 'bolls') {
             return await this.fetchFromBolls(reference, translation);
@@ -180,14 +188,16 @@ class TranslationManager {
             for (const item of data) {
                 verses.push({
                     verse: item.verse,
-                    text: this.cleanHtmlTags(item.text)
+                    text: this.cleanHtmlTags(item.text),
+                    rawText: this.getRawText(item.text) // Keep Strong's numbers for concordance
                 });
             }
         } else if (data.text) {
             // Single verse response
             verses.push({
                 verse: data.verse || 1,
-                text: this.cleanHtmlTags(data.text)
+                text: this.cleanHtmlTags(data.text),
+                rawText: this.getRawText(data.text) // Keep Strong's numbers for concordance
             });
         }
 
@@ -200,18 +210,25 @@ class TranslationManager {
         };
     }
 
-    // Remove HTML tags from text and wrap Strong's numbers for styling
+    // Remove HTML tags from text and hide Strong's numbers for readability
     cleanHtmlTags(html) {
         if (!html) return '';
 
         // Remove HTML tags
         let text = html.replace(/<[^>]*>/g, '').trim();
 
-        // Wrap Strong's numbers in spans for CSS styling (makes them hideable)
-        // Pattern matches H#### or G#### (Strong's numbers)
-        text = text.replace(/\s([HG]\d+)/g, ' <span class="strongs-num">$1</span>');
+        // Remove Strong's numbers (H#### or G####) for clean display
+        // They're still in the original data for concordance lookup
+        text = text.replace(/\s+[HG]\d+/g, '');
 
         return text;
+    }
+
+    // Get raw text with Strong's numbers (for concordance extraction)
+    getRawText(html) {
+        if (!html) return '';
+        // Only remove HTML tags, keep Strong's numbers
+        return html.replace(/<[^>]*>/g, '').trim();
     }
 
     // Get all available translations

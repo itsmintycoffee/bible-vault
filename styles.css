@@ -460,11 +460,6 @@ body {
     vertical-align: super;
 }
 
-/* Hide Strong's numbers in Hebrew/Greek text for readability */
-.strongs-num {
-    display: none;
-}
-
 .word {
     cursor: pointer;
     padding: 2px 0;
