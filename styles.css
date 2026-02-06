@@ -112,7 +112,7 @@ body {
     position: sticky;
     top: 0;
     z-index: 10;
-    display: none;
+    display: block;
 }
 
 .header-top {
