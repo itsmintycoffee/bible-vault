@@ -383,7 +383,7 @@ body {
     padding-right: calc(50vw - 50%);
     margin-top: -1rem;
     padding-top: 0;
-    box-shadow: 0 2px 8px rgba(44, 42, 39, 0.05);
+    box-shadow: none;
     will-change: transform;
 }
 
@@ -416,7 +416,7 @@ body {
     background: rgba(253, 250, 244, 0.85);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    box-shadow: 0 2px 8px rgba(44, 42, 39, 0.05);
+    box-shadow: none;
 }
 
 .chapter-content {
