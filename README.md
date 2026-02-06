@@ -4,10 +4,14 @@ Your Personal Torah Study Companion - An interactive platform for studying the F
 
 ## Features
 
-✨ **Complete Torah Coverage**
-- All 5 books: Genesis, Exodus, Leviticus, Numbers, Deuteronomy
-- 187 chapters of biblical text
-- World English Bible (WEB) translation
+✨ **Multi-Translation Support**
+- English Standard Version (ESV)
+- King James Version (KJV)
+- Bulgarian Bible (1940)
+- Hebrew: Westminster Leningrad Codex (WLCa)
+- Greek: Septuagint (LXX)
+- Easy translation switching with dropdown selector
+- Saves your translation preference
 
 📅 **Interactive Historical Timeline**
 - 22 major biblical characters from Creation to Moses

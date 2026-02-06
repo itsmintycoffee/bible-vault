@@ -1,6 +1,4 @@
-// Bible API Integration using bible-api.com
-const API_BASE_URL = 'https://bible-api.com';
-
+// Bible API Integration with multi-translation support
 // Get DOM elements
 const verseInput = document.getElementById('verse-input');
 const searchBtn = document.getElementById('search-btn');
@@ -8,29 +6,43 @@ const loading = document.getElementById('loading');
 const error = document.getElementById('error');
 const verseContent = document.getElementById('verse-content');
 const mainContent = document.querySelector('.main-content');
+const translationSelector = document.getElementById('translation-selector');
 
 // Track current reading state
 let currentBook = 'Genesis';
 let currentChapter = 1;
 let isLoading = false;
 
-// Fetch verse from API
+// Initialize translation selector
+function initializeTranslationSelector() {
+    // Set saved preference
+    const savedTranslation = translationManager.currentTranslation;
+    if (translationSelector) {
+        translationSelector.value = savedTranslation;
+
+        // Listen for translation changes
+        translationSelector.addEventListener('change', async (e) => {
+            const newTranslation = e.target.value;
+            translationManager.setTranslation(newTranslation);
+
+            // Reload current chapter with new translation
+            const currentRef = `${currentBook} ${currentChapter}`;
+            await fetchVerse(currentRef);
+        });
+    }
+}
+
+// Fetch verse from appropriate translation source
 async function fetchVerse(reference) {
     try {
         showLoading();
 
-        // Format the reference for the API (replace spaces with +)
-        const formattedReference = reference.trim().replace(/\s+/g, '+');
-        const response = await fetch(`${API_BASE_URL}/${formattedReference}`);
-
-        if (!response.ok) {
-            throw new Error('Verse not found. Please check your reference and try again.');
-        }
-
-        const data = await response.json();
+        // Use translation manager to fetch from appropriate source
+        const data = await translationManager.fetchVerse(reference);
         await displayVerse(data);
 
     } catch (err) {
+        console.error('Fetch error:', err);
         showError(err.message);
     }
 }
@@ -291,6 +303,7 @@ mainContent.addEventListener('scroll', () => {
 
 // Load a default chapter on page load
 window.addEventListener('load', () => {
+    initializeTranslationSelector();
     fetchVerse('Genesis 1');
 });
 
