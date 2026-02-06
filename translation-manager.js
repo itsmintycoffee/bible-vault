@@ -218,8 +218,12 @@ class TranslationManager {
         let text = html.replace(/<[^>]*>/g, '').trim();
 
         // Remove Strong's numbers (H#### or G####) for clean display
-        // They're still in the original data for concordance lookup
-        text = text.replace(/\s+[HG]\d+/g, '');
+        // Pattern matches: optional space + H or G + digits + optional space
+        // This handles various formats: " H559 ", "H559 ", " H559", "H559"
+        text = text.replace(/\s*[HG]\d+\s*/g, ' ');
+
+        // Clean up any double spaces created by removal
+        text = text.replace(/\s{2,}/g, ' ').trim();
 
         return text;
     }
