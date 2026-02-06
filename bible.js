@@ -249,14 +249,8 @@ async function loadNextChapter() {
     isLoading = true;
 
     try {
-        const formattedReference = nextChapterRef.trim().replace(/\s+/g, '+');
-        const response = await fetch(`${API_BASE_URL}/${formattedReference}`);
-
-        if (!response.ok) {
-            throw new Error('Could not load next chapter');
-        }
-
-        const data = await response.json();
+        // Use translation manager to support all translations (Bulgarian, Hebrew, Greek, ESV, KJV)
+        const data = await translationManager.fetchVerse(nextChapterRef);
         await displayVerse(data, true); // append=true
 
     } catch (err) {
