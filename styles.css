@@ -363,7 +363,7 @@ body {
     font-weight: 800;
     color: var(--text-primary);
     margin-bottom: 2.5rem;
-    font-size: 2rem;
+    font-size: 2.5rem;
     text-transform: none;
     letter-spacing: -0.02em;
     position: sticky;
@@ -372,15 +372,15 @@ body {
     background: rgba(253, 250, 244, 0.85);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    height: 60px;
+    height: 70px;
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
     width: 100vw;
-    margin-left: calc(-6rem + (-50vw + 50%));
-    padding-left: calc(6rem + (50vw - 50%));
-    padding-right: calc(6rem + (50vw - 50%));
+    margin-left: calc(-50vw + 50%);
+    padding-left: calc(50vw - 50%);
+    padding-right: calc(50vw - 50%);
     margin-top: -1rem;
     padding-top: 0;
     box-shadow: 0 2px 8px rgba(44, 42, 39, 0.05);
@@ -389,7 +389,7 @@ body {
 
 /* First chapter title - large headline style */
 .chapter-section:first-child .chapter-title {
-    font-size: 4rem;
+    font-size: 5rem;
     font-weight: 900;
     letter-spacing: -0.03em;
     height: auto;
@@ -405,10 +405,10 @@ body {
 
 /* First chapter title when sticky - shrink to normal size */
 .chapter-section:first-child .chapter-title.sticky-active {
-    font-size: 2rem;
+    font-size: 2.5rem;
     font-weight: 800;
     letter-spacing: -0.02em;
-    height: 60px;
+    height: 70px;
     padding-top: 0;
     padding-bottom: 0;
     margin-top: -1rem;
@@ -466,14 +466,19 @@ body {
 .verse {
     display: block;
     margin-bottom: 0;
+    position: relative;
+    padding-left: 0;
 }
 
 .verse-number {
     font-weight: 600;
     color: #c75146;
-    font-size: 0.6em;
-    margin: 0 0.6rem 0 0.2rem;
-    vertical-align: super;
+    font-size: 0.7em;
+    position: absolute;
+    left: -2.5em;
+    top: 0.1em;
+    text-align: right;
+    width: 2em;
 }
 
 /* Word underlines hidden by default */
