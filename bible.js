@@ -616,7 +616,18 @@ function updateChapterSelector() {
 
 // Add scroll event listener with debounce
 let scrollTimeout;
+const contentHeader = document.querySelector('.content-header');
+
 mainContent.addEventListener('scroll', () => {
+    // Show/hide top bar based on scroll position (no debounce for responsiveness)
+    if (contentHeader) {
+        if (mainContent.scrollTop > 100) {
+            contentHeader.classList.add('scrolled');
+        } else {
+            contentHeader.classList.remove('scrolled');
+        }
+    }
+
     clearTimeout(scrollTimeout);
     scrollTimeout = setTimeout(() => {
         handleScroll();
@@ -793,6 +804,13 @@ async function displayComparisonVerse(leftData, rightData, append = false, prepe
     chapterDiv.appendChild(comparisonHeader);
     chapterDiv.appendChild(chapterContent);
 
+    // Apply JEDP source color-coding to comparison mode verses
+    if (typeof loadJEDPData === 'function' && typeof applyJEDPSources === 'function') {
+        await loadJEDPData(currentBook);
+        const verseColumns = chapterDiv.querySelectorAll('.verse-column');
+        applyJEDPSources(verseColumns);
+    }
+
     // Make words clickable for word study in comparison mode
     if (typeof makeWordsClickable === 'function') {
         const leftVerseTexts = chapterContent.querySelectorAll('.verse-column:first-child .verse-text');
@@ -853,8 +871,27 @@ async function displayComparisonVerse(leftData, rightData, append = false, prepe
 
 // Default chapter is loaded by chapter-selector.js to avoid duplicate loading
 
-// Mobile sidebar toggle functionality
+// Desktop sidebar toggle functionality
 const rightPanel = document.getElementById('right-panel');
+const sidebarToggle = document.getElementById('sidebar-toggle');
+
+if (sidebarToggle) {
+    sidebarToggle.addEventListener('click', () => {
+        const isOpen = rightPanel.classList.contains('expanded');
+
+        if (isOpen) {
+            rightPanel.classList.remove('expanded');
+            document.body.classList.remove('study-mode');
+            sidebarToggle.setAttribute('title', 'Open sidebar');
+        } else {
+            rightPanel.classList.add('expanded');
+            document.body.classList.add('study-mode');
+            sidebarToggle.setAttribute('title', 'Close sidebar');
+        }
+    });
+}
+
+// Mobile sidebar toggle functionality
 const mobileToggleBtn = document.getElementById('mobile-sidebar-toggle');
 const mobileCloseBtn = document.getElementById('mobile-close-btn');
 

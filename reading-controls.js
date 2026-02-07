@@ -58,7 +58,7 @@ class ReadingControls {
         this.loadPreferences();
     }
 
-    // Parallel View Functions
+    // Parallel View Functions - uses bible.js verse-aligned comparison mode
     toggleParallelView() {
         this.isParallelMode = !this.isParallelMode;
         const parallelToggle = document.getElementById('parallel-toggle');
@@ -66,15 +66,14 @@ class ReadingControls {
 
         if (this.isParallelMode) {
             // Auto-select comparison translation based on current selection
-            const currentTranslation = translationManager.getCurrentTranslation().id;
+            const currentTranslationId = translationManager.getCurrentTranslation().id;
             let autoCompareTranslation;
 
-            if (currentTranslation === 'esv' || currentTranslation === 'kjv') {
+            if (currentTranslationId === 'esv' || currentTranslationId === 'kjv') {
                 autoCompareTranslation = 'bulgarian';
-            } else if (currentTranslation === 'bulgarian') {
+            } else if (currentTranslationId === 'bulgarian') {
                 autoCompareTranslation = 'esv';
             } else {
-                // Hebrew/Greek defaults to ESV
                 autoCompareTranslation = 'esv';
             }
 
@@ -87,117 +86,31 @@ class ReadingControls {
 
             parallelToggle.classList.add('active');
 
-            // Immediately refresh with auto-selected translation
-            this.refreshParallelView();
+            // Use bible.js verse-aligned comparison mode
+            isComparisonMode = true;
+            leftTranslation = currentTranslationId;
+            rightTranslation = autoCompareTranslation;
+            loadChapterInComparisonMode(`${currentBook} ${currentChapter}`);
         } else {
             parallelToggle.classList.remove('active');
             if (parallelTranslationSelector) {
                 parallelTranslationSelector.classList.add('hidden');
             }
-            // Switch back to single column view
-            this.renderSingleView();
+
+            // Switch back to single view
+            isComparisonMode = false;
+            const bibleContent = document.querySelector('.bible-content');
+            if (bibleContent) bibleContent.classList.remove('parallel-view');
+            fetchVerse(`${currentBook} ${currentChapter}`);
         }
 
-        // Save preference
         localStorage.setItem('parallelMode', this.isParallelMode);
     }
 
     async refreshParallelView() {
         if (!this.parallelTranslation) return;
-
-        const currentRef = `${currentBook} ${currentChapter}`;
-
-        // Fetch both translations
-        const primaryData = await translationManager.fetchVerse(currentRef);
-
-        // Temporarily switch translation to fetch parallel
-        const originalTranslation = translationManager.currentTranslation;
-        translationManager.currentTranslation = this.parallelTranslation;
-        const parallelData = await translationManager.fetchVerse(currentRef);
-        translationManager.currentTranslation = originalTranslation;
-
-        // Render parallel view
-        this.renderParallelView(primaryData, parallelData);
-    }
-
-    renderParallelView(primaryData, parallelData) {
-        const verseContent = document.getElementById('verse-content');
-        const bibleContent = verseContent.closest('.bible-content');
-
-        // Add parallel view class
-        bibleContent.classList.add('parallel-view');
-
-        // Create parallel columns
-        const primaryTranslation = translationManager.getCurrentTranslation();
-        const parallelTranslation = TRANSLATIONS[this.parallelTranslation];
-
-        const parallelHTML = `
-            <div class="parallel-column">
-                <div class="parallel-column-header">${primaryTranslation.name}</div>
-                <div class="chapter-section">
-                    <div class="chapter-title">${primaryData.reference}</div>
-                    <div class="chapter-content">${formatVerseText(primaryData)}</div>
-                </div>
-            </div>
-            <div class="parallel-column">
-                <div class="parallel-column-header">${parallelTranslation.name}</div>
-                <div class="chapter-section">
-                    <div class="chapter-title">${parallelData.reference}</div>
-                    <div class="chapter-content">${formatVerseText(parallelData)}</div>
-                </div>
-            </div>
-        `;
-
-        verseContent.innerHTML = parallelHTML;
-    }
-
-    renderSingleView() {
-        const verseContent = document.getElementById('verse-content');
-        const bibleContent = verseContent.closest('.bible-content');
-
-        // Remove parallel view class
-        bibleContent.classList.remove('parallel-view');
-
-        // Reload current chapter in single view
-        const currentRef = `${currentBook} ${currentChapter}`;
-        fetchVerse(currentRef);
-    }
-
-    async appendParallelChapter(chapterRef) {
-        if (!this.parallelTranslation) return;
-
-        // Fetch both translations for the new chapter
-        const primaryData = await translationManager.fetchVerse(chapterRef);
-
-        // Temporarily switch translation to fetch parallel
-        const originalTranslation = translationManager.currentTranslation;
-        translationManager.currentTranslation = this.parallelTranslation;
-        const parallelData = await translationManager.fetchVerse(chapterRef);
-        translationManager.currentTranslation = originalTranslation;
-
-        // Append to existing columns
-        const columns = document.querySelectorAll('.parallel-column');
-        if (columns.length === 2) {
-            const primaryColumn = columns[0];
-            const parallelColumn = columns[1];
-
-            const primaryChapterHTML = `
-                <div class="chapter-section">
-                    <div class="chapter-title">${primaryData.reference}</div>
-                    <div class="chapter-content">${formatVerseText(primaryData)}</div>
-                </div>
-            `;
-
-            const parallelChapterHTML = `
-                <div class="chapter-section">
-                    <div class="chapter-title">${parallelData.reference}</div>
-                    <div class="chapter-content">${formatVerseText(parallelData)}</div>
-                </div>
-            `;
-
-            primaryColumn.innerHTML += primaryChapterHTML;
-            parallelColumn.innerHTML += parallelChapterHTML;
-        }
+        rightTranslation = this.parallelTranslation;
+        loadChapterInComparisonMode(`${currentBook} ${currentChapter}`);
     }
 
     // Text Size Functions

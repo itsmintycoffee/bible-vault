@@ -563,24 +563,24 @@ body {
     transition: color 0.3s ease;
 }
 
-/* Show source highlighting in study mode - text color */
-body.study-mode .source-J {
+/* Source highlighting - always visible with text color */
+.source-J {
     color: #dc3545; /* Jahwist - Red */
 }
 
-body.study-mode .source-E {
+.source-E {
     color: #0d6efd; /* Elohist - Blue */
 }
 
-body.study-mode .source-P {
+.source-P {
     color: #6f42c1; /* Priestly - Purple */
 }
 
-body.study-mode .source-D {
+.source-D {
     color: #198754; /* Deuteronomist - Green */
 }
 
-body.study-mode .source-R {
+.source-R {
     color: #fd7e14; /* Redactor - Orange */
 }
 
