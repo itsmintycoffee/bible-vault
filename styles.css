@@ -75,7 +75,7 @@ body {
 }
 
 /* Hide header when at very top (not scrolled) */
-.content-header:not(.scrolled) {
+.content-header:not(.scrolled):not(.loading) {
     opacity: 0;
     pointer-events: none;
     transform: translateY(-100%);
@@ -88,7 +88,8 @@ body {
 }
 
 /* Show header when scrolled down */
-.content-header.scrolled {
+.content-header.scrolled,
+.content-header.loading {
     opacity: 1;
     pointer-events: auto;
     transform: translateY(0);
@@ -298,6 +299,7 @@ body {
     max-width: 800px;
     margin: 0 auto;
     width: 100%;
+    position: relative;
 }
 
 /* Parallel View Layout */
@@ -364,9 +366,14 @@ body {
 
 #loading,
 #error {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     text-align: center;
     padding: 2rem;
     font-size: 1rem;
+    width: auto;
 }
 
 #loading {
@@ -682,6 +689,151 @@ body {
     font-size: 0.85rem;
     line-height: 1.5;
     color: var(--text-secondary);
+}
+
+/* Chapter Selector Modal */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(44, 42, 39, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(3px);
+}
+
+.modal-content {
+    background: var(--bg-secondary);
+    border-radius: 16px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 10px 40px rgba(44, 42, 39, 0.2);
+}
+
+.modal-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.testament-tabs {
+    display: flex;
+    gap: 0.5rem;
+    background: var(--bg-primary);
+    padding: 0.3rem;
+    border-radius: 8px;
+}
+
+.tab-btn {
+    padding: 0.5rem 1.5rem;
+    border: none;
+    background: transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    transition: all 0.2s;
+}
+
+.tab-btn.active {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    transition: background 0.2s;
+}
+
+.close-btn:hover {
+    background: var(--bg-primary);
+}
+
+.modal-body {
+    padding: 1.5rem;
+    overflow-y: auto;
+    display: flex;
+    gap: 1.5rem;
+}
+
+.books-list {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.book-item {
+    padding: 0.7rem 1rem;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: left;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    transition: all 0.2s;
+}
+
+.book-item:hover {
+    background: var(--bg-primary);
+    border-color: var(--border);
+}
+
+.book-item.selected {
+    background: var(--accent);
+    color: white;
+    font-weight: 600;
+}
+
+.chapters-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.5rem;
+    align-content: start;
+}
+
+.chapter-item {
+    padding: 0.8rem 0.5rem;
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+    color: var(--text-primary);
+    font-size: 0.8rem;
+    transition: all 0.2s;
+    white-space: normal;
+    word-break: break-word;
+}
+
+.chapter-item:hover {
+    background: var(--accent-light);
+    color: white;
+    border-color: var(--accent-light);
 }
 
 /* Hidden utility class - must be after modal to override display */

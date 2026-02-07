@@ -8,6 +8,7 @@ const loading = document.getElementById('loading');
 const error = document.getElementById('error');
 const verseContent = document.getElementById('verse-content');
 const mainContent = document.querySelector('.main-content');
+const contentHeader = document.querySelector('.content-header');
 
 // Track current reading state (var for cross-script access)
 var currentBook = 'Genesis';
@@ -394,6 +395,9 @@ function showLoading() {
     loading.classList.remove('hidden');
     error.classList.add('hidden');
     verseContent.innerHTML = '';
+    if (contentHeader) {
+        contentHeader.classList.add('loading');
+    }
 }
 
 function showError(message) {
@@ -401,11 +405,17 @@ function showError(message) {
     error.classList.remove('hidden');
     error.textContent = message;
     verseContent.innerHTML = '';
+    if (contentHeader) {
+        contentHeader.classList.remove('loading');
+    }
 }
 
 function hideLoadingAndError() {
     loading.classList.add('hidden');
     error.classList.add('hidden');
+    if (contentHeader) {
+        contentHeader.classList.remove('loading');
+    }
 }
 
 // Event listeners
@@ -699,7 +709,6 @@ function updateChapterSelector() {
 
 // Add scroll event listener with debounce
 let scrollTimeout;
-const contentHeader = document.querySelector('.content-header');
 
 mainContent.addEventListener('scroll', () => {
     // Show/hide top bar based on scroll position (no debounce for responsiveness)

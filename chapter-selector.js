@@ -153,7 +153,7 @@ function displayChapters(book) {
     for (let i = 1; i <= book.chapters; i++) {
         const chapterBtn = document.createElement('button');
         chapterBtn.className = 'chapter-item';
-        chapterBtn.textContent = i;
+        chapterBtn.textContent = `${book.name} ${i}`;
         chapterBtn.addEventListener('click', () => {
             loadChapter(book.name, i);
         });
