@@ -256,8 +256,11 @@ async function displayVerse(data, append = false, prepend = false) {
     // Then make words clickable for word study (after JEDP highlighting)
     const verseTexts = chapterDiv.querySelectorAll('.verse-text');
     if (typeof makeWordsClickable === 'function') {
+        // Determine the translation type for word study
+        const translationType = data.translation_id || 'english';
+
         for (const verseText of verseTexts) {
-            await makeWordsClickable(verseText);
+            await makeWordsClickable(verseText, translationType);
         }
     }
 
@@ -684,9 +687,32 @@ async function loadChapterInComparisonMode(reference) {
 async function displayComparisonVerse(leftData, rightData, append = false, prepend = false) {
     hideLoadingAndError();
 
+    // Fetch Hebrew/Greek version for Strong's numbers (for both columns)
+    let originalLanguageData = null;
+    if (typeof translationManager !== 'undefined') {
+        try {
+            const isOldTestament = currentBook && ['Genesis', 'Exodus', 'Leviticus', 'Numbers', 'Deuteronomy',
+                'Joshua', 'Judges', 'Ruth', '1 Samuel', '2 Samuel', '1 Kings', '2 Kings',
+                '1 Chronicles', '2 Chronicles', 'Ezra', 'Nehemiah', 'Esther', 'Job', 'Psalms',
+                'Proverbs', 'Ecclesiastes', 'Song of Solomon', 'Isaiah', 'Jeremiah', 'Lamentations',
+                'Ezekiel', 'Daniel', 'Hosea', 'Joel', 'Amos', 'Obadiah', 'Jonah', 'Micah',
+                'Nahum', 'Habakkuk', 'Zephaniah', 'Haggai', 'Zechariah', 'Malachi'].includes(currentBook);
+
+            const originalTranslation = isOldTestament ? 'wlca' : 'lxx';
+            originalLanguageData = await translationManager.fetchVerseForTranslation(leftData.reference, originalTranslation);
+        } catch (error) {
+            console.log('Could not fetch original language data for comparison:', error);
+        }
+    }
+
     // Create chapter element
     const chapterDiv = document.createElement('div');
     chapterDiv.className = 'chapter-section';
+
+    // Store original language data for both columns
+    if (originalLanguageData) {
+        chapterDiv.dataset.originalLanguageData = JSON.stringify(originalLanguageData);
+    }
 
     // Create header with translation names
     const comparisonHeader = document.createElement('div');
@@ -758,6 +784,23 @@ async function displayComparisonVerse(leftData, rightData, append = false, prepe
     chapterDiv.appendChild(chapterTitle);
     chapterDiv.appendChild(comparisonHeader);
     chapterDiv.appendChild(chapterContent);
+
+    // Make words clickable for word study in comparison mode
+    if (typeof makeWordsClickable === 'function') {
+        const leftVerseTexts = chapterContent.querySelectorAll('.verse-column:first-child .verse-text');
+        const rightVerseTexts = chapterContent.querySelectorAll('.verse-column:last-child .verse-text');
+
+        const leftTranslationType = leftData.translation_id || leftTranslation;
+        const rightTranslationType = rightData.translation_id || rightTranslation;
+
+        for (const verseText of leftVerseTexts) {
+            await makeWordsClickable(verseText, leftTranslationType);
+        }
+
+        for (const verseText of rightVerseTexts) {
+            await makeWordsClickable(verseText, rightTranslationType);
+        }
+    }
 
     // Update current reading position (only if not prepending or appending)
     if (!prepend && !append) {

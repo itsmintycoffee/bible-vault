@@ -131,7 +131,7 @@ const stopWords = new Set([
 ]);
 
 // Make verse text clickable with Strong's number mapping
-async function makeWordsClickable(verseElement) {
+async function makeWordsClickable(verseElement, translationType = 'english') {
     // Get the verse number from this verse element
     const verseNumberElem = verseElement.closest('.verse')?.querySelector('.verse-number');
     const verseNumber = verseNumberElem ? parseInt(verseNumberElem.textContent) : null;
@@ -141,7 +141,17 @@ async function makeWordsClickable(verseElement) {
     let originalVerseData = null;
     let strongsNumbers = [];
 
-    if (chapterSection && chapterSection.dataset.originalLanguageData) {
+    // Determine if this is an original language text (Hebrew/Greek)
+    const isOriginalLanguage = translationType === 'wlca' || translationType === 'lxx' ||
+                               translationType === 'hebrew' || translationType === 'greek';
+
+    if (isOriginalLanguage) {
+        // For Hebrew/Greek, extract Strong's numbers from the verse text itself
+        const rawText = verseElement.textContent;
+        strongsNumbers = extractStrongsNumbers(rawText);
+        console.log(`Original language verse ${verseNumber} Strong's numbers:`, strongsNumbers);
+    } else if (chapterSection && chapterSection.dataset.originalLanguageData) {
+        // For translations (English, Bulgarian), use mapped Strong's numbers from original language
         try {
             const originalData = JSON.parse(chapterSection.dataset.originalLanguageData);
             // Find the verse with matching verse number
@@ -149,7 +159,7 @@ async function makeWordsClickable(verseElement) {
                 originalVerseData = originalData.verses.find(v => v.verse === verseNumber);
                 if (originalVerseData && originalVerseData.rawText) {
                     strongsNumbers = extractStrongsNumbers(originalVerseData.rawText);
-                    console.log(`Verse ${verseNumber} Strong's numbers:`, strongsNumbers);
+                    console.log(`Verse ${verseNumber} Strong's numbers from original:`, strongsNumbers);
                 }
             }
         } catch (error) {
@@ -177,45 +187,85 @@ async function makeWordsClickable(verseElement) {
     for (let i = textNodesToReplace.length - 1; i >= 0; i--) {
         textNode = textNodesToReplace[i];
         const text = textNode.textContent;
-        const tokens = text.split(/(\s+)/);
 
         const fragment = document.createDocumentFragment();
 
-        for (const token of tokens) {
-            // If it's whitespace, keep as text node
-            if (/^\s+$/.test(token)) {
-                fragment.appendChild(document.createTextNode(token));
-                continue;
-            }
+        if (isOriginalLanguage) {
+            // For Hebrew/Greek: Extract words with embedded Strong's numbers
+            // Pattern: word followed by optional Strong's number (e.g., "בְּרֵאשִׁ֖יתH7225")
+            const wordPattern = /([^\s]+?)([HG]\d{1,5})?(\s+)/g;
+            let match;
+            let lastIndex = 0;
 
-            // Clean the word (remove punctuation for checking)
-            const cleanWord = token.toLowerCase().replace(/[.,;:!?'"()]/g, '');
+            while ((match = wordPattern.exec(text)) !== null) {
+                const originalWord = match[1]; // The Hebrew/Greek word
+                const strongsNum = match[2] || null; // The Strong's number if present
+                const whitespace = match[3]; // Whitespace after the word
 
-            // If it's a stop word or very short, don't make it clickable
-            if (stopWords.has(cleanWord) || cleanWord.length <= 2) {
-                fragment.appendChild(document.createTextNode(token));
-                wordIndex++;
-                continue;
-            }
-
-            // Get corresponding Strong's number if available
-            const strongsNum = strongsNumbers[wordIndex] || null;
-
-            // Make it clickable if we have a Strong's number OR if we have a definition in the index
-            if (strongsNum || hasDefinition(cleanWord)) {
-                const span = document.createElement('span');
-                span.className = 'word';
-                span.setAttribute('data-word', cleanWord);
+                // Create clickable span for the original word
                 if (strongsNum) {
+                    const span = document.createElement('span');
+                    span.className = 'word';
+                    span.setAttribute('data-word', originalWord);
                     span.setAttribute('data-strongs', strongsNum);
+                    span.setAttribute('data-original-language', 'true');
+                    span.textContent = originalWord; // Display only the word, not the Strong's number
+                    fragment.appendChild(span);
+                } else {
+                    fragment.appendChild(document.createTextNode(originalWord));
                 }
-                span.textContent = token;
-                fragment.appendChild(span);
-            } else {
-                fragment.appendChild(document.createTextNode(token));
+
+                fragment.appendChild(document.createTextNode(whitespace));
+                lastIndex = wordPattern.lastIndex;
             }
 
-            wordIndex++;
+            // Add any remaining text
+            if (lastIndex < text.length) {
+                fragment.appendChild(document.createTextNode(text.substring(lastIndex)));
+            }
+        } else {
+            // For translations (English, Bulgarian): Use position-based mapping
+            const tokens = text.split(/(\s+)/);
+
+            for (const token of tokens) {
+                // If it's whitespace, keep as text node
+                if (/^\s+$/.test(token)) {
+                    fragment.appendChild(document.createTextNode(token));
+                    continue;
+                }
+
+                // Clean the word (remove punctuation for checking)
+                const cleanWord = token.toLowerCase().replace(/[.,;:!?'"()]/g, '');
+
+                // For Bulgarian, don't use stop words filter (it's in Cyrillic)
+                const isBulgarian = translationType === 'bulgarian' || translationType === 'bulgarian1940';
+                const isStopWord = !isBulgarian && (stopWords.has(cleanWord) || cleanWord.length <= 2);
+
+                if (isStopWord) {
+                    fragment.appendChild(document.createTextNode(token));
+                    wordIndex++;
+                    continue;
+                }
+
+                // Get corresponding Strong's number if available
+                const strongsNum = strongsNumbers[wordIndex] || null;
+
+                // Make it clickable if we have a Strong's number OR if we have a definition in the index
+                if (strongsNum || (!isBulgarian && hasDefinition(cleanWord))) {
+                    const span = document.createElement('span');
+                    span.className = 'word';
+                    span.setAttribute('data-word', isBulgarian ? token : cleanWord);
+                    if (strongsNum) {
+                        span.setAttribute('data-strongs', strongsNum);
+                    }
+                    span.textContent = token;
+                    fragment.appendChild(span);
+                } else {
+                    fragment.appendChild(document.createTextNode(token));
+                }
+
+                wordIndex++;
+            }
         }
 
         // Replace text node with fragment
@@ -275,10 +325,11 @@ function initWordStudy() {
 
             const word = e.target.dataset.word;
             const strongsNumber = e.target.dataset.strongs || null;
+            const isOriginalLanguage = e.target.dataset.originalLanguage === 'true';
 
             // Add a small delay before showing (200ms) to avoid accidental triggers
             tooltipShowTimeout = setTimeout(async () => {
-                await showTooltip(word, e, strongsNumber);
+                await showTooltip(word, e, strongsNumber, isOriginalLanguage);
             }, 200);
         }
     }, true); // Use capture phase to catch events on dynamically added elements
@@ -345,14 +396,17 @@ async function fetchWordFromAPI(word) {
 }
 
 // Show tooltip
-async function showTooltip(word, event, strongsNumber = null) {
+async function showTooltip(word, event, strongsNumber = null, isOriginalLanguage = false) {
     currentTooltipWord = word;
 
+    // For original language, show the word as the "original spelling"
+    const displayWord = isOriginalLanguage ? 'Original Word' : word;
+
     // Show loading state
-    tooltip.querySelector('#tooltip-word').textContent = word;
+    tooltip.querySelector('#tooltip-word').textContent = displayWord;
     tooltip.querySelector('#tooltip-strongs').textContent = strongsNumber ? `(${strongsNumber})` : '';
     tooltip.querySelector('#tooltip-language').textContent = 'Loading...';
-    tooltip.querySelector('#tooltip-original').textContent = '';
+    tooltip.querySelector('#tooltip-original').textContent = isOriginalLanguage ? word : '';
     tooltip.querySelector('#tooltip-transliteration').textContent = '';
     tooltip.querySelector('#tooltip-definition').textContent = 'Fetching word data...';
 
@@ -364,10 +418,17 @@ async function showTooltip(word, event, strongsNumber = null) {
 
     // Update tooltip with actual data (only if still showing same word)
     if (currentTooltipWord === word) {
-        tooltip.querySelector('#tooltip-word').textContent = wordInfo.english;
+        // For original language, show the actual word as the original spelling
+        if (isOriginalLanguage) {
+            tooltip.querySelector('#tooltip-word').textContent = 'Original Word';
+            tooltip.querySelector('#tooltip-original').textContent = word;
+        } else {
+            tooltip.querySelector('#tooltip-word').textContent = wordInfo.english;
+            tooltip.querySelector('#tooltip-original').textContent = wordInfo.original;
+        }
+
         tooltip.querySelector('#tooltip-strongs').textContent = wordInfo.strongsNumber ? `(${wordInfo.strongsNumber})` : '';
         tooltip.querySelector('#tooltip-language').textContent = wordInfo.language;
-        tooltip.querySelector('#tooltip-original').textContent = wordInfo.original;
         tooltip.querySelector('#tooltip-transliteration').textContent = wordInfo.transliteration;
         tooltip.querySelector('#tooltip-definition').textContent = wordInfo.definition;
     }
