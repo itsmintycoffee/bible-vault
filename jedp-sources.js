@@ -7,6 +7,7 @@ let jedpData = {};
 // Load JEDP source data for a specific book
 async function loadJEDPData(book) {
     if (jedpData[book]) {
+        console.log(`JEDP data already loaded for ${book}`);
         return jedpData[book];
     }
 
@@ -14,12 +15,15 @@ async function loadJEDPData(book) {
         const bookLower = book.toLowerCase();
         const response = await fetch(`sources/${bookLower}-jedp.json`);
         if (!response.ok) {
+            console.log(`JEDP data not available for ${book}: ${response.status}`);
             return {};
         }
         const data = await response.json();
         jedpData[book] = data;
+        console.log(`✓ JEDP source data loaded for ${book}:`, Object.keys(data).length, 'chapters');
         return data;
     } catch (error) {
+        console.log(`JEDP data error for ${book}:`, error);
         return {};
     }
 }
@@ -69,13 +73,10 @@ function wrapWordsWithSource(container, source) {
         
         while ((match = regex.exec(text)) !== null) {
             const token = match[0];
-
+            
             if (/\s/.test(token)) {
-                // Whitespace - wrap in source span too
-                const span = document.createElement('span');
-                span.className = `source-${source}`;
-                span.textContent = token;
-                fragment.appendChild(span);
+                // Whitespace
+                fragment.appendChild(document.createTextNode(token));
             } else {
                 // Word: wrap in source span
                 const span = document.createElement('span');
@@ -92,9 +93,14 @@ function wrapWordsWithSource(container, source) {
 
 // Apply JEDP color-coding to individual words in verses
 function applyJEDPSources(verseElements) {
+    console.log(`applyJEDPSources: Processing ${verseElements ? verseElements.length : 0} verses`);
+    
     if (!verseElements || verseElements.length === 0) {
+        console.log('No verse elements found!');
         return;
     }
+    
+    let coloredCount = 0;
     
     verseElements.forEach((verseElement) => {
         // Try to extract verse reference from context
@@ -129,9 +135,12 @@ function applyJEDPSources(verseElements) {
             if (verseTextSpan) {
                 wrapWordsWithSource(verseTextSpan, source);
                 verseElement.dataset.source = source;
+                coloredCount++;
             }
         }
     });
+    
+    console.log(`✓ JEDP: Colored ${coloredCount}/${verseElements.length} verses`);
 }
 
 // Initialize JEDP on page load with current book
