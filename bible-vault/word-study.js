@@ -248,14 +248,14 @@ async function makeWordsClickable(verseElement, translationType = 'english') {
                 const isBulgarian = translationType === 'bulgarian' || translationType === 'bulgarian1940';
                 const isStopWord = !isBulgarian && (stopWords.has(cleanWord) || cleanWord.length <= 2);
 
+                // Get corresponding Strong's number if available (before stop word check)
+                const strongsNum = strongsNumbers[wordIndex] || null;
+
                 if (isStopWord) {
+                    // Stop words don't have Hebrew/Greek equivalents, so don't increment index
                     fragment.appendChild(document.createTextNode(token));
-                    wordIndex++;
                     continue;
                 }
-
-                // Get corresponding Strong's number if available
-                const strongsNum = strongsNumbers[wordIndex] || null;
 
                 // Make it clickable if we have a Strong's number OR if we have a definition in the index
                 if (strongsNum || (!isBulgarian && hasDefinition(cleanWord))) {
@@ -271,6 +271,7 @@ async function makeWordsClickable(verseElement, translationType = 'english') {
                     fragment.appendChild(document.createTextNode(token));
                 }
 
+                // Only increment index for non-stop words (words that have Hebrew/Greek equivalents)
                 wordIndex++;
             }
         }
