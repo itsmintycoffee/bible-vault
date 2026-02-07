@@ -953,26 +953,26 @@ body {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 2rem;
-    margin-bottom: 0.5rem;
-    align-items: start;
+    margin-bottom: 1rem;
+    align-items: baseline; /* Align verse numbers at same baseline */
 }
 
 .verse-column {
     display: flex;
-    align-items: start;
+    align-items: baseline; /* Align verse numbers on same baseline */
     gap: 0.6rem;
     min-height: 1.5em;
 }
 
 .verse-column .verse-number {
     flex-shrink: 0;
-    align-self: start;
     margin: 0;
-    padding-top: 0.1em;
+    line-height: 1.6;
 }
 
 .verse-column .verse-text {
     flex: 1;
+    line-height: 1.6;
 }
 
 /* Translation headers for comparison columns */
@@ -1035,15 +1035,41 @@ body {
         grid-template-columns: repeat(6, 1fr);
     }
 
-    /* Comparison mode responsive */
+    /* Comparison mode responsive - stack verses vertically */
     .verse-row {
         grid-template-columns: 1fr;
-        gap: 0.5rem;
+        gap: 0;
+        margin-bottom: 1.5rem;
+        align-items: start;
+    }
+
+    .verse-column {
+        align-items: start;
+    }
+
+    /* First column (primary translation) - normal size */
+    .verse-column:first-child {
+        margin-bottom: 0.5rem;
+    }
+
+    /* Second column (comparison translation) - smaller subtitle style */
+    .verse-column:last-child {
+        padding-left: 1.5rem;
+        opacity: 0.75;
+    }
+
+    .verse-column:last-child .verse-number {
+        display: none; /* Hide duplicate verse number on mobile */
+    }
+
+    .verse-column:last-child .verse-text {
+        font-size: 0.9em;
+        font-style: italic;
+        color: var(--text-secondary);
     }
 
     .comparison-header {
-        grid-template-columns: 1fr;
-        gap: 0.5rem;
+        display: none; /* Hide translation headers on mobile */
     }
 
     .comparison-controls {
