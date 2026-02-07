@@ -182,6 +182,25 @@ async function fetchVerse(reference) {
 async function displayVerse(data, append = false, prepend = false) {
     hideLoadingAndError();
 
+    // Fetch Hebrew/Greek version for Strong's numbers (for Old/New Testament)
+    let originalLanguageData = null;
+    if (typeof translationManager !== 'undefined') {
+        try {
+            // Determine if OT or NT based on book
+            const isOldTestament = currentBook && ['Genesis', 'Exodus', 'Leviticus', 'Numbers', 'Deuteronomy',
+                'Joshua', 'Judges', 'Ruth', '1 Samuel', '2 Samuel', '1 Kings', '2 Kings',
+                '1 Chronicles', '2 Chronicles', 'Ezra', 'Nehemiah', 'Esther', 'Job', 'Psalms',
+                'Proverbs', 'Ecclesiastes', 'Song of Solomon', 'Isaiah', 'Jeremiah', 'Lamentations',
+                'Ezekiel', 'Daniel', 'Hosea', 'Joel', 'Amos', 'Obadiah', 'Jonah', 'Micah',
+                'Nahum', 'Habakkuk', 'Zephaniah', 'Haggai', 'Zechariah', 'Malachi'].includes(currentBook);
+
+            const originalTranslation = isOldTestament ? 'wlca' : 'lxx';
+            originalLanguageData = await translationManager.fetchVerseForTranslation(data.reference, originalTranslation);
+        } catch (error) {
+            console.log('Could not fetch original language data:', error);
+        }
+    }
+
     // Create chapter element
     const chapterDiv = document.createElement('div');
     chapterDiv.className = 'chapter-section';
@@ -189,6 +208,11 @@ async function displayVerse(data, append = false, prepend = false) {
         <div class="chapter-title">${data.reference}</div>
         <div class="chapter-content">${formatVerseText(data)}</div>
     `;
+
+    // Store original language data on the chapter div for word study
+    if (originalLanguageData) {
+        chapterDiv.dataset.originalLanguageData = JSON.stringify(originalLanguageData);
+    }
 
     // Update current reading position (only if not prepending or appending)
     if (!prepend && !append) {

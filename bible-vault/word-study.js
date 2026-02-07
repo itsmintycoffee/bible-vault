@@ -55,24 +55,26 @@ function hasDefinition(word) {
     return !!(concordanceIndex.hebrew[cleanWord] || concordanceIndex.greek[cleanWord]);
 }
 
-// Get word info from concordance
-async function getWordInfo(word) {
-    const cleanWord = word.toLowerCase().replace(/[.,;:!?'"]/g, '');
+// Extract Strong's numbers from original language text
+function extractStrongsNumbers(rawText) {
+    if (!rawText) return [];
 
-    // Wait for index to load if not already loaded
-    if (!concordanceIndex) {
-        await loadConcordanceIndex();
-    }
+    // Pattern matches H#### or G#### (Hebrew or Greek Strong's numbers)
+    const strongsPattern = /[HG]\d{1,5}/g;
+    const matches = rawText.match(strongsPattern) || [];
 
-    // Find Strong's number
-    const strongsNumber = concordanceIndex.hebrew[cleanWord] || concordanceIndex.greek[cleanWord];
+    return matches;
+}
 
+// Get word info from concordance using Strong's number
+async function getWordInfoByStrongsNumber(strongsNumber, word) {
     if (strongsNumber) {
         const entry = await loadConcordanceEntry(strongsNumber);
 
         if (entry) {
             return {
                 english: word,
+                strongsNumber: strongsNumber,
                 language: strongsNumber.startsWith('H') ? 'Hebrew' : 'Greek',
                 original: entry.original,
                 transliteration: entry.transliteration,
@@ -84,11 +86,33 @@ async function getWordInfo(word) {
     // Default response if not found
     return {
         english: word,
+        strongsNumber: strongsNumber || 'N/A',
         language: 'Not available',
         original: '—',
         transliteration: '—',
         definition: 'Word study data not available for this word.'
     };
+}
+
+// Get word info from concordance (fallback to index-based lookup)
+async function getWordInfo(word, strongsNumber = null) {
+    const cleanWord = word.toLowerCase().replace(/[.,;:!?'"]/g, '');
+
+    // If we have a Strong's number, use it directly
+    if (strongsNumber) {
+        return await getWordInfoByStrongsNumber(strongsNumber, word);
+    }
+
+    // Otherwise, fall back to index-based lookup (less reliable)
+    // Wait for index to load if not already loaded
+    if (!concordanceIndex) {
+        await loadConcordanceIndex();
+    }
+
+    // Find Strong's number from index
+    const indexedStrongsNumber = concordanceIndex.hebrew[cleanWord] || concordanceIndex.greek[cleanWord];
+
+    return await getWordInfoByStrongsNumber(indexedStrongsNumber, word);
 }
 
 // Common words to exclude from word study (stop words)
@@ -106,11 +130,31 @@ const stopWords = new Set([
     'each', 'few', 'more', 'most', 'other', 'some', 'such'
 ]);
 
-// Make verse text clickable (only for words with definitions)
+// Make verse text clickable with Strong's number mapping
 async function makeWordsClickable(verseElement) {
-    // Wait for concordance index to load
-    if (!concordanceIndex) {
-        await loadConcordanceIndex();
+    // Get the verse number from this verse element
+    const verseNumberElem = verseElement.closest('.verse')?.querySelector('.verse-number');
+    const verseNumber = verseNumberElem ? parseInt(verseNumberElem.textContent) : null;
+
+    // Get original language data from the chapter
+    const chapterSection = verseElement.closest('.chapter-section');
+    let originalVerseData = null;
+    let strongsNumbers = [];
+
+    if (chapterSection && chapterSection.dataset.originalLanguageData) {
+        try {
+            const originalData = JSON.parse(chapterSection.dataset.originalLanguageData);
+            // Find the verse with matching verse number
+            if (originalData && originalData.verses) {
+                originalVerseData = originalData.verses.find(v => v.verse === verseNumber);
+                if (originalVerseData && originalVerseData.rawText) {
+                    strongsNumbers = extractStrongsNumbers(originalVerseData.rawText);
+                    console.log(`Verse ${verseNumber} Strong's numbers:`, strongsNumbers);
+                }
+            }
+        } catch (error) {
+            console.log('Error parsing original language data:', error);
+        }
     }
 
     // Use TreeWalker to process text nodes while preserving JEDP highlighting
@@ -127,6 +171,8 @@ async function makeWordsClickable(verseElement) {
         textNodesToReplace.push(textNode);
     }
 
+    let wordIndex = 0; // Track word position for Strong's number mapping
+
     // Process text nodes in reverse to avoid invalidating walker
     for (let i = textNodesToReplace.length - 1; i >= 0; i--) {
         textNode = textNodesToReplace[i];
@@ -134,7 +180,7 @@ async function makeWordsClickable(verseElement) {
         const tokens = text.split(/(\s+)/);
 
         const fragment = document.createDocumentFragment();
-        
+
         for (const token of tokens) {
             // If it's whitespace, keep as text node
             if (/^\s+$/.test(token)) {
@@ -148,19 +194,28 @@ async function makeWordsClickable(verseElement) {
             // If it's a stop word or very short, don't make it clickable
             if (stopWords.has(cleanWord) || cleanWord.length <= 2) {
                 fragment.appendChild(document.createTextNode(token));
+                wordIndex++;
                 continue;
             }
 
-            // Only make it clickable if we have a definition for it
-            if (hasDefinition(cleanWord)) {
+            // Get corresponding Strong's number if available
+            const strongsNum = strongsNumbers[wordIndex] || null;
+
+            // Make it clickable if we have a Strong's number OR if we have a definition in the index
+            if (strongsNum || hasDefinition(cleanWord)) {
                 const span = document.createElement('span');
                 span.className = 'word';
                 span.setAttribute('data-word', cleanWord);
+                if (strongsNum) {
+                    span.setAttribute('data-strongs', strongsNum);
+                }
                 span.textContent = token;
                 fragment.appendChild(span);
             } else {
                 fragment.appendChild(document.createTextNode(token));
             }
+
+            wordIndex++;
         }
 
         // Replace text node with fragment
@@ -186,6 +241,7 @@ function initWordStudy() {
     tooltip.innerHTML = `
         <div class="tooltip-header">
             <strong id="tooltip-word"></strong>
+            <span id="tooltip-strongs" style="color: var(--text-secondary); font-size: 0.85em; margin-left: 0.5rem;"></span>
         </div>
         <div class="tooltip-body">
             <div class="tooltip-row">
@@ -218,10 +274,11 @@ function initWordStudy() {
             }
 
             const word = e.target.dataset.word;
+            const strongsNumber = e.target.dataset.strongs || null;
 
             // Add a small delay before showing (200ms) to avoid accidental triggers
             tooltipShowTimeout = setTimeout(async () => {
-                await showTooltip(word, e);
+                await showTooltip(word, e, strongsNumber);
             }, 200);
         }
     }, true); // Use capture phase to catch events on dynamically added elements
@@ -288,11 +345,12 @@ async function fetchWordFromAPI(word) {
 }
 
 // Show tooltip
-async function showTooltip(word, event) {
+async function showTooltip(word, event, strongsNumber = null) {
     currentTooltipWord = word;
 
     // Show loading state
     tooltip.querySelector('#tooltip-word').textContent = word;
+    tooltip.querySelector('#tooltip-strongs').textContent = strongsNumber ? `(${strongsNumber})` : '';
     tooltip.querySelector('#tooltip-language').textContent = 'Loading...';
     tooltip.querySelector('#tooltip-original').textContent = '';
     tooltip.querySelector('#tooltip-transliteration').textContent = '';
@@ -301,21 +359,13 @@ async function showTooltip(word, event) {
     positionTooltip(event);
     tooltip.style.opacity = '1';
 
-    // Try to fetch from API first, then fall back to local database
-    const apiData = await fetchWordFromAPI(word);
-
-    let wordInfo;
-    if (apiData) {
-        // Use API data if available
-        wordInfo = parseAPIResponse(apiData, word);
-    } else {
-        // Fall back to local database
-        wordInfo = await getWordInfo(word);
-    }
+    // Use Strong's number if available, otherwise fall back to word lookup
+    const wordInfo = await getWordInfo(word, strongsNumber);
 
     // Update tooltip with actual data (only if still showing same word)
     if (currentTooltipWord === word) {
         tooltip.querySelector('#tooltip-word').textContent = wordInfo.english;
+        tooltip.querySelector('#tooltip-strongs').textContent = wordInfo.strongsNumber ? `(${wordInfo.strongsNumber})` : '';
         tooltip.querySelector('#tooltip-language').textContent = wordInfo.language;
         tooltip.querySelector('#tooltip-original').textContent = wordInfo.original;
         tooltip.querySelector('#tooltip-transliteration').textContent = wordInfo.transliteration;
