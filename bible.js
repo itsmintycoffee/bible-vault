@@ -208,8 +208,12 @@ async function displayVerse(data, append = false, prepend = false) {
     // Create chapter element
     const chapterDiv = document.createElement('div');
     chapterDiv.className = 'chapter-section';
+
+    // Format the chapter title (first chapter shows book name, others show just number)
+    const formattedTitle = formatChapterTitle(data.reference);
+
     chapterDiv.innerHTML = `
-        <div class="chapter-title">${data.reference}</div>
+        <div class="chapter-title">${formattedTitle}</div>
         <div class="chapter-content">${formatVerseText(data)}</div>
     `;
 
@@ -219,6 +223,7 @@ async function displayVerse(data, append = false, prepend = false) {
     }
 
     // Update current reading position (only if not prepending or appending)
+    // This needs to happen BEFORE we parse titles from DOM, so currentBook is set
     if (!prepend && !append) {
         updateCurrentPosition(data.reference);
     }
@@ -328,7 +333,19 @@ function setupFirstChapterObserver() {
 
 // Update current book and chapter from reference
 function updateCurrentPosition(reference) {
-    const match = reference.match(/^(.+?)\s+(\d+)/);
+    // Handle new title format: either "GENESIS" or "2" (chapter number)
+    const trimmed = reference.trim();
+
+    // Check if it's just a number (subsequent chapter)
+    if (/^\d+$/.test(trimmed)) {
+        // Just a chapter number, use current book
+        currentChapter = parseInt(trimmed);
+        console.log(`[POSITION] Updated chapter to ${currentChapter} (book: ${currentBook})`);
+        return;
+    }
+
+    // Otherwise, it should be a book name or "Book Chapter" format
+    const match = trimmed.match(/^(.+?)\s+(\d+)?$/);
     if (match) {
         // Normalize case since chapter titles are uppercase
         let bookName = match[1].trim();
@@ -338,9 +355,26 @@ function updateCurrentPosition(reference) {
         ).join(' ');
 
         currentBook = bookName;
-        currentChapter = parseInt(match[2]);
+        // If chapter number was provided, use it; otherwise assume chapter 1
+        currentChapter = match[2] ? parseInt(match[2]) : 1;
         console.log(`[POSITION] Updated to ${currentBook} ${currentChapter}`);
     }
+}
+
+// Format chapter title based on whether it's the first chapter of a book
+function formatChapterTitle(reference) {
+    const match = reference.match(/^(.+?)\s+(\d+)$/);
+    if (!match) return reference;
+
+    const bookName = match[1].trim();
+    const chapterNum = parseInt(match[2]);
+
+    // First chapter of a book: show just the book name
+    if (chapterNum === 1) {
+        return bookName;
+    }
+    // Subsequent chapters: show just the number
+    return chapterNum.toString();
 }
 
 // Format verse text with verse numbers
@@ -801,7 +835,7 @@ async function displayComparisonVerse(leftData, rightData, append = false, prepe
     // Create chapter title
     const chapterTitle = document.createElement('div');
     chapterTitle.className = 'chapter-title';
-    chapterTitle.textContent = leftData.reference;
+    chapterTitle.textContent = formatChapterTitle(leftData.reference);
 
     // Create chapter content container
     const chapterContent = document.createElement('div');
@@ -928,8 +962,8 @@ async function displayComparisonVerse(leftData, rightData, append = false, prepe
 
 // Default chapter is loaded by chapter-selector.js to avoid duplicate loading
 
-// JEDP Source Coloring State
-var jedpColorsVisible = true;
+// JEDP Source Coloring State - OFF by default
+var jedpColorsVisible = false;
 
 // JEDP Toggle Button
 const jedpToggleBtn = document.getElementById('jedp-toggle');
@@ -956,6 +990,26 @@ if (jedpToggleBtn) {
 
     // Set initial button state
     jedpToggleBtn.classList.toggle('active', jedpColorsVisible);
+
+    // Hide source colors by default on page load
+    document.addEventListener('DOMContentLoaded', () => {
+        const sourceElements = document.querySelectorAll('[class^="source-"]');
+        sourceElements.forEach(el => {
+            el.style.color = 'inherit';
+        });
+    });
+
+    // Also hide colors when new content is loaded (prepend/append)
+    const originalDisplayVerse = window.displayVerse;
+    window.displayVerse = async function(...args) {
+        const result = await originalDisplayVerse.apply(this, args);
+        // Hide colors after verse is displayed
+        const sourceElements = document.querySelectorAll('[class^="source-"]');
+        sourceElements.forEach(el => {
+            el.style.color = 'inherit';
+        });
+        return result;
+    };
 }
 
 // Expose key functions globally for cross-script access

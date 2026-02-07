@@ -395,7 +395,7 @@ body {
     font-weight: normal;
     color: var(--text-primary);
     margin-bottom: 2.5rem;
-    font-size: 101px;
+    font-size: 61px;
     text-transform: uppercase;
     letter-spacing: -0.02em;
     position: sticky;
@@ -434,7 +434,7 @@ body {
 
 /* First chapter title - large headline style */
 .chapter-section:first-child .chapter-title {
-    font-size: 8rem;
+    font-size: 5rem;
     font-weight: normal;
     letter-spacing: -0.03em;
     height: auto;
@@ -450,7 +450,7 @@ body {
 
 /* First chapter title when sticky - shrink to normal size */
 .chapter-section:first-child .chapter-title.sticky-active {
-    font-size: 101px;
+    font-size: 61px;
     font-weight: normal;
     letter-spacing: -0.02em;
     height: auto;
