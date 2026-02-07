@@ -221,9 +221,11 @@ async function displayVerse(data, append = false, prepend = false) {
 
     if (illustrationsHtml) {
         chapterDiv.innerHTML = `
-            <div class="chapter-title">${formattedTitle}</div>
             <div class="chapter-body with-illustrations">
-                <div class="chapter-content">${formatVerseText(data)}</div>
+                <div class="chapter-text-column">
+                    <div class="chapter-title">${formattedTitle}</div>
+                    <div class="chapter-content">${formatVerseText(data)}</div>
+                </div>
                 <aside class="chapter-illustrations">${illustrationsHtml}</aside>
             </div>
         `;
