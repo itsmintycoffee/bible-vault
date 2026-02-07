@@ -211,8 +211,11 @@ async function displayVerse(data, append = false, prepend = false) {
     chapterDiv.className = 'chapter-section';
     chapterDiv.dataset.reference = data.reference;
 
-    // Format the chapter title (first chapter shows book name, others show just number)
-    const formattedTitle = formatChapterTitle(data.reference);
+    // Determine current translation for title and language class
+    const activeTranslationId = data.translation_id || (typeof translationManager !== 'undefined' ? translationManager.currentTranslation : 'esv');
+
+    // Format the chapter title in the active translation's language
+    const formattedTitle = formatChapterTitle(data.reference, activeTranslationId);
 
     const illustrationsHtml = getChapterIllustrations(data.reference);
 
@@ -240,6 +243,7 @@ async function displayVerse(data, append = false, prepend = false) {
     // This needs to happen BEFORE we parse titles from DOM, so currentBook is set
     if (!prepend && !append) {
         updateCurrentPosition(data.reference);
+        applyLanguageClass(activeTranslationId);
     }
 
     // Add to DOM based on mode
@@ -372,17 +376,117 @@ function updateCurrentPosition(reference) {
     }
 }
 
+// Book name translations for chapter titles in the reading area
+const bookNameTranslations = {
+    // Old Testament
+    'Genesis': { bulgarian: 'Битие', hebrew: 'בראשית', greek: 'Γένεσις' },
+    'Exodus': { bulgarian: 'Изход', hebrew: 'שמות', greek: 'Ἔξοδος' },
+    'Leviticus': { bulgarian: 'Левит', hebrew: 'ויקרא', greek: 'Λευιτικόν' },
+    'Numbers': { bulgarian: 'Числа', hebrew: 'במדבר', greek: 'Ἀριθμοί' },
+    'Deuteronomy': { bulgarian: 'Второзаконие', hebrew: 'דברים', greek: 'Δευτερονόμιον' },
+    'Joshua': { bulgarian: 'Исус Навин', hebrew: 'יהושע', greek: 'Ἰησοῦς Ναυή' },
+    'Judges': { bulgarian: 'Съдии', hebrew: 'שופטים', greek: 'Κριταί' },
+    'Ruth': { bulgarian: 'Рут', hebrew: 'רות', greek: 'Ῥούθ' },
+    '1 Samuel': { bulgarian: '1 Самуил', hebrew: 'שמואל א', greek: 'Α΄ Βασιλειῶν' },
+    '2 Samuel': { bulgarian: '2 Самуил', hebrew: 'שמואל ב', greek: 'Β΄ Βασιλειῶν' },
+    '1 Kings': { bulgarian: '1 Царе', hebrew: 'מלכים א', greek: 'Γ΄ Βασιλειῶν' },
+    '2 Kings': { bulgarian: '2 Царе', hebrew: 'מלכים ב', greek: 'Δ΄ Βασιλειῶν' },
+    '1 Chronicles': { bulgarian: '1 Летописи', hebrew: 'דברי הימים א', greek: 'Α΄ Παραλειπομένων' },
+    '2 Chronicles': { bulgarian: '2 Летописи', hebrew: 'דברי הימים ב', greek: 'Β΄ Παραλειπομένων' },
+    'Ezra': { bulgarian: 'Ездра', hebrew: 'עזרא', greek: 'Ἔσδρας' },
+    'Nehemiah': { bulgarian: 'Неемия', hebrew: 'נחמיה', greek: 'Νεεμίας' },
+    'Esther': { bulgarian: 'Естир', hebrew: 'אסתר', greek: 'Ἐσθήρ' },
+    'Job': { bulgarian: 'Йов', hebrew: 'איוב', greek: 'Ἰώβ' },
+    'Psalms': { bulgarian: 'Псалми', hebrew: 'תהילים', greek: 'Ψαλμοί' },
+    'Proverbs': { bulgarian: 'Притчи', hebrew: 'משלי', greek: 'Παροιμίαι' },
+    'Ecclesiastes': { bulgarian: 'Еклисиаст', hebrew: 'קהלת', greek: 'Ἐκκλησιαστής' },
+    'Song of Solomon': { bulgarian: 'Песен на песните', hebrew: 'שיר השירים', greek: 'Ἆσμα Ἀσμάτων' },
+    'Isaiah': { bulgarian: 'Исая', hebrew: 'ישעיהו', greek: 'Ἡσαΐας' },
+    'Jeremiah': { bulgarian: 'Еремия', hebrew: 'ירמיהו', greek: 'Ἱερεμίας' },
+    'Lamentations': { bulgarian: 'Плач Еремиев', hebrew: 'איכה', greek: 'Θρῆνοι' },
+    'Ezekiel': { bulgarian: 'Езекиил', hebrew: 'יחזקאל', greek: 'Ἰεζεκιήλ' },
+    'Daniel': { bulgarian: 'Даниил', hebrew: 'דניאל', greek: 'Δανιήλ' },
+    'Hosea': { bulgarian: 'Осия', hebrew: 'הושע', greek: 'Ὡσηέ' },
+    'Joel': { bulgarian: 'Йоил', hebrew: 'יואל', greek: 'Ἰωήλ' },
+    'Amos': { bulgarian: 'Амос', hebrew: 'עמוס', greek: 'Ἀμώς' },
+    'Obadiah': { bulgarian: 'Авдий', hebrew: 'עובדיה', greek: 'Ὀβδιού' },
+    'Jonah': { bulgarian: 'Йона', hebrew: 'יונה', greek: 'Ἰωνᾶς' },
+    'Micah': { bulgarian: 'Михей', hebrew: 'מיכה', greek: 'Μιχαίας' },
+    'Nahum': { bulgarian: 'Наум', hebrew: 'נחום', greek: 'Ναούμ' },
+    'Habakkuk': { bulgarian: 'Авакум', hebrew: 'חבקוק', greek: 'Ἁβακκούμ' },
+    'Zephaniah': { bulgarian: 'Софония', hebrew: 'צפניה', greek: 'Σοφονίας' },
+    'Haggai': { bulgarian: 'Агей', hebrew: 'חגי', greek: 'Ἀγγαῖος' },
+    'Zechariah': { bulgarian: 'Захария', hebrew: 'זכריה', greek: 'Ζαχαρίας' },
+    'Malachi': { bulgarian: 'Малахия', hebrew: 'מלאכי', greek: 'Μαλαχίας' },
+    // New Testament
+    'Matthew': { bulgarian: 'Матей', hebrew: 'מתי', greek: 'Κατὰ Ματθαῖον' },
+    'Mark': { bulgarian: 'Марко', hebrew: 'מרקוס', greek: 'Κατὰ Μάρκον' },
+    'Luke': { bulgarian: 'Лука', hebrew: 'לוקס', greek: 'Κατὰ Λουκᾶν' },
+    'John': { bulgarian: 'Йоан', hebrew: 'יוחנן', greek: 'Κατὰ Ἰωάννην' },
+    'Acts': { bulgarian: 'Деяния', hebrew: 'מעשי השליחים', greek: 'Πράξεις Ἀποστόλων' },
+    'Romans': { bulgarian: 'Римляни', hebrew: 'רומים', greek: 'Πρὸς Ῥωμαίους' },
+    '1 Corinthians': { bulgarian: '1 Коринтяни', hebrew: 'קורינתים א', greek: 'Α΄ Κορινθίους' },
+    '2 Corinthians': { bulgarian: '2 Коринтяни', hebrew: 'קורינתים ב', greek: 'Β΄ Κορινθίους' },
+    'Galatians': { bulgarian: 'Галатяни', hebrew: 'גלטים', greek: 'Πρὸς Γαλάτας' },
+    'Ephesians': { bulgarian: 'Ефесяни', hebrew: 'אפסים', greek: 'Πρὸς Ἐφεσίους' },
+    'Philippians': { bulgarian: 'Филипяни', hebrew: 'פיליפים', greek: 'Πρὸς Φιλιππησίους' },
+    'Colossians': { bulgarian: 'Колосяни', hebrew: 'קולוסים', greek: 'Πρὸς Κολοσσαεῖς' },
+    '1 Thessalonians': { bulgarian: '1 Солунци', hebrew: 'תסלוניקים א', greek: 'Α΄ Θεσσαλονικεῖς' },
+    '2 Thessalonians': { bulgarian: '2 Солунци', hebrew: 'תסלוניקים ב', greek: 'Β΄ Θεσσαλονικεῖς' },
+    '1 Timothy': { bulgarian: '1 Тимотей', hebrew: 'טימותיוס א', greek: 'Α΄ Τιμόθεον' },
+    '2 Timothy': { bulgarian: '2 Тимотей', hebrew: 'טימותיוס ב', greek: 'Β΄ Τιμόθεον' },
+    'Titus': { bulgarian: 'Тит', hebrew: 'טיטוס', greek: 'Πρὸς Τίτον' },
+    'Philemon': { bulgarian: 'Филимон', hebrew: 'פילמון', greek: 'Πρὸς Φιλήμονα' },
+    'Hebrews': { bulgarian: 'Евреи', hebrew: 'עברים', greek: 'Πρὸς Ἑβραίους' },
+    'James': { bulgarian: 'Яков', hebrew: 'יעקב', greek: 'Ἰακώβου' },
+    '1 Peter': { bulgarian: '1 Петрово', hebrew: 'פטרוס א', greek: 'Α΄ Πέτρου' },
+    '2 Peter': { bulgarian: '2 Петрово', hebrew: 'פטרוס ב', greek: 'Β΄ Πέτρου' },
+    '1 John': { bulgarian: '1 Йоаново', hebrew: 'יוחנן א', greek: 'Α΄ Ἰωάννου' },
+    '2 John': { bulgarian: '2 Йоаново', hebrew: 'יוחנן ב', greek: 'Β΄ Ἰωάννου' },
+    '3 John': { bulgarian: '3 Йоаново', hebrew: 'יוחנן ג', greek: 'Γ΄ Ἰωάννου' },
+    'Jude': { bulgarian: 'Юда', hebrew: 'יהודה', greek: 'Ἰούδα' },
+    'Revelation': { bulgarian: 'Откровение', hebrew: 'התגלות', greek: 'Ἀποκάλυψις' }
+};
+
+// Get translated book name based on translation ID
+function getTranslatedBookName(englishName, translationId) {
+    if (!translationId || translationId === 'esv' || translationId === 'kjv') {
+        return englishName;
+    }
+    const entry = bookNameTranslations[englishName];
+    if (!entry) return englishName;
+
+    if (translationId === 'bulgarian') return entry.bulgarian || englishName;
+    if (translationId === 'wlca') return entry.hebrew || englishName;
+    if (translationId === 'lxx') return entry.greek || englishName;
+
+    return englishName;
+}
+
+// Apply language-specific CSS class to .bible-content
+function applyLanguageClass(translationId) {
+    const bibleContent = document.querySelector('.bible-content');
+    if (!bibleContent) return;
+
+    bibleContent.classList.remove('lang-english', 'lang-bulgarian', 'lang-hebrew', 'lang-greek');
+
+    const translation = typeof TRANSLATIONS !== 'undefined' ? TRANSLATIONS[translationId] : null;
+    if (!translation) return;
+
+    bibleContent.classList.add(`lang-${translation.language.toLowerCase()}`);
+}
+
 // Format chapter title based on whether it's the first chapter of a book
-function formatChapterTitle(reference) {
+function formatChapterTitle(reference, translationId) {
     const match = reference.match(/^(.+?)\s+(\d+)/);
     if (!match) return reference;
 
     const bookName = match[1].trim();
     const chapterNum = parseInt(match[2]);
 
-    // First chapter of a book: show just the book name
+    // First chapter of a book: show translated book name
     if (chapterNum === 1) {
-        return bookName;
+        return getTranslatedBookName(bookName, translationId);
     }
     // Subsequent chapters: show just the number
     return chapterNum.toString();
@@ -880,10 +984,10 @@ async function displayComparisonVerse(leftData, rightData, append = false, prepe
         <div class="comparison-header-item">${rightData.translation_name || 'Right Translation'}</div>
     `;
 
-    // Create chapter title
+    // Create chapter title (use left translation's language)
     const chapterTitle = document.createElement('div');
     chapterTitle.className = 'chapter-title';
-    chapterTitle.textContent = formatChapterTitle(leftData.reference);
+    chapterTitle.textContent = formatChapterTitle(leftData.reference, leftData.translation_id || leftTranslation);
 
     // Create chapter content container
     const chapterContent = document.createElement('div');

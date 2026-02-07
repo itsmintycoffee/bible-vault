@@ -548,8 +548,13 @@ body {
 }
 
 .bible-content.lang-hebrew .chapter-title {
+    font-family: 'Noto Sans Hebrew', Arial, sans-serif;
     direction: rtl;
-    text-align: right;
+}
+
+.bible-content.lang-greek .chapter-content {
+    line-height: 1.9;
+    font-size: 1.35rem;
 }
 
 /* Text Size Variations */
