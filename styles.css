@@ -134,6 +134,11 @@ body {
     transform: translateY(0);
 }
 
+.toolbar-logo {
+    height: 24px;
+    width: auto;
+}
+
 .control-btn {
     padding: 0.5rem 0.9rem;
     background: rgba(245, 241, 232, 0.6);
