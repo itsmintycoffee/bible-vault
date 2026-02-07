@@ -7,6 +7,7 @@
 :root {
     --bg-primary: #f5f1e8;
     --bg-secondary: #fdfaf4;
+    --bg-sidebar: #2c2a27;
     --text-primary: #2c2a27;
     --text-secondary: #6b6762;
     --accent: #8b7355;
@@ -41,6 +42,58 @@ body {
     width: 100%;
 }
 
+/* Left Sidebar */
+.sidebar {
+    width: 70px;
+    background: var(--bg-sidebar);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.5rem 0;
+    box-shadow: 2px 0 10px var(--shadow);
+    position: relative;
+    z-index: 100;
+}
+
+.logo {
+    margin-bottom: 2rem;
+}
+
+.logo-icon {
+    font-size: 2rem;
+    cursor: pointer;
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+    align-items: center;
+}
+
+.nav-item {
+    width: 45px;
+    height: 45px;
+    border: none;
+    background: transparent;
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    transition: background 0.2s;
+}
+
+.nav-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.nav-item.active {
+    background: rgba(255, 255, 255, 0.15);
+}
+
 /* Main Content (Bible) */
 .main-content {
     flex: 1;
@@ -53,177 +106,46 @@ body {
 }
 
 .content-header {
-    padding: 0.75rem 3rem;
-    border-bottom: none;
-    background: transparent;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
+    padding: 2rem 3rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-secondary);
     position: sticky;
     top: 0;
-    z-index: 100;
-    display: block;
-}
-
-/* Hide header when at very top (not scrolled) */
-.content-header:not(.scrolled) {
-    opacity: 0;
-    pointer-events: none;
-    transform: translateY(-100%);
-    margin-bottom: 0;
-    padding-top: 0;
-    padding-bottom: 0;
-    height: 0;
-    min-height: 0;
-    border-bottom-width: 0;
-}
-
-/* Show header when scrolled down */
-.content-header.scrolled {
-    opacity: 1;
-    pointer-events: auto;
-    transform: translateY(0);
-    transition: all 0.3s ease;
+    z-index: 10;
+    display: none;
 }
 
 .header-top {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.75rem;
+    margin-bottom: 1.5rem;
 }
 
-/* Header Chapter Title (hidden - using sticky chapter title instead) */
-.header-chapter-title {
-    display: none;
-}
-
-/* Reading Controls - Floating Pill Bar */
-.reading-controls {
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-    flex-wrap: wrap;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease, transform 0.3s ease;
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    padding: 0.5rem;
-    border-radius: 50px;
-    border: 1px solid rgba(232, 227, 216, 0.6);
-}
-
-/* When scrolled down, show controls */
-.content-header.scrolled .reading-controls {
-    opacity: 1;
-    pointer-events: auto;
-    transform: translateY(0);
-}
-
-.control-btn {
-    padding: 0.5rem 0.9rem;
-    background: rgba(245, 241, 232, 0.6);
-    border: 1px solid rgba(232, 227, 216, 0.8);
-    border-radius: 50px;
-    cursor: pointer;
-    font-family: inherit;
-    font-size: 0.85rem;
+.content-header h1 {
+    font-size: 2rem;
+    font-weight: 600;
     color: var(--text-primary);
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    white-space: nowrap;
-}
-
-.control-btn:hover {
-    border-color: var(--accent);
-    background: rgba(255, 255, 255, 0.9);
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(44, 42, 39, 0.1);
-}
-
-.control-btn:focus {
-    outline: none;
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(139, 115, 85, 0.1);
-}
-
-.control-btn.active {
-    background: var(--accent);
-    color: white;
-    border-color: var(--accent);
-}
-
-.translation-selector {
-    min-width: 160px;
+    margin-bottom: 0;
 }
 
 .chapter-selector-btn {
-    min-width: 120px;
-}
-
-.icon-btn svg {
-    width: 14px;
-    height: 14px;
-}
-
-.text-size-icon {
-    font-size: 1rem;
-    font-weight: 600;
-}
-
-.btn-label {
-    font-size: 0.85rem;
-}
-
-/* Text Size Controls */
-.text-size-controls {
-    display: flex;
-    gap: 0.5rem;
-    padding: 0.5rem;
-    border-top: none;
-    margin-top: 0.75rem;
-    background: rgba(255, 255, 255, 0.6);
-    border-radius: 50px;
-    border: 1px solid rgba(232, 227, 216, 0.6);
-}
-
-.size-btn {
-    width: 36px;
-    height: 36px;
-    border: 1px solid rgba(232, 227, 216, 0.8);
-    background: rgba(245, 241, 232, 0.6);
-    border-radius: 50px;
+    padding: 0.6rem 1.2rem;
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
     cursor: pointer;
-    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
     transition: all 0.2s;
     color: var(--text-primary);
+    font-size: 0.95rem;
 }
 
-.size-btn:hover {
+.chapter-selector-btn:hover {
     border-color: var(--accent);
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(44, 42, 39, 0.1);
-}
-
-.size-btn.active {
-    background: var(--accent);
-    color: white;
-    border-color: var(--accent);
-}
-
-.size-btn[data-size="small"] {
-    font-size: 0.75rem;
-}
-
-.size-btn[data-size="medium"] {
-    font-size: 0.9rem;
-}
-
-.size-btn[data-size="large"] {
-    font-size: 1.1rem;
+    background: var(--bg-secondary);
 }
 
 .dropdown-arrow {
@@ -241,10 +163,10 @@ body {
     flex: 1;
     padding: 0.75rem 1rem;
     font-size: 0.95rem;
-    border: 1px solid rgba(232, 227, 216, 0.8);
-    border-radius: 50px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
     outline: none;
-    background: rgba(245, 241, 232, 0.6);
+    background: var(--bg-primary);
     color: var(--text-primary);
     transition: border-color 0.3s;
 }
@@ -264,85 +186,21 @@ body {
     color: white;
     background: var(--accent);
     border: none;
-    border-radius: 50px;
+    border-radius: 8px;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: background 0.2s;
 }
 
 #search-btn:hover {
     background: var(--accent-light);
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(139, 115, 85, 0.3);
 }
 
 .bible-content {
     flex: 1;
     padding: 4rem 6rem;
-    max-width: 800px;
+    max-width: 650px;
     margin: 0 auto;
     width: 100%;
-}
-
-/* Parallel View Layout */
-.bible-content.parallel-view {
-    max-width: none;
-    padding: 4rem 3rem;
-    display: flex;
-    justify-content: center;
-}
-
-.bible-content.parallel-view #verse-content {
-    display: flex;
-    gap: 2rem;
-    align-items: flex-start;
-    max-width: 1400px;
-}
-
-.parallel-column {
-    flex: 1;
-    max-width: 600px;
-}
-
-/* Reset chapter title width in parallel view - don't break out of columns */
-.parallel-column .chapter-title {
-    width: 100%;
-    margin-left: 0;
-    padding-left: 1rem;
-    padding-right: 1rem;
-    font-size: 1.8rem !important;
-}
-
-/* Ensure consistent font sizing in parallel view for alignment */
-.parallel-column .chapter-content {
-    font-size: 1.3rem;
-    line-height: 1.75;
-}
-
-/* Keep verse numbers visible and in margin */
-.parallel-column .verse {
-    position: relative;
-    padding-left: 0;
-}
-
-.parallel-column .verse-number {
-    position: absolute;
-    left: -2.5em;
-    top: 0.1em;
-    text-align: right;
-    width: 2em;
-}
-
-.parallel-column-header {
-    position: sticky;
-    top: 0;
-    background: var(--bg-secondary);
-    padding: 0.75rem 1rem;
-    border-bottom: 2px solid var(--accent);
-    margin-bottom: 2rem;
-    z-index: 5;
-    font-weight: 600;
-    font-size: 0.9rem;
-    color: var(--accent);
 }
 
 #loading,
@@ -377,38 +235,34 @@ body {
 
 .chapter-title {
     font-family: 'Crimson Text', Georgia, serif;
-    font-weight: 800;
+    font-weight: 700;
     color: var(--text-primary);
     margin-bottom: 2.5rem;
-    font-size: 2.5rem;
+    font-size: 1.5rem;
     text-transform: none;
-    letter-spacing: -0.02em;
+    letter-spacing: 0;
     position: sticky;
     top: 0;
     z-index: 50;
     background: rgba(253, 250, 244, 0.85);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    height: 70px;
+    height: 50px;
     display: flex;
     align-items: center;
-    justify-content: center;
-    text-align: center;
     width: 100vw;
-    margin-left: calc(-50vw + 50%);
-    padding-left: calc(50vw - 50%);
-    padding-right: calc(50vw - 50%);
+    margin-left: calc(-6rem + (-50vw + 50%));
+    padding-left: calc(6rem + (50vw - 50%));
+    padding-right: calc(6rem + (50vw - 50%));
     margin-top: -1rem;
     padding-top: 0;
-    box-shadow: none;
+    box-shadow: 0 2px 8px rgba(44, 42, 39, 0.05);
     will-change: transform;
 }
 
 /* First chapter title - large headline style */
 .chapter-section:first-child .chapter-title {
-    font-size: 5rem;
-    font-weight: 900;
-    letter-spacing: -0.03em;
+    font-size: 3.5rem;
     height: auto;
     padding-top: 2rem;
     padding-bottom: 2rem;
@@ -422,10 +276,8 @@ body {
 
 /* First chapter title when sticky - shrink to normal size */
 .chapter-section:first-child .chapter-title.sticky-active {
-    font-size: 2.5rem;
-    font-weight: 800;
-    letter-spacing: -0.02em;
-    height: 70px;
+    font-size: 1.5rem;
+    height: 50px;
     padding-top: 0;
     padding-bottom: 0;
     margin-top: -1rem;
@@ -433,7 +285,7 @@ body {
     background: rgba(253, 250, 244, 0.85);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    box-shadow: none;
+    box-shadow: 0 2px 8px rgba(44, 42, 39, 0.05);
 }
 
 .chapter-content {
@@ -445,80 +297,35 @@ body {
     letter-spacing: 0.003em;
 }
 
-/* Language-specific fonts */
-.bible-content.lang-english .chapter-content {
-    font-family: 'Literata', Georgia, serif;
-}
-
-.bible-content.lang-bulgarian .chapter-content {
-    font-family: 'Old Standard TT', Georgia, serif;
-}
-
-.bible-content.lang-hebrew .chapter-content {
-    font-family: 'Noto Sans Hebrew', Arial, sans-serif;
-    direction: rtl;
-    text-align: right;
-    line-height: 2;
-    font-size: 1.4rem;
-}
-
-.bible-content.lang-hebrew .chapter-title {
-    direction: rtl;
-    text-align: right;
-}
-
-/* Text Size Variations */
-.bible-content.text-small .chapter-content {
-    font-size: 1.1rem;
-}
-
-.bible-content.text-small .chapter-title {
-    font-size: 1.2rem !important;
-}
-
-.bible-content.text-medium .chapter-content {
-    font-size: 1.3rem;
-}
-
-.bible-content.text-large .chapter-content {
-    font-size: 1.5rem;
-}
-
-.bible-content.text-large .chapter-title {
-    font-size: 1.8rem !important;
-}
-
 .verse {
     display: block;
     margin-bottom: 0;
-    position: relative;
-    padding-left: 0;
 }
 
 .verse-number {
     font-weight: 600;
     color: #c75146;
-    font-size: 0.7em;
-    position: absolute;
-    left: -2.5em;
-    top: 0.1em;
-    text-align: right;
-    width: 2em;
+    font-size: 0.6em;
+    margin: 0 0.6rem 0 0.2rem;
+    vertical-align: super;
 }
 
-/* Word underlines shown by default */
 .word {
     cursor: pointer;
-    padding: 2px 0;
+    padding: 4px 2px;
+    transition: all 0.2s;
+    border-radius: 2px;
     text-decoration: underline;
     text-decoration-style: dotted;
     text-decoration-color: rgba(199, 81, 70, 0.4);
     text-decoration-thickness: 1px;
     text-underline-offset: 3px;
-    transition: all 0.2s;
+    display: inline-block;
+    margin: -2px 0;
 }
 
 .word:hover {
+    text-decoration: underline;
     text-decoration-style: solid;
     text-decoration-color: #c75146;
     text-decoration-thickness: 2px;
@@ -526,63 +333,25 @@ body {
     color: #c75146;
 }
 
-/* Drop Cap for first word of each book */
-.drop-cap::first-letter {
-    float: left;
-    font-size: 5.5em;
-    line-height: 0.85;
-    margin-right: 0.1em;
-    margin-top: 0.1em;
-    font-weight: 700;
-    color: var(--accent);
+/* Documentary Hypothesis Source Color-Coding - Text Color Style */
+.source-J {
+    color: #c75146;
 }
 
-/* Handle ascenders spacing with :before */
-.drop-cap::before {
-    content: '';
-    display: block;
-    margin-top: -0.25em;
+.source-E {
+    color: #0d6efd;
 }
 
-/* Handle descenders spacing with :after */
-.drop-cap::after {
-    content: '';
-    display: table;
-    clear: both;
+.source-P {
+    color: #6f42c1;
 }
 
-/* Documentary Hypothesis Source Color-Coding - Marker Highlight Style */
-/* Hidden by default */
-.source-J,
-.source-E,
-.source-P,
-.source-D,
+.source-D {
+    color: #198754;
+}
+
 .source-R {
-    padding: 0 2px;
-    margin: 0 -1.5px;
-    background-color: transparent;
-    transition: background-color 0.3s ease;
-}
-
-/* Show source highlighting in study mode */
-body.study-mode .source-J {
-    background-color: rgba(230, 150, 150, 0.10);
-}
-
-body.study-mode .source-E {
-    background-color: rgba(150, 180, 255, 0.10);
-}
-
-body.study-mode .source-P {
-    background-color: rgba(111, 66, 193, 0.10);
-}
-
-body.study-mode .source-D {
-    background-color: rgba(150, 200, 150, 0.10);
-}
-
-body.study-mode .source-R {
-    background-color: rgba(255, 200, 130, 0.10);
+    color: #fd7e14;
 }
 
 /* JEDP Legend */
@@ -634,82 +403,21 @@ body.study-mode .source-R {
     border-color: rgba(253, 126, 20, 0.6);
 }
 
-/* Right Panel - Collapsible */
+/* Right Panel */
 .right-panel {
-    width: 0;
-    min-width: 0;
-    max-width: 0;
-    background: rgba(245, 241, 232, 0.6);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-left: none;
-    overflow: hidden;
-    padding: 0;
-    position: relative;
-    z-index: 50;
-    transition: all 0.3s ease;
-}
-
-/* Expanded state */
-.right-panel.expanded {
     width: 33vw;
     min-width: 400px;
     max-width: 600px;
+    background: rgba(245, 241, 232, 0.6);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border-left: 1px solid rgba(232, 227, 216, 0.5);
     overflow-y: auto;
     padding: 2rem 2rem;
-}
-
-/* Sidebar Toggle Button */
-.sidebar-toggle {
-    position: fixed !important;
-    right: 0 !important;
-    top: 50% !important;
-    transform: translateY(-50%) !important;
-    width: 32px !important;
-    height: 64px !important;
-    background: rgba(245, 241, 232, 0.95) !important;
-    border: 1px solid rgba(232, 227, 216, 0.8) !important;
-    border-right: none !important;
-    border-radius: 8px 0 0 8px !important;
-    cursor: pointer !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    color: var(--text-secondary) !important;
-    transition: all 0.2s ease !important;
-    z-index: 9999 !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    pointer-events: auto !important;
-}
-
-/* When panel is expanded, move button to the left edge of the panel */
-body.study-mode .sidebar-toggle {
-    right: 33vw;
-}
-
-@media (min-width: 1025px) {
-    body.study-mode .sidebar-toggle {
-        right: max(33vw, 400px);
-    }
-}
-
-.sidebar-toggle:hover {
-    background: rgba(139, 115, 85, 0.95);
-    color: white;
-    width: 36px;
-}
-
-.sidebar-toggle svg {
     transition: transform 0.3s ease;
+    position: relative;
+    z-index: 50;
 }
-
-/* Rotate chevron when expanded */
-body.study-mode .sidebar-toggle svg {
-    transform: rotate(180deg);
-}
-
 
 /* Resize Handle */
 .resize-handle {
@@ -722,11 +430,6 @@ body.study-mode .sidebar-toggle svg {
     z-index: 1000;
     background: transparent;
     transition: background 0.2s;
-    display: none;
-}
-
-.right-panel.expanded .resize-handle {
-    display: block;
 }
 
 .resize-handle:hover,
@@ -755,13 +458,6 @@ body.study-mode .sidebar-toggle svg {
 
 .panel-header {
     margin-bottom: 2rem;
-    display: none;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.right-panel.expanded .panel-header {
-    display: flex;
 }
 
 .panel-header h2 {
@@ -770,31 +466,8 @@ body.study-mode .sidebar-toggle svg {
     color: var(--text-primary);
 }
 
-.panel-close-btn {
-    background: none;
-    border: none;
-    color: var(--text-secondary);
-    cursor: pointer;
-    padding: 0.5rem;
-    border-radius: 50%;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.panel-close-btn:hover {
-    background: rgba(139, 115, 85, 0.1);
-    color: var(--accent);
-}
-
 .tool-section {
     margin-bottom: 2rem;
-    display: none;
-}
-
-.right-panel.expanded .tool-section {
-    display: block;
 }
 
 .tool-section h3 {
@@ -1045,7 +718,7 @@ body.study-mode .sidebar-toggle svg {
     box-shadow: 0 8px 24px rgba(44, 42, 39, 0.2);
     z-index: 2000;
     max-width: 400px;
-    pointer-events: none;
+    pointer-events: auto;
     opacity: 0;
     transition: opacity 0.2s;
 }
@@ -1119,20 +792,22 @@ body.study-mode .sidebar-toggle svg {
     width: 56px;
     height: 56px;
     border-radius: 50%;
-    background: var(--accent);
-    color: white;
+    background: var(--bg-sidebar);
+    color: var(--bg-secondary);
     border: none;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     cursor: pointer;
     z-index: 100;
     font-size: 1.5rem;
     align-items: center;
     justify-content: center;
-    transition: transform 0.2s;
+    transition: all 0.2s;
 }
 
 .mobile-sidebar-toggle:hover {
     transform: scale(1.1);
+    background: #1a1816;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
 }
 
 /* Responsive */
@@ -1150,8 +825,7 @@ body.study-mode .sidebar-toggle svg {
         box-shadow: -4px 0 20px rgba(0, 0, 0, 0.2);
     }
 
-    .right-panel.mobile-open,
-    .right-panel.study-mode-active {
+    .right-panel.mobile-open {
         transform: translateX(0);
     }
 
@@ -1163,20 +837,166 @@ body.study-mode .sidebar-toggle svg {
         display: none;
     }
 
-    /* Hide desktop study toggle on mobile */
-    .study-mode-toggle {
-        display: none;
+    .panel-header {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        position: relative;
+    }
+
+    .mobile-close-btn {
+        display: block;
+        background: none;
+        border: none;
+        font-size: 2rem;
+        color: var(--text-secondary);
+        cursor: pointer;
+        padding: 0;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        transition: background 0.2s;
+        position: absolute;
+        left: -50px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: var(--accent);
+        color: white;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .mobile-close-btn:hover {
+        background: var(--accent-light);
     }
 }
 
 @media (min-width: 1025px) {
-    /* Desktop: show panel close button, hide mobile sidebar toggle */
-    .mobile-sidebar-toggle {
-        display: none !important;
+    .mobile-close-btn {
+        display: none;
     }
 }
 
+/* Comparison Mode Styles */
+.comparison-controls {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.comparison-btn {
+    padding: 0.7rem 1.2rem;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.comparison-btn:hover {
+    background: var(--accent-light);
+}
+
+.translation-select {
+    padding: 0.7rem 1rem;
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+
+.translation-select:hover {
+    border-color: var(--accent);
+}
+
+.translation-select:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+/* Two-column comparison layout */
+#verse-content.comparison-mode {
+    max-width: 100%;
+    width: 100%;
+}
+
+.comparison-mode .chapter-section {
+    display: block;
+}
+
+.comparison-mode .chapter-title {
+    width: 100vw;
+    margin-left: calc(-6rem + (-50vw + 50%));
+    padding-left: calc(6rem + (50vw - 50%));
+    padding-right: calc(6rem + (50vw - 50%));
+}
+
+.comparison-mode .chapter-content {
+    display: block;
+}
+
+/* Verse row container - each verse gets its own row */
+.verse-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 0.5rem;
+    align-items: start;
+}
+
+.verse-column {
+    display: flex;
+    align-items: start;
+    gap: 0.6rem;
+    min-height: 1.5em;
+}
+
+.verse-column .verse-number {
+    flex-shrink: 0;
+    align-self: start;
+    margin: 0;
+    padding-top: 0.1em;
+}
+
+.verse-column .verse-text {
+    flex: 1;
+}
+
+/* Translation headers for comparison columns */
+.comparison-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.comparison-header-item {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-align: center;
+}
+
 @media (max-width: 768px) {
+    .sidebar {
+        width: 60px;
+    }
+
     .content-header {
         padding: 1.5rem;
     }
@@ -1207,46 +1027,27 @@ body.study-mode .sidebar-toggle svg {
         gap: 1rem;
     }
 
-    .reading-controls {
-        flex-direction: row;
-        width: 100%;
-        gap: 0.4rem;
-        overflow-x: auto;
-    }
-
-    .control-btn {
-        font-size: 0.75rem;
-        padding: 0.4rem 0.7rem;
-    }
-
-    .btn-label {
-        display: none;
-    }
-
-    .icon-btn {
-        min-width: 36px;
-    }
-
-    .translation-selector,
-    .chapter-selector-btn {
-        flex-shrink: 0;
-    }
-
-    /* Parallel view on mobile - stack vertically */
-    .bible-content.parallel-view {
-        flex-direction: column;
-        padding: 2rem 1.5rem;
-    }
-
-    .parallel-column {
-        max-width: none;
-    }
-
     .modal-body {
         flex-direction: column;
     }
 
     .chapters-grid {
         grid-template-columns: repeat(6, 1fr);
+    }
+
+    /* Comparison mode responsive */
+    .verse-row {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+
+    .comparison-header {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+
+    .comparison-controls {
+        flex-direction: column;
+        align-items: stretch;
     }
 }
