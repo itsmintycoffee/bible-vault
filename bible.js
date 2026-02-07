@@ -9,15 +9,15 @@ const error = document.getElementById('error');
 const verseContent = document.getElementById('verse-content');
 const mainContent = document.querySelector('.main-content');
 
-// Track current reading state
-let currentBook = 'Genesis';
-let currentChapter = 1;
-let isLoading = false;
+// Track current reading state (var for cross-script access)
+var currentBook = 'Genesis';
+var currentChapter = 1;
+var isLoading = false;
 
-// Comparison mode state
-let isComparisonMode = false;
-let leftTranslation = 'esv';
-let rightTranslation = 'bulgarian';
+// Comparison mode state (var for cross-script access from reading-controls.js)
+var isComparisonMode = false;
+var leftTranslation = 'esv';
+var rightTranslation = 'bulgarian';
 
 // Chapter Manager for lazy loading
 class ChapterManager {
@@ -382,6 +382,34 @@ verseInput.addEventListener('keypress', (e) => {
     }
 });
 
+// Translation selector handler
+const translationSelector = document.getElementById('translation-selector');
+if (translationSelector) {
+    translationSelector.addEventListener('change', async (e) => {
+        const translationId = e.target.value;
+        if (typeof translationManager !== 'undefined') {
+            translationManager.setTranslation(translationId);
+        }
+
+        // Reload current chapter with new translation
+        if (isComparisonMode) {
+            leftTranslation = translationId;
+            loadChapterInComparisonMode(`${currentBook} ${currentChapter}`);
+        } else {
+            // Use translationManager to fetch with the selected translation
+            try {
+                showLoading();
+                const data = await translationManager.fetchVerseForTranslation(
+                    `${currentBook} ${currentChapter}`, translationId
+                );
+                await displayVerse(data);
+            } catch (err) {
+                showError(err.message);
+            }
+        }
+    });
+}
+
 // Get previous chapter reference
 function getPreviousChapter() {
     if (typeof bibleBooks === 'undefined') return null;
@@ -685,6 +713,7 @@ if (translationRightSelect) {
 // Load chapter in comparison mode
 async function loadChapterInComparisonMode(reference) {
     try {
+        console.log(`[COMPARE] Loading comparison: ${reference}, left=${leftTranslation}, right=${rightTranslation}`);
         showLoading();
 
         // Check if translationManager is available
@@ -693,11 +722,18 @@ async function loadChapterInComparisonMode(reference) {
         }
 
         // Fetch both translations
+        console.log(`[COMPARE] Fetching left (${leftTranslation})...`);
         const leftData = await translationManager.fetchVerseForTranslation(reference, leftTranslation);
+        console.log(`[COMPARE] Left data received: ${leftData.verses?.length} verses`);
+
+        console.log(`[COMPARE] Fetching right (${rightTranslation})...`);
         const rightData = await translationManager.fetchVerseForTranslation(reference, rightTranslation);
+        console.log(`[COMPARE] Right data received: ${rightData.verses?.length} verses`);
 
         await displayComparisonVerse(leftData, rightData);
+        console.log('[COMPARE] Comparison mode rendered successfully');
     } catch (err) {
+        console.error('[COMPARE] Error in comparison mode:', err);
         showError(err.message);
     }
 }
@@ -871,106 +907,38 @@ async function displayComparisonVerse(leftData, rightData, append = false, prepe
 
 // Default chapter is loaded by chapter-selector.js to avoid duplicate loading
 
-// Desktop sidebar toggle functionality
-const rightPanel = document.getElementById('right-panel');
-const sidebarToggle = document.getElementById('sidebar-toggle');
+// JEDP Source Coloring State
+var jedpColorsVisible = true;
 
-if (sidebarToggle) {
-    sidebarToggle.addEventListener('click', () => {
-        const isOpen = rightPanel.classList.contains('expanded');
+// JEDP Toggle Button
+const jedpToggleBtn = document.getElementById('jedp-toggle');
+if (jedpToggleBtn) {
+    jedpToggleBtn.addEventListener('click', () => {
+        jedpColorsVisible = !jedpColorsVisible;
 
-        if (isOpen) {
-            rightPanel.classList.remove('expanded');
-            document.body.classList.remove('study-mode');
-            sidebarToggle.setAttribute('title', 'Open sidebar');
-        } else {
-            rightPanel.classList.add('expanded');
-            document.body.classList.add('study-mode');
-            sidebarToggle.setAttribute('title', 'Close sidebar');
-        }
+        // Toggle all source span elements
+        const sourceElements = document.querySelectorAll('[class^="source-"]');
+        sourceElements.forEach(el => {
+            if (jedpColorsVisible) {
+                el.style.color = '';
+            } else {
+                el.style.color = 'inherit';
+            }
+        });
+
+        // Visual feedback on button
+        jedpToggleBtn.classList.toggle('active', jedpColorsVisible);
+        jedpToggleBtn.setAttribute('title', jedpColorsVisible ? 'Hide Source Colors' : 'Show Source Colors');
+
+        console.log('[JEDP] Colors toggled:', jedpColorsVisible);
     });
+
+    // Set initial button state
+    jedpToggleBtn.classList.toggle('active', jedpColorsVisible);
 }
 
-// Mobile sidebar toggle functionality
-const mobileToggleBtn = document.getElementById('mobile-sidebar-toggle');
-const mobileCloseBtn = document.getElementById('mobile-close-btn');
-
-// Open sidebar on mobile
-if (mobileToggleBtn) {
-    mobileToggleBtn.addEventListener('click', () => {
-        rightPanel.classList.add('mobile-open');
-        mobileToggleBtn.classList.add('hidden');
-    });
-}
-
-// Close sidebar on mobile
-if (mobileCloseBtn) {
-    mobileCloseBtn.addEventListener('click', () => {
-        rightPanel.classList.remove('mobile-open');
-        mobileToggleBtn.classList.remove('hidden');
-    });
-}
-
-// Right Panel Resize Functionality
-const resizeHandle = document.getElementById('resize-handle');
-let isResizing = false;
-let startX = 0;
-let startWidth = 0;
-
-if (resizeHandle) {
-    resizeHandle.addEventListener('mousedown', (e) => {
-        // Only enable resizing on desktop (screen width > 1024px)
-        if (window.innerWidth <= 1024) return;
-
-        isResizing = true;
-        startX = e.clientX;
-        startWidth = rightPanel.offsetWidth;
-
-        resizeHandle.classList.add('dragging');
-        document.body.style.cursor = 'ew-resize';
-        document.body.style.userSelect = 'none';
-
-        e.preventDefault();
-    });
-
-    document.addEventListener('mousemove', (e) => {
-        if (!isResizing) return;
-
-        // Calculate new width (subtract because we're dragging from the right)
-        const deltaX = startX - e.clientX;
-        const newWidth = startWidth + deltaX;
-
-        // Constrain width between min and max
-        const minWidth = 400;
-        const maxWidth = window.innerWidth * 0.6; // Max 60% of window width
-        const constrainedWidth = Math.max(minWidth, Math.min(maxWidth, newWidth));
-
-        // Apply new width
-        rightPanel.style.width = `${constrainedWidth}px`;
-        rightPanel.style.minWidth = `${constrainedWidth}px`;
-        rightPanel.style.maxWidth = `${constrainedWidth}px`;
-    });
-
-    document.addEventListener('mouseup', () => {
-        if (isResizing) {
-            isResizing = false;
-            resizeHandle.classList.remove('dragging');
-            document.body.style.cursor = '';
-            document.body.style.userSelect = '';
-
-            // Save width preference to localStorage
-            localStorage.setItem('rightPanelWidth', rightPanel.offsetWidth);
-        }
-    });
-
-    // Restore saved width on page load
-    window.addEventListener('load', () => {
-        const savedWidth = localStorage.getItem('rightPanelWidth');
-        if (savedWidth && window.innerWidth > 1024) {
-            const width = parseInt(savedWidth);
-            rightPanel.style.width = `${width}px`;
-            rightPanel.style.minWidth = `${width}px`;
-            rightPanel.style.maxWidth = `${width}px`;
-        }
-    });
-}
+// Expose key functions globally for cross-script access
+window.fetchVerse = fetchVerse;
+window.loadChapterInComparisonMode = loadChapterInComparisonMode;
+window.displayVerse = displayVerse;
+window.displayComparisonVerse = displayComparisonVerse;

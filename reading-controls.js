@@ -87,10 +87,15 @@ class ReadingControls {
             parallelToggle.classList.add('active');
 
             // Use bible.js verse-aligned comparison mode
-            isComparisonMode = true;
-            leftTranslation = currentTranslationId;
-            rightTranslation = autoCompareTranslation;
-            loadChapterInComparisonMode(`${currentBook} ${currentChapter}`);
+            try {
+                isComparisonMode = true;
+                leftTranslation = currentTranslationId;
+                rightTranslation = autoCompareTranslation;
+                console.log(`[PARALLEL] Starting comparison: left=${leftTranslation}, right=${rightTranslation}, ref=${currentBook} ${currentChapter}`);
+                loadChapterInComparisonMode(`${currentBook} ${currentChapter}`);
+            } catch (err) {
+                console.error('[PARALLEL] Error starting comparison mode:', err);
+            }
         } else {
             parallelToggle.classList.remove('active');
             if (parallelTranslationSelector) {
