@@ -510,7 +510,7 @@ body {
 }
 
 .chapter-illustrations {
-    flex: 0 0 340px;
+    flex: 0 0 400px;
 }
 
 .illustration-grid {
@@ -529,10 +529,7 @@ body {
 }
 
 /* Day 1 - top center */
-.illustration-grid img:nth-child(1) {
-    grid-column: 2;
-    width: 90%;
-}
+.illustration-grid img:nth-child(1) { grid-column: 2; }
 
 /* Days 2, 3, 4 - horizontal row */
 .illustration-grid img:nth-child(2) { grid-column: 1; }
@@ -540,16 +537,10 @@ body {
 .illustration-grid img:nth-child(4) { grid-column: 3; }
 
 /* Day 5 - below center */
-.illustration-grid img:nth-child(5) {
-    grid-column: 2;
-    width: 90%;
-}
+.illustration-grid img:nth-child(5) { grid-column: 2; }
 
 /* Day 6 - below Day 5, center */
-.illustration-grid img:nth-child(6) {
-    grid-column: 2;
-    width: 90%;
-}
+.illustration-grid img:nth-child(6) { grid-column: 2; }
 
 /* Language-specific fonts */
 .bible-content.lang-english .chapter-content {
@@ -960,6 +951,15 @@ body {
 
     .illustration-grid {
         margin-top: 0;
+    }
+
+    .drop-cap {
+        display: flex;
+        align-items: flex-end;
+    }
+
+    .drop-cap-letter {
+        font-size: 2.75em;
     }
 
     .chapter-title {
