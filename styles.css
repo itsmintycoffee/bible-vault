@@ -4,6 +4,14 @@
     box-sizing: border-box;
 }
 
+/* Bohemian Font */
+@font-face {
+    font-family: 'Bohemian Soul';
+    src: url('src/Bohemian Soul.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+
 :root {
     --bg-primary: #f5f1e8;
     --bg-secondary: #fdfaf4;
@@ -19,7 +27,9 @@ body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     height: 100vh;
     overflow: hidden;
-    background: var(--bg-primary);
+    background: url('img/ep_naturalwhite.webp');
+    background-size: auto;
+    background-repeat: repeat;
     color: var(--text-primary);
 }
 
@@ -106,12 +116,12 @@ body {
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.3s ease, transform 0.3s ease;
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background: linear-gradient(0deg, rgba(255, 255, 255, 0.55) 0%, rgba(213, 206, 199, 0.55) 100%);
+    border: 1px solid #FFFFFF;
+    box-shadow: 0px 20px 8px rgba(41, 22, 10, 0.01), 0px 11px 7px rgba(41, 22, 10, 0.03), 0px 5px 5px rgba(41, 22, 10, 0.04), 0px 1px 3px rgba(41, 22, 10, 0.05);
+    border-radius: 22px;
     padding: 0.5rem;
-    border-radius: 50px;
-    border: 1px solid rgba(232, 227, 216, 0.6);
+    box-sizing: border-box;
 }
 
 /* When scrolled down, show controls */
@@ -381,11 +391,11 @@ body {
 }
 
 .chapter-title {
-    font-family: 'Crimson Text', Georgia, serif;
-    font-weight: 800;
+    font-family: 'Bohemian Soul', serif;
+    font-weight: normal;
     color: var(--text-primary);
     margin-bottom: 2.5rem;
-    font-size: 2.5rem;
+    font-size: 101px;
     text-transform: none;
     letter-spacing: -0.02em;
     position: sticky;
@@ -394,8 +404,9 @@ body {
     background: rgba(253, 250, 244, 0.85);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    height: 70px;
+    height: auto;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     text-align: center;
@@ -404,15 +415,27 @@ body {
     padding-left: calc(50vw - 50%);
     padding-right: calc(50vw - 50%);
     margin-top: -1rem;
-    padding-top: 0;
+    padding-top: 1.5rem;
+    padding-bottom: 1rem;
     box-shadow: none;
     will-change: transform;
+    position: relative;
+}
+
+.chapter-title::after {
+    content: '';
+    display: block;
+    width: 120px;
+    margin-top: 0.8rem;
+    border-top: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    height: 0.5rem;
 }
 
 /* First chapter title - large headline style */
 .chapter-section:first-child .chapter-title {
-    font-size: 5rem;
-    font-weight: 900;
+    font-size: 8rem;
+    font-weight: normal;
     letter-spacing: -0.03em;
     height: auto;
     padding-top: 2rem;
@@ -427,12 +450,12 @@ body {
 
 /* First chapter title when sticky - shrink to normal size */
 .chapter-section:first-child .chapter-title.sticky-active {
-    font-size: 2.5rem;
-    font-weight: 800;
+    font-size: 101px;
+    font-weight: normal;
     letter-spacing: -0.02em;
-    height: 70px;
-    padding-top: 0;
-    padding-bottom: 0;
+    height: auto;
+    padding-top: 1.5rem;
+    padding-bottom: 1rem;
     margin-top: -1rem;
     margin-bottom: 2.5rem;
     background: rgba(253, 250, 244, 0.85);

@@ -14,7 +14,19 @@
       "Bash(git fetch:*)",
       "Bash(curl:*)",
       "Bash(gh workflow:*)",
-      "Bash(git ls-tree:*)"
+      "Bash(git ls-tree:*)",
+      "Bash(test:*)",
+      "Bash(python3:*)",
+      "Bash(for file in CNAME README.md bible.js bulgarian-bible-parser.js bulgarian_bible_1940.txt chapter-selector.js index.html jedp-sources.js mask.png mask.svg particles.js styles.css translation-manager.js word-study.js)",
+      "Bash(do if [ -f \"$file\" ])",
+      "Bash(then echo \"✓ $file\")",
+      "Bash(else echo \"✗ MISSING: $file\")",
+      "Bash(fi:*)",
+      "Bash(done)",
+      "Bash(git checkout:*)",
+      "Bash(explorer:*)",
+      "Bash(start \"\" \"n:\\\\Chrome\\\\bible-tools\")",
+      "Bash(git stash:*)"
     ]
   }
 }
