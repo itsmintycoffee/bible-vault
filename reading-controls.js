@@ -77,8 +77,24 @@ class ReadingControls {
                 autoCompareTranslation = 'esv';
             }
 
-            // Set parallel translation selector
+            // Rebuild parallel selector excluding the current translation
             if (parallelTranslationSelector) {
+                const allTranslations = [
+                    { value: 'esv', label: 'ESV' },
+                    { value: 'kjv', label: 'KJV' },
+                    { value: 'bulgarian', label: 'Bulgarian (1940)' },
+                    { value: 'wlca', label: 'Hebrew (WLC)' },
+                    { value: 'lxx', label: 'Greek (LXX)' }
+                ];
+                parallelTranslationSelector.innerHTML = '';
+                allTranslations.forEach(t => {
+                    if (t.value !== currentTranslationId) {
+                        const option = document.createElement('option');
+                        option.value = t.value;
+                        option.textContent = t.label;
+                        parallelTranslationSelector.appendChild(option);
+                    }
+                });
                 parallelTranslationSelector.value = autoCompareTranslation;
                 this.parallelTranslation = autoCompareTranslation;
                 parallelTranslationSelector.classList.remove('hidden');

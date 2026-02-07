@@ -214,10 +214,22 @@ async function displayVerse(data, append = false, prepend = false) {
     // Format the chapter title (first chapter shows book name, others show just number)
     const formattedTitle = formatChapterTitle(data.reference);
 
-    chapterDiv.innerHTML = `
-        <div class="chapter-title">${formattedTitle}</div>
-        <div class="chapter-content">${formatVerseText(data)}</div>
-    `;
+    const illustrationsHtml = getChapterIllustrations(data.reference);
+
+    if (illustrationsHtml) {
+        chapterDiv.innerHTML = `
+            <div class="chapter-title">${formattedTitle}</div>
+            <div class="chapter-body with-illustrations">
+                <div class="chapter-content">${formatVerseText(data)}</div>
+                <aside class="chapter-illustrations">${illustrationsHtml}</aside>
+            </div>
+        `;
+    } else {
+        chapterDiv.innerHTML = `
+            <div class="chapter-title">${formattedTitle}</div>
+            <div class="chapter-content">${formatVerseText(data)}</div>
+        `;
+    }
 
     // Store original language data on the chapter div for word study
     if (originalLanguageData) {
@@ -390,13 +402,42 @@ function formatFullChapterReference(reference) {
 // Format verse text with verse numbers
 function formatVerseText(data) {
     if (data.verses && data.verses.length > 0) {
-        return data.verses.map(verse => {
+        return data.verses.map((verse, index) => {
             const verseNumber = verse.verse;
             const verseText = verse.text;
+            // First verse of each chapter: drop cap, hide verse number
+            if (index === 0) {
+                return `<div class="verse drop-cap"><span class="verse-text">${verseText}</span></div>`;
+            }
             return `<div class="verse"><sup class="verse-number">${verseNumber}</sup><span class="verse-text">${verseText}</span></div>`;
         }).join('');
     }
     return `${data.text}`;
+}
+
+// Get chapter illustration HTML if available
+function getChapterIllustrations(reference) {
+    const match = reference.match(/^(.+?)\s+(\d+)/);
+    if (!match) return null;
+
+    const bookName = match[1].trim().toLowerCase();
+    const chapterNum = parseInt(match[2]);
+
+    if (bookName === 'genesis' && chapterNum === 1) {
+        const basePath = 'chapters/genesis/resources';
+        return `
+            <div class="illustration-grid">
+                <img src="${basePath}/day01.png" alt="Day 1 – Light">
+                <img src="${basePath}/day02.png" alt="Day 2 – Sky">
+                <img src="${basePath}/day03.png" alt="Day 3 – Land and Seas">
+                <img src="${basePath}/day04.png" alt="Day 4 – Sun, Moon, Stars">
+                <img src="${basePath}/day05.png" alt="Day 5 – Sea and Sky Creatures">
+                <img src="${basePath}/day06.png" alt="Day 6 – Land Animals and Man">
+            </div>
+        `;
+    }
+
+    return null;
 }
 
 // UI Helper functions
