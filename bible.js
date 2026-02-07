@@ -513,7 +513,10 @@ function formatVerseText(data) {
             const verseText = verse.text;
             // First verse of each chapter: drop cap, hide verse number
             if (index === 0) {
-                return `<div class="verse drop-cap"><span class="verse-text">${verseText}</span></div>`;
+                const trimmed = verseText.trimStart();
+                const firstLetter = trimmed.charAt(0);
+                const rest = trimmed.substring(1);
+                return `<div class="verse drop-cap"><span class="drop-cap-letter">${firstLetter}</span><span class="verse-text">${rest}</span></div>`;
             }
             return `<div class="verse"><sup class="verse-number">${verseNumber}</sup><span class="verse-text">${verseText}</span></div>`;
         }).join('');

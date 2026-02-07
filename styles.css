@@ -638,20 +638,18 @@ body {
 }
 
 /* Drop Cap for first verse of each chapter */
-.drop-cap::first-letter {
-    float: left;
-    font-size: 5.5em;
-    line-height: 0.45;
-    margin-right: 0.08em;
-    padding-top: 0.05em;
-    font-weight: 700;
-    color: #2F3D52;
+.drop-cap {
+    display: flex;
+    align-items: flex-end;
 }
 
-.drop-cap::after {
-    content: '';
-    display: table;
-    clear: both;
+.drop-cap-letter {
+    font-size: 5.5em;
+    line-height: 0.8;
+    margin-right: 0.06em;
+    font-weight: 700;
+    color: #2F3D52;
+    flex-shrink: 0;
 }
 
 /* Documentary Hypothesis Source Color-Coding - Text Color Style */
