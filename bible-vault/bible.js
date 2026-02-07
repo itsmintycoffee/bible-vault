@@ -14,6 +14,11 @@ let currentBook = 'Genesis';
 let currentChapter = 1;
 let isLoading = false;
 
+// Comparison mode state
+let isComparisonMode = false;
+let leftTranslation = 'esv';
+let rightTranslation = 'bulgarian';
+
 // Chapter Manager for lazy loading
 class ChapterManager {
     constructor() {
@@ -94,7 +99,7 @@ class ChapterManager {
             if (!visibleRefs.has(ref)) {
                 const index = this.chapterOrder.indexOf(ref);
 
-                // Remove from DOM
+                // Remove from DOM but keep the reference in memory
                 if (chapter.element && chapter.element.parentNode) {
                     chapter.element.remove();
                 }
@@ -110,7 +115,7 @@ class ChapterManager {
             }
         });
 
-        // Update spacers
+        // Update spacers (these represent the removed content)
         this.topSpacer.style.height = `${topSpacerHeight}px`;
         this.bottomSpacer.style.height = `${bottomSpacerHeight}px`;
 
@@ -140,8 +145,8 @@ class ChapterManager {
     }
 
     shouldLoadPrevious(scrollTop) {
-        // Load previous chapter when within 500px of top
-        return scrollTop < 500 && !this.isLoadingPrevious;
+        // Load previous chapter when within 800px of top (increased for better UX)
+        return scrollTop < 800 && !this.isLoadingPrevious;
     }
 
     shouldLoadNext(scrollPosition, scrollHeight) {
@@ -507,8 +512,9 @@ function handleScroll() {
     const scrollPosition = scrollTop + mainContent.clientHeight;
     const scrollHeight = mainContent.scrollHeight;
 
-    // Load previous chapter when near top
-    if (chapterManager.shouldLoadPrevious(scrollTop)) {
+    // Load previous chapter when near top (including accounting for top spacer)
+    const topSpacerHeight = chapterManager.topSpacer ? parseInt(chapterManager.topSpacer.style.height) || 0 : 0;
+    if (chapterManager.shouldLoadPrevious(scrollTop) || (topSpacerHeight > 0 && scrollTop < topSpacerHeight + 500)) {
         loadPreviousChapter();
     }
 
@@ -524,24 +530,29 @@ function handleScroll() {
 // Update current chapter based on scroll position
 function updateCurrentChapterFromScroll() {
     const chapters = document.querySelectorAll('.chapter-section');
-    const viewportMiddle = mainContent.scrollTop + (mainContent.clientHeight / 2);
+    const scrollTop = mainContent.scrollTop;
+    const viewportMiddle = scrollTop + (mainContent.clientHeight / 2);
 
-    let closestChapter = null;
-    let closestDistance = Infinity;
+    let currentChapter = null;
 
+    // Find the chapter whose title is at the top or whose content is past the middle
     chapters.forEach(chapter => {
-        const chapterTop = chapter.offsetTop;
-        const chapterMiddle = chapterTop + (chapter.offsetHeight / 2);
-        const distance = Math.abs(viewportMiddle - chapterMiddle);
+        const title = chapter.querySelector('.chapter-title');
+        if (!title) return;
 
-        if (distance < closestDistance) {
-            closestDistance = distance;
-            closestChapter = chapter;
+        const chapterTop = chapter.offsetTop;
+        const titleBottom = chapterTop + title.offsetHeight;
+
+        // Chapter is current if:
+        // 1. Its title is at or past the top of the viewport
+        // 2. OR its content area has passed the middle of the viewport
+        if (titleBottom >= scrollTop && chapterTop <= viewportMiddle) {
+            currentChapter = chapter;
         }
     });
 
-    if (closestChapter) {
-        const title = closestChapter.querySelector('.chapter-title');
+    if (currentChapter) {
+        const title = currentChapter.querySelector('.chapter-title');
         if (title) {
             const reference = title.textContent;
             updateCurrentPosition(reference);
@@ -577,6 +588,193 @@ mainContent.addEventListener('scroll', () => {
         updateChapterSelector();
     }, 200);
 });
+
+// Comparison Mode Event Listeners
+const toggleComparisonBtn = document.getElementById('toggle-comparison');
+const translationLeftSelect = document.getElementById('translation-left');
+const translationRightSelect = document.getElementById('translation-right');
+
+if (toggleComparisonBtn) {
+    toggleComparisonBtn.addEventListener('click', () => {
+        isComparisonMode = !isComparisonMode;
+
+        if (isComparisonMode) {
+            // Show translation selects
+            translationLeftSelect.classList.remove('hidden');
+            translationRightSelect.classList.remove('hidden');
+            verseContent.classList.add('comparison-mode');
+
+            // Reload current chapter in comparison mode
+            loadChapterInComparisonMode(`${currentBook} ${currentChapter}`);
+        } else {
+            // Hide translation selects
+            translationLeftSelect.classList.add('hidden');
+            translationRightSelect.classList.add('hidden');
+            verseContent.classList.remove('comparison-mode');
+
+            // Reload current chapter in single mode
+            fetchVerse(`${currentBook} ${currentChapter}`);
+        }
+    });
+}
+
+if (translationLeftSelect) {
+    translationLeftSelect.addEventListener('change', (e) => {
+        leftTranslation = e.target.value;
+        if (isComparisonMode) {
+            loadChapterInComparisonMode(`${currentBook} ${currentChapter}`);
+        }
+    });
+}
+
+if (translationRightSelect) {
+    translationRightSelect.addEventListener('change', (e) => {
+        rightTranslation = e.target.value;
+        if (isComparisonMode) {
+            loadChapterInComparisonMode(`${currentBook} ${currentChapter}`);
+        }
+    });
+}
+
+// Load chapter in comparison mode
+async function loadChapterInComparisonMode(reference) {
+    try {
+        showLoading();
+
+        // Check if translationManager is available
+        if (typeof translationManager === 'undefined') {
+            throw new Error('Translation manager not loaded. Please ensure translation-manager.js is included.');
+        }
+
+        // Fetch both translations
+        const leftData = await translationManager.fetchVerseForTranslation(reference, leftTranslation);
+        const rightData = await translationManager.fetchVerseForTranslation(reference, rightTranslation);
+
+        await displayComparisonVerse(leftData, rightData);
+    } catch (err) {
+        showError(err.message);
+    }
+}
+
+// Display verses in comparison mode with aligned verse numbers
+async function displayComparisonVerse(leftData, rightData, append = false, prepend = false) {
+    hideLoadingAndError();
+
+    // Create chapter element
+    const chapterDiv = document.createElement('div');
+    chapterDiv.className = 'chapter-section';
+
+    // Create header with translation names
+    const comparisonHeader = document.createElement('div');
+    comparisonHeader.className = 'comparison-header';
+    comparisonHeader.innerHTML = `
+        <div class="comparison-header-item">${leftData.translation_name || 'Left Translation'}</div>
+        <div class="comparison-header-item">${rightData.translation_name || 'Right Translation'}</div>
+    `;
+
+    // Create chapter title
+    const chapterTitle = document.createElement('div');
+    chapterTitle.className = 'chapter-title';
+    chapterTitle.textContent = leftData.reference;
+
+    // Create chapter content container
+    const chapterContent = document.createElement('div');
+    chapterContent.className = 'chapter-content';
+
+    // Get all verse numbers (union of both translations)
+    const leftVerses = new Map(leftData.verses.map(v => [v.verse, v]));
+    const rightVerses = new Map(rightData.verses.map(v => [v.verse, v]));
+    const allVerseNumbers = new Set([...leftVerses.keys(), ...rightVerses.keys()]);
+    const sortedVerseNumbers = Array.from(allVerseNumbers).sort((a, b) => a - b);
+
+    // Create aligned verse rows
+    for (const verseNum of sortedVerseNumbers) {
+        const leftVerse = leftVerses.get(verseNum);
+        const rightVerse = rightVerses.get(verseNum);
+
+        const verseRow = document.createElement('div');
+        verseRow.className = 'verse-row';
+
+        // Left column
+        const leftColumn = document.createElement('div');
+        leftColumn.className = 'verse-column';
+        if (leftVerse) {
+            leftColumn.innerHTML = `
+                <sup class="verse-number">${verseNum}</sup>
+                <span class="verse-text">${leftVerse.text}</span>
+            `;
+        } else {
+            leftColumn.innerHTML = `
+                <sup class="verse-number">${verseNum}</sup>
+                <span class="verse-text" style="color: var(--text-secondary); font-style: italic;">—</span>
+            `;
+        }
+
+        // Right column
+        const rightColumn = document.createElement('div');
+        rightColumn.className = 'verse-column';
+        if (rightVerse) {
+            rightColumn.innerHTML = `
+                <sup class="verse-number">${verseNum}</sup>
+                <span class="verse-text">${rightVerse.text}</span>
+            `;
+        } else {
+            rightColumn.innerHTML = `
+                <sup class="verse-number">${verseNum}</sup>
+                <span class="verse-text" style="color: var(--text-secondary); font-style: italic;">—</span>
+            `;
+        }
+
+        verseRow.appendChild(leftColumn);
+        verseRow.appendChild(rightColumn);
+        chapterContent.appendChild(verseRow);
+    }
+
+    // Assemble chapter
+    chapterDiv.appendChild(chapterTitle);
+    chapterDiv.appendChild(comparisonHeader);
+    chapterDiv.appendChild(chapterContent);
+
+    // Update current reading position (only if not prepending or appending)
+    if (!prepend && !append) {
+        updateCurrentPosition(leftData.reference);
+    }
+
+    // Add to DOM based on mode
+    if (prepend) {
+        const topSpacer = document.getElementById('top-spacer');
+        if (topSpacer && topSpacer.nextSibling) {
+            verseContent.insertBefore(chapterDiv, topSpacer.nextSibling);
+        } else {
+            verseContent.appendChild(chapterDiv);
+        }
+    } else if (append) {
+        const bottomSpacer = document.getElementById('bottom-spacer');
+        if (bottomSpacer) {
+            verseContent.insertBefore(chapterDiv, bottomSpacer);
+        } else {
+            verseContent.appendChild(chapterDiv);
+        }
+    } else {
+        // Clear and add (first load)
+        verseContent.innerHTML = '';
+        chapterManager.initialize();
+        verseContent.insertBefore(chapterDiv, chapterManager.bottomSpacer);
+    }
+
+    // Add to chapter manager
+    chapterManager.addChapter(leftData.reference, leftData, chapterDiv, prepend);
+
+    // Cleanup old chapters if needed
+    if (chapterManager.needsCleanup()) {
+        chapterManager.cleanup();
+    }
+
+    // Setup sticky observer for first chapter title
+    if (!append && !prepend) {
+        setupFirstChapterObserver();
+    }
+}
 
 // Default chapter is loaded by chapter-selector.js to avoid duplicate loading
 
