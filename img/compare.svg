@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" id="compare">
+  <g id="document, page, file, compare, combine, arrow, merge, editor, side by side">
+    <path id="Vector" stroke="#000" stroke-width="2" d="M12 15V3L17 3L22 8L22 16H17"></path>
+    <path id="Vector_2" stroke="#000" stroke-width="2" d="M17 3L17 8L22 8"></path>
+    <path id="Vector_3" stroke="#000" stroke-width="2" d="M12 15V8L7 3L2 3V16H7"></path>
+    <path id="Vector_4" stroke="#000" stroke-width="2" d="M7 3L7 8L12 8"></path>
+    <path id="Vector_5" stroke="#000" stroke-width="2" d="M16.5 20L16 19.5V20.5L16.5 20Z"></path>
+    <path id="Vector_6" stroke="#000" stroke-width="2" d="M7.5 20L8 19.5L8 20.5L7.5 20Z"></path>
+    <path id="Vector_7" stroke="#000" stroke-width="2" d="M16 20L8 20"></path>
+  </g>
+</svg>

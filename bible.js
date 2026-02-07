@@ -209,6 +209,7 @@ async function displayVerse(data, append = false, prepend = false) {
     // Create chapter element
     const chapterDiv = document.createElement('div');
     chapterDiv.className = 'chapter-section';
+    chapterDiv.dataset.reference = data.reference;
 
     // Format the chapter title (first chapter shows book name, others show just number)
     const formattedTitle = formatChapterTitle(data.reference);
@@ -346,25 +347,22 @@ function updateCurrentPosition(reference) {
     }
 
     // Otherwise, it should be a book name or "Book Chapter" format
-    const match = trimmed.match(/^(.+?)\s+(\d+)?$/);
+    const match = trimmed.match(/^(.+?)\s+(\d+)/);
     if (match) {
-        // Normalize case since chapter titles are uppercase
         let bookName = match[1].trim();
-        // Capitalize first letter of each word to match bibleBooks format
         bookName = bookName.split(' ').map(word =>
             word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
         ).join(' ');
 
         currentBook = bookName;
-        // If chapter number was provided, use it; otherwise assume chapter 1
-        currentChapter = match[2] ? parseInt(match[2]) : 1;
+        currentChapter = parseInt(match[2]);
         console.log(`[POSITION] Updated to ${currentBook} ${currentChapter}`);
     }
 }
 
 // Format chapter title based on whether it's the first chapter of a book
 function formatChapterTitle(reference) {
-    const match = reference.match(/^(.+?)\s+(\d+)$/);
+    const match = reference.match(/^(.+?)\s+(\d+)/);
     if (!match) return reference;
 
     const bookName = match[1].trim();
@@ -376,6 +374,17 @@ function formatChapterTitle(reference) {
     }
     // Subsequent chapters: show just the number
     return chapterNum.toString();
+}
+
+// Format full chapter reference for toolbar display (always shows "Book Chapter" format)
+function formatFullChapterReference(reference) {
+    const match = reference.match(/^(.+?)\s+(\d+)/);
+    if (!match) return reference;
+
+    const bookName = match[1].trim();
+    const chapterNum = parseInt(match[2]);
+
+    return `${bookName} ${chapterNum}`;
 }
 
 // Format verse text with verse numbers
@@ -658,33 +667,18 @@ function handleScroll() {
 // Update current chapter based on scroll position
 function updateCurrentChapterFromScroll() {
     const chapters = document.querySelectorAll('.chapter-section');
-    const scrollTop = mainContent.scrollTop;
-    const viewportMiddle = scrollTop + (mainContent.clientHeight / 2);
+    let visibleChapter = null;
 
-    let currentChapter = null;
-
-    // Find the chapter whose title is at the top or whose content is past the middle
     chapters.forEach(chapter => {
-        const title = chapter.querySelector('.chapter-title');
-        if (!title) return;
-
-        const chapterTop = chapter.offsetTop;
-        const titleBottom = chapterTop + title.offsetHeight;
-
-        // Chapter is current if:
-        // 1. Its title is at or past the top of the viewport
-        // 2. OR its content area has passed the middle of the viewport
-        if (titleBottom >= scrollTop && chapterTop <= viewportMiddle) {
-            currentChapter = chapter;
+        const rect = chapter.getBoundingClientRect();
+        // Chapter is current if its content is in the upper half of the viewport
+        if (rect.top < window.innerHeight / 2 && rect.bottom > 0) {
+            visibleChapter = chapter;
         }
     });
 
-    if (currentChapter) {
-        const title = currentChapter.querySelector('.chapter-title');
-        if (title) {
-            const reference = title.textContent;
-            updateCurrentPosition(reference);
-        }
+    if (visibleChapter && visibleChapter.dataset.reference) {
+        updateCurrentPosition(visibleChapter.dataset.reference);
     }
 }
 
@@ -695,16 +689,19 @@ function updateChapterSelector() {
 
     if (!currentChapterDisplay) return;
 
+    let visibleChapter = null;
+
     chapters.forEach(chapter => {
         const rect = chapter.getBoundingClientRect();
-        // Check if chapter is in viewport (top portion visible)
-        if (rect.top >= 0 && rect.top <= window.innerHeight / 2) {
-            const title = chapter.querySelector('.chapter-title');
-            if (title) {
-                currentChapterDisplay.textContent = title.textContent;
-            }
+        if (rect.top < window.innerHeight / 2 && rect.bottom > 0) {
+            visibleChapter = chapter;
         }
     });
+
+    if (visibleChapter && visibleChapter.dataset.reference) {
+        updateCurrentPosition(visibleChapter.dataset.reference);
+        currentChapterDisplay.textContent = formatFullChapterReference(visibleChapter.dataset.reference);
+    }
 }
 
 // Add scroll event listener with debounce
@@ -827,6 +824,7 @@ async function displayComparisonVerse(leftData, rightData, append = false, prepe
     // Create chapter element
     const chapterDiv = document.createElement('div');
     chapterDiv.className = 'chapter-section';
+    chapterDiv.dataset.reference = leftData.reference;
 
     // Store original language data for both columns
     if (originalLanguageData) {
