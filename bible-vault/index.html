@@ -205,12 +205,21 @@
         </div>
     </div>
 
+    <script>
+        console.log('[INDEX] Starting to load scripts...');
+    </script>
     <script src="particles.js"></script>
     <script src="jedp-sources.js"></script>
     <script src="word-study.js"></script>
+    <script>
+        console.log('[INDEX] word-study.js loaded, makeWordsClickable available:', typeof makeWordsClickable !== 'undefined');
+    </script>
     <script src="bulgarian-bible-parser.js"></script>
     <script src="translation-manager.js"></script>
     <script src="bible.js"></script>
     <script src="chapter-selector.js"></script>
+    <script>
+        console.log('[INDEX] All scripts loaded');
+    </script>
 </body>
 </html>

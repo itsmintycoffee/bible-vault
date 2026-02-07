@@ -255,9 +255,13 @@ async function displayVerse(data, append = false, prepend = false) {
 
     // Then make words clickable for word study (after JEDP highlighting)
     const verseTexts = chapterDiv.querySelectorAll('.verse-text');
+    console.log(`[BIBLE] Found ${verseTexts.length} verse texts to process`);
+    console.log(`[BIBLE] makeWordsClickable exists:`, typeof makeWordsClickable === 'function');
+
     if (typeof makeWordsClickable === 'function') {
         // Determine the translation type for word study
         const translationType = data.translation_id || 'english';
+        console.log(`[BIBLE] Calling makeWordsClickable with translation type: ${translationType}`);
 
         for (const verseText of verseTexts) {
             await makeWordsClickable(verseText, translationType);

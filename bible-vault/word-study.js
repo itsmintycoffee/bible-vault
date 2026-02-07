@@ -1,4 +1,5 @@
 // Word Study Feature with Concordance Integration
+console.log('[WORD-STUDY] Script loaded at:', new Date().toISOString());
 
 // Concordance index (maps words to Strong's numbers)
 let concordanceIndex = null;
@@ -132,6 +133,8 @@ const stopWords = new Set([
 
 // Make verse text clickable with Strong's number mapping
 async function makeWordsClickable(verseElement, translationType = 'english') {
+    console.log('[WORD-STUDY] makeWordsClickable called');
+
     // Get the verse number from this verse element
     // Works for both single-view (.verse) and comparison mode (.verse-column)
     let verseNumberElem = verseElement.closest('.verse')?.querySelector('.verse-number');
@@ -141,7 +144,7 @@ async function makeWordsClickable(verseElement, translationType = 'english') {
     }
     const verseNumber = verseNumberElem ? parseInt(verseNumberElem.textContent) : null;
 
-    console.log(`Processing verse ${verseNumber} with translation type: ${translationType}`);
+    console.log(`[WORD-STUDY] Processing verse ${verseNumber} with translation type: ${translationType}`);
 
     // Get original language data from the chapter
     const chapterSection = verseElement.closest('.chapter-section');
@@ -250,6 +253,10 @@ async function makeWordsClickable(verseElement, translationType = 'english') {
 
                 // Get corresponding Strong's number if available (before stop word check)
                 const strongsNum = strongsNumbers[wordIndex] || null;
+
+                if (strongsNum) {
+                    console.log(`[WORD-STUDY] Word #${wordIndex}: "${token}" -> ${strongsNum}`);
+                }
 
                 if (isStopWord) {
                     // Stop words don't have Hebrew/Greek equivalents, so don't increment index
