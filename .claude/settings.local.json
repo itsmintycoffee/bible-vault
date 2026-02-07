@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git pull:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(timeout 10 git status:*)",
+      "WebFetch(domain:interactivebook.webflow.io)",
+      "Bash(git init:*)",
+      "Bash(git remote add:*)",
+      "Bash(git branch:*)",
+      "Bash(ls:*)",
+      "Bash(git fetch:*)",
+      "Bash(curl:*)",
+      "Bash(gh workflow:*)",
+      "Bash(git ls-tree:*)"
+    ]
+  }
+}

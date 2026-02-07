@@ -1,0 +1,187 @@
+Book,Chapter,Verse_Range,Source,Notes
+Exodus,1,1-5,P,Genealogical introduction
+Exodus,1,6,J,Joseph dies
+Exodus,1,7,P,Israel multiplies
+Exodus,1,8-12,J,New king oppresses
+Exodus,1,13-14,P,Hard labor description
+Exodus,1,15-2:10,E,Midwives and Moses' birth
+Exodus,2,11-23,J,Moses flees and Egyptian encounter
+Exodus,2,23b-25,P,God remembers covenant
+Exodus,3,1,E,Moses at Horeb with Jethro's flock
+Exodus,3,2-4a; 3:5; 3:7-8; 3:16-4:17,J,Burning bush and call narrative
+Exodus,3,4b; 3:6; 3:9b-15,E,Alternative call elements
+Exodus,4,1-9,J,Signs given to Moses
+Exodus,4,10-17,J/E,Objections; Aaron as spokesman intro
+Exodus,4,18,E,Departure from Midian
+Exodus,4,19-26,J,Journey details; circumcision
+Exodus,4,27-6:1,J,Moses and Aaron meet
+Exodus,5,1-5,J,First request to Pharaoh
+Exodus,5,6-18,J,Taskmasters and straw difficulties
+Exodus,5,19-6:1,J,People complain to Moses
+Exodus,6,2-9,P,Covenant introduction and promises
+Exodus,6,10-12,J/Mixed,Moses complains to God
+Exodus,6,13-30,P,Genealogies and Moses/Aaron credentials
+Exodus,7,1-13,P,Aaron as spokesman; staff to serpent
+Exodus,7,14-18; 7:20b-21a; 7:23-8:4,J,Water plague and frogs (J version)
+Exodus,7,19-20a; 7:21b-22,P,Water plague (P version)
+Exodus,7,25-8:11,J/E,Frogs and gnats (mixed versions)
+Exodus,8,12-15,J,Flies plague
+Exodus,8,16-28,J,Gnats/lice and flies mixed account
+Exodus,9,1-7,J,Livestock plague
+Exodus,9,8-12,P,Boils plague
+Exodus,9,13-35,J,Hail plague (extensive account)
+Exodus,10,1-20,J,Locusts plague
+Exodus,10,21-23,P,Darkness plague
+Exodus,11,1-8,J,Tenth plague announcement
+Exodus,11,9-12:1,P,Further plague information
+Exodus,12,2-51,Multiple,Passover regulation (sources mixed)
+Exodus,12,2; 3-27; 40-51,P,Priestly Passover regulations
+Exodus,12,12a; 29-36; 37b-39,J,Yahwist Passover narrative
+Exodus,13,1-16,J/Mixed,Firstborn consecration
+Exodus,13,17-22,J,Wilderness guidance/pillar
+Exodus,14,1-29,J/E/P,Sea crossing (complex three-source narrative)
+Exodus,14,5-7; 10a; 11-14; 19-20; 21b; 24-25; 27b; 30-31,J,Yahwist crossing
+Exodus,14,1-4; 8-9; 10b; 15-18; 21a; 21c-23; 26-27a; 28-29,P,Priestly crossing
+Exodus,15,1-18,J,Song of the Sea (ancient poetry)
+Exodus,15,20-21,E,Miriam's song
+Exodus,15,22a; 23-26,J,Water complaints and sweetening
+Exodus,15,27-16:1,P,Journey stages
+Exodus,16,1a,P,Wilderness gathering notice
+Exodus,16,2-3; 6-21; 22-25; 31-36,Mixed,Manna and quail (multiple sources intertwined)
+Exodus,16,4-5; 26-30,J,Yahwist manna narrative
+Exodus,17,1a,P,Rephidim notice
+Exodus,17,1b-6,J,Water from rock (Horeb version)
+Exodus,17,7,J,Name Massah/Meribah
+Exodus,17,8-16,E,Amalekites battle
+Exodus,18,1-27,E,Jethro's visit and legal organization
+Exodus,19,1-2a,P,Arrival at Sinai
+Exodus,19,2b-9a,E,Covenant preparation
+Exodus,19,9b-16a; 18; 20-25,J,Theophany and revelation
+Exodus,19,16b-17; 19,E,Additional preparations
+Exodus,20,1-17,Mixed/E,Ten Commandments base
+Exodus,20,18-23:15a,E,Covenant Code (foundational laws)
+Exodus,23,16-33,E,Festival laws and land promises
+Exodus,24,1-2; 9-11a,J,Covenant ceremony and God's presence
+Exodus,24,3-8,E,Alternative covenant ceremony
+Exodus,24,11b-15,E,Continued presence with God
+Exodus,24,12-14,J,Moses enters cloud; Joshua remains
+Exodus,24,15-18a,P,Glory visible; 40-day period
+Exodus,25,1-27:19,P,Tabernacle instructions and components
+Exodus,28,1-29:37,P,Priestly garments and ordination
+Exodus,29,38-42a,P,Daily burnt offerings
+Exodus,30,1-31:18a,P,Incense altar; laver; anointing oil; artisan selection
+Exodus,32,1-6; 15-24,Mixed,Golden calf made
+Exodus,32,7-14,J,Moses intercedes for people
+Exodus,32,25-29,J,Levites' violent action
+Exodus,32,30-35,Mixed,Atonement and consequences
+Exodus,33,1-6,J,Covenant renewal offer rejected
+Exodus,33,7-11,E,Tent of meeting appearance
+Exodus,33,12-23,J,Moses' intimate communion request
+Exodus,34,1-9,J/Mixed,Covenant renewal and character proclamation
+Exodus,34,10-27,J,Religious calendar provisions
+Exodus,34,28,E/R,Duration (forty days)
+Exodus,34,29-35,P,Moses' shining face
+Exodus,35,1-36:1,P/R,Sabbath and construction initiation
+Exodus,36,2-40:38,P,Detailed construction and glory filling
+Leviticus,1,1-4:35,P,Burnt; grain; peace; sin offerings
+Leviticus,5,1-13,P,Sin and guilt offerings (simpler cases)
+Leviticus,5,14-11:47,P,Guilt offering; purity laws
+Leviticus,11,46-47,P,Summary of purity laws
+Leviticus,12,1-16:28,P,Purity (women's; leprosy; discharges; Day of Atonement)
+Leviticus,16,29-23:21,P,Annual observances (Atonement; Tabernacles)
+Leviticus,23,23-38,P,Festivals and observances
+Leviticus,23,39-26:46,P,Holiness Code (H) within Priestly tradition
+Leviticus,27,1-34,P,Votive offerings and redemption laws
+Numbers,1,1-8:26,P,Census and Levitical organization
+Numbers,9,1-14,P,Passover regulations
+Numbers,9,15-10:28,P,Cloud and fire; departure from Sinai
+Numbers,10,29-11:6,J,Hobab joined; complaints about manna
+Numbers,11,7-9,Mixed,Manna description
+Numbers,11,10-12; 14-17; 24b-30,E,Elders' spirit receiving; Moses' jealousy
+Numbers,11,13; 18-24a; 31-34,J,Meat provision; quail narrative
+Numbers,12,1-16,E,Miriam's criticism and leprosy
+Numbers,13,1-33,Multiple,Spy narrative (sources embedded)
+Numbers,13,1-17a,P,Spy commission
+Numbers,13,17b-20; 22-24; 26b-31; 33,J,Spy journey and report
+Numbers,13,21; 25-26a; 32,P,Alternative spy details
+Numbers,14,1-45,Multiple,Rebellion and consequences (J/E dominant)
+Numbers,14,1a,P,Congregation introduction
+Numbers,14,1b-10; 39-45,J/E,Complaint; judgment; failed invasion
+Numbers,14,2-10; 26-38,P,Legal consequences
+Numbers,15,1-41,P,Offerings; Sabbath-breaker stoning
+Numbers,16,1-50,Multiple,Korah rebellion (complex narrative)
+Numbers,16,1a; 2-11,P/J/E,Core rebellion elements
+Numbers,16,12-15,E,Dathan and Abiram complaint
+Numbers,16,16-35,J/Mixed,Divine judgment
+Numbers,16,36-50,P,Plague and Aaron's intercession
+Numbers,17,1-13,P,Aaron's rod budding (Levite confirmation)
+Numbers,18,1-32,P,Levite and priestly portions; tithes
+Numbers,19,1-22,P,Red heifer purification ritual
+Numbers,20,1-13,Mixed,Meribah water crisis (J/E/P intertwined)
+Numbers,20,1a,E,Introduction
+Numbers,20,2-5; 14-21,E/J,People and Edom interactions
+Numbers,20,3a; 6-13,Mixed,Water and God's anger at Moses
+Numbers,20,22-29,P,Aaron's death at Mount Hor
+Numbers,21,1-3,J,Victory over Arad
+Numbers,21,4-9,E,Snake plague and bronze serpent
+Numbers,21,10-11,P,Journey notice
+Numbers,21,12-20,E/Mixed,Journey stages and victories
+Numbers,21,21-32,E,Victory over Sihon
+Numbers,22,1-24:25,J,Balaam narrative and oracles
+Numbers,25,1-18,Mixed,Baal-Peor and covenant
+Numbers,25,1-2a; 3a; 3b-4,E/J,Seduction and judgment
+Numbers,25,3a; 3b-4; 6-8a,J,Phinehas' zealous action
+Numbers,25,10-18,P,Reward and covenant
+Numbers,26,1-65,P,Second census
+Numbers,27,1-23,P,Women's inheritance; Joshua selection
+Numbers,28,1-29:40,P,Festival and offering calendar
+Numbers,30,1-16,P,Vow regulations
+Numbers,31,1-54,P,Midian war and booty division
+Numbers,32,1-42,Mixed,Transjordan settlement (J/E/P)
+Numbers,33,1-56,P,Complete itinerary and land boundaries
+Numbers,34,1-35:34,P,Land boundaries; Levitical cities; refuge cities
+Numbers,36,1-13,P,Women's inheritance clarification
+Deuteronomy,1,1-3,D with P note,Frame; Moses reviews history
+Deuteronomy,1,4-46; 2-3,D,Conquest review; Transjordan campaigns
+Deuteronomy,4,1-40,D,Exhortations and covenant blessings/curses
+Deuteronomy,4,32-34; 36-38; 40,D,Summary appeals to covenant
+Deuteronomy,4,44-5:4,D,Introduction to law code
+Deuteronomy,5,1-33,D,Decalogue repeated and covenant
+Deuteronomy,6,1-9:19,D,Extended exhortations and covenant love
+Deuteronomy,9,21-10:5,D,Renewal and law repetition
+Deuteronomy,10,1-11,D,Covenant tablets and Levite role
+Deuteronomy,10,8-24:15,D,Central sanctuary and centralization laws
+Deuteronomy,12,1-28,D,Central sanctuary sacrifice law (radical reform)
+Deuteronomy,13,1-18,D,False prophets and idolatry warnings
+Deuteronomy,14,1-21,D,Dietary laws (simplified vs. Leviticus)
+Deuteronomy,14,22-29,D,Tithe regulations
+Deuteronomy,15,1-18,D,Sabbatical year and slave release
+Deuteronomy,16,1-17,D,Three pilgrimage festivals
+Deuteronomy,16,18-17:20,D,Judges and king regulations
+Deuteronomy,18,1-8,D,Levite support
+Deuteronomy,18,9-22,D,False prophets and true prophet signs
+Deuteronomy,19,1-21,D,Cities of refuge and witnesses
+Deuteronomy,20,1-20,D,Holy war regulations
+Deuteronomy,21,1-25:19,D,Miscellaneous laws (murder; family; slaves; etc.)
+Deuteronomy,26,1-15,D,First fruits and tithe declarations
+Deuteronomy,26,16-19,D,Covenant statement
+Deuteronomy,27,1-26,D/Dtr1,Mount Ebal ceremony and curses
+Deuteronomy,28,1-68,D,Blessings and curses for obedience/disobedience
+Deuteronomy,29,1-28,D,Covenant renewal ceremony
+Deuteronomy,29,28-29,D,Hidden and revealed matters
+Deuteronomy,30,1-10,D,Future repentance and restoration
+Deuteronomy,30,11-20,D,Law's accessibility and choice
+Deuteronomy,31,1-8,D,Charge to Joshua
+Deuteronomy,31,9-13,D,Torah reading instruction
+Deuteronomy,31,14-15,E,God and Joshua commissioning
+Deuteronomy,31,16-22,D,Covenant breaking prediction
+Deuteronomy,31,23,E,Joshua commissioning
+Deuteronomy,31,24-29,D,Law deposition and witness
+Deuteronomy,32,1-47,D,Song of Moses (ancient poetry)
+Deuteronomy,32,48-52,P,Moses' impending death notice
+Deuteronomy,33,1-29,J,Blessing of Moses (ancient poetry)
+Deuteronomy,34,1a,P,Moses ascends mountain
+Deuteronomy,34,1b-4,Mixed,Vision and forbidden entry
+Deuteronomy,34,5-6,E/Mixed,Death and burial mystery
+Deuteronomy,34,7-9,P,Physical vigor; Joshua's wisdom
+Deuteronomy,34,10-12,R,Editorial conclusion about unique prophet
