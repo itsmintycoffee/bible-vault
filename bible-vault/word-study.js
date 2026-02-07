@@ -133,8 +133,15 @@ const stopWords = new Set([
 // Make verse text clickable with Strong's number mapping
 async function makeWordsClickable(verseElement, translationType = 'english') {
     // Get the verse number from this verse element
-    const verseNumberElem = verseElement.closest('.verse')?.querySelector('.verse-number');
+    // Works for both single-view (.verse) and comparison mode (.verse-column)
+    let verseNumberElem = verseElement.closest('.verse')?.querySelector('.verse-number');
+    if (!verseNumberElem) {
+        // Try comparison mode structure
+        verseNumberElem = verseElement.closest('.verse-column')?.querySelector('.verse-number');
+    }
     const verseNumber = verseNumberElem ? parseInt(verseNumberElem.textContent) : null;
+
+    console.log(`Processing verse ${verseNumber} with translation type: ${translationType}`);
 
     // Get original language data from the chapter
     const chapterSection = verseElement.closest('.chapter-section');
