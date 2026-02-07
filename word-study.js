@@ -164,17 +164,25 @@ async function makeWordsClickable(verseElement, translationType = 'english') {
         // For translations (English, Bulgarian), use mapped Strong's numbers from original language
         try {
             const originalData = JSON.parse(chapterSection.dataset.originalLanguageData);
+            console.log(`[WORD-STUDY] V${verseNumber}: Found original data with ${originalData.verses?.length || 0} verses`);
+
             // Find the verse with matching verse number
             if (originalData && originalData.verses) {
                 originalVerseData = originalData.verses.find(v => v.verse === verseNumber);
-                if (originalVerseData && originalVerseData.rawText) {
-                    strongsNumbers = extractStrongsNumbers(originalVerseData.rawText);
-                    console.log(`Verse ${verseNumber} Strong's numbers from original:`, strongsNumbers);
+                if (originalVerseData) {
+                    console.log(`[WORD-STUDY] V${verseNumber}: rawText sample:`, originalVerseData.rawText?.substring(0, 80));
+
+                    if (originalVerseData.rawText) {
+                        strongsNumbers = extractStrongsNumbers(originalVerseData.rawText);
+                        console.log(`[WORD-STUDY] V${verseNumber}: Extracted ${strongsNumbers.length} Strong's:`, strongsNumbers.slice(0, 10));
+                    }
                 }
             }
         } catch (error) {
-            console.log('Error parsing original language data:', error);
+            console.error('[WORD-STUDY] Error parsing original language data:', error);
         }
+    } else {
+        console.warn(`[WORD-STUDY] V${verseNumber}: No original data. Has chapter: ${!!chapterSection}, Has dataset: ${!!chapterSection?.dataset.originalLanguageData}`);
     }
 
     // Use TreeWalker to process text nodes while preserving JEDP highlighting

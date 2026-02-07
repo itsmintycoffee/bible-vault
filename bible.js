@@ -195,10 +195,14 @@ async function displayVerse(data, append = false, prepend = false) {
                 'Nahum', 'Habakkuk', 'Zephaniah', 'Haggai', 'Zechariah', 'Malachi'].includes(currentBook);
 
             const originalTranslation = isOldTestament ? 'wlca' : 'lxx';
+            console.log(`[BIBLE] Fetching original language: ${originalTranslation} for ${data.reference}`);
             originalLanguageData = await translationManager.fetchVerseForTranslation(data.reference, originalTranslation);
+            console.log('[BIBLE] Original data received. Sample rawText:', originalLanguageData?.verses?.[0]?.rawText?.substring(0, 100));
         } catch (error) {
-            console.log('Could not fetch original language data:', error);
+            console.error('[BIBLE] Could not fetch original language data:', error);
         }
+    } else {
+        console.warn('[BIBLE] translationManager not available!');
     }
 
     // Create chapter element
