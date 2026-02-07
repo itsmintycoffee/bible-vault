@@ -396,7 +396,7 @@ body {
     color: var(--text-primary);
     margin-bottom: 2.5rem;
     font-size: 101px;
-    text-transform: none;
+    text-transform: uppercase;
     letter-spacing: -0.02em;
     position: sticky;
     top: 0;

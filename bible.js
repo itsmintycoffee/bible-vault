@@ -330,8 +330,16 @@ function setupFirstChapterObserver() {
 function updateCurrentPosition(reference) {
     const match = reference.match(/^(.+?)\s+(\d+)/);
     if (match) {
-        currentBook = match[1];
+        // Normalize case since chapter titles are uppercase
+        let bookName = match[1].trim();
+        // Capitalize first letter of each word to match bibleBooks format
+        bookName = bookName.split(' ').map(word =>
+            word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+        ).join(' ');
+
+        currentBook = bookName;
         currentChapter = parseInt(match[2]);
+        console.log(`[POSITION] Updated to ${currentBook} ${currentChapter}`);
     }
 }
 
@@ -538,34 +546,47 @@ async function loadPreviousChapter() {
 
 // Load next chapter and append to content
 async function loadNextChapter() {
-    if (isLoading) return;
+    if (isLoading) {
+        console.log(`[LOAD] Already loading, skipping`);
+        return;
+    }
 
     const nextChapterRef = getNextChapter();
-    if (!nextChapterRef) return;
+    console.log(`[LOAD] Next chapter: ${nextChapterRef}, current: ${currentBook} ${currentChapter}`);
+
+    if (!nextChapterRef) {
+        console.log(`[LOAD] No next chapter available`);
+        return;
+    }
 
     // Check if already loaded
     if (chapterManager.chapters.has(nextChapterRef)) {
-        console.log(`Chapter ${nextChapterRef} already loaded`);
+        console.log(`[LOAD] Chapter ${nextChapterRef} already loaded`);
         return;
     }
 
     isLoading = true;
+    console.log(`[LOAD] Starting load of ${nextChapterRef}`);
 
     try {
         const formattedReference = nextChapterRef.trim().replace(/\s+/g, '+');
+        console.log(`[LOAD] Fetching ${formattedReference}...`);
         const response = await fetch(`${API_BASE_URL}/${formattedReference}`);
 
         if (!response.ok) {
-            throw new Error('Could not load next chapter');
+            throw new Error(`Failed to fetch: ${response.statusText}`);
         }
 
         const data = await response.json();
+        console.log(`[LOAD] Received data for ${nextChapterRef}, chapters: ${data.verses?.length}`);
         await displayVerse(data, true); // append=true
+        console.log(`[LOAD] Successfully loaded ${nextChapterRef}`);
 
     } catch (err) {
-        console.error('Error loading next chapter:', err);
+        console.error(`[LOAD] Error loading next chapter:`, err);
     } finally {
         isLoading = false;
+        console.log(`[LOAD] Finished loading, isLoading reset to false`);
     }
 }
 
