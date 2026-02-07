@@ -792,22 +792,20 @@ body {
     width: 56px;
     height: 56px;
     border-radius: 50%;
-    background: var(--bg-sidebar);
-    color: var(--bg-secondary);
+    background: var(--accent);
+    color: white;
     border: none;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     cursor: pointer;
     z-index: 100;
     font-size: 1.5rem;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s;
+    transition: transform 0.2s;
 }
 
 .mobile-sidebar-toggle:hover {
     transform: scale(1.1);
-    background: #1a1816;
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
 }
 
 /* Responsive */
@@ -879,119 +877,6 @@ body {
     }
 }
 
-/* Comparison Mode Styles */
-.comparison-controls {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 2rem;
-    align-items: center;
-    flex-wrap: wrap;
-}
-
-.comparison-btn {
-    padding: 0.7rem 1.2rem;
-    background: var(--accent);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 0.95rem;
-    font-weight: 600;
-    transition: background 0.2s;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.comparison-btn:hover {
-    background: var(--accent-light);
-}
-
-.translation-select {
-    padding: 0.7rem 1rem;
-    background: var(--bg-primary);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    color: var(--text-primary);
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: border-color 0.2s;
-}
-
-.translation-select:hover {
-    border-color: var(--accent);
-}
-
-.translation-select:focus {
-    outline: none;
-    border-color: var(--accent);
-}
-
-/* Two-column comparison layout */
-#verse-content.comparison-mode {
-    max-width: 100%;
-    width: 100%;
-}
-
-.comparison-mode .chapter-section {
-    display: block;
-}
-
-.comparison-mode .chapter-title {
-    width: 100vw;
-    margin-left: calc(-6rem + (-50vw + 50%));
-    padding-left: calc(6rem + (50vw - 50%));
-    padding-right: calc(6rem + (50vw - 50%));
-}
-
-.comparison-mode .chapter-content {
-    display: block;
-}
-
-/* Verse row container - each verse gets its own row */
-.verse-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem;
-    margin-bottom: 0.5rem;
-    align-items: start;
-}
-
-.verse-column {
-    display: flex;
-    align-items: start;
-    gap: 0.6rem;
-    min-height: 1.5em;
-}
-
-.verse-column .verse-number {
-    flex-shrink: 0;
-    align-self: start;
-    margin: 0;
-    padding-top: 0.1em;
-}
-
-.verse-column .verse-text {
-    flex: 1;
-}
-
-/* Translation headers for comparison columns */
-.comparison-header {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem;
-    margin-bottom: 1.5rem;
-    padding-bottom: 0.75rem;
-    border-bottom: 1px solid var(--border);
-}
-
-.comparison-header-item {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--text-secondary);
-    text-align: center;
-}
-
 @media (max-width: 768px) {
     .sidebar {
         width: 60px;
@@ -1033,21 +918,5 @@ body {
 
     .chapters-grid {
         grid-template-columns: repeat(6, 1fr);
-    }
-
-    /* Comparison mode responsive */
-    .verse-row {
-        grid-template-columns: 1fr;
-        gap: 0.5rem;
-    }
-
-    .comparison-header {
-        grid-template-columns: 1fr;
-        gap: 0.5rem;
-    }
-
-    .comparison-controls {
-        flex-direction: column;
-        align-items: stretch;
     }
 }

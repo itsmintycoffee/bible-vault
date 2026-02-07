@@ -551,7 +551,7 @@ body {
     clear: both;
 }
 
-/* Documentary Hypothesis Source Color-Coding - Marker Highlight Style */
+/* Documentary Hypothesis Source Color-Coding - Text Color Style */
 /* Hidden by default */
 .source-J,
 .source-E,
@@ -560,29 +560,28 @@ body {
 .source-R {
     padding: 0 2px;
     margin: 0 -1.5px;
-    background-color: transparent;
-    transition: background-color 0.3s ease;
+    transition: color 0.3s ease;
 }
 
-/* Show source highlighting in study mode */
+/* Show source highlighting in study mode - text color */
 body.study-mode .source-J {
-    background-color: rgba(230, 150, 150, 0.10);
+    color: #dc3545; /* Jahwist - Red */
 }
 
 body.study-mode .source-E {
-    background-color: rgba(150, 180, 255, 0.10);
+    color: #0d6efd; /* Elohist - Blue */
 }
 
 body.study-mode .source-P {
-    background-color: rgba(111, 66, 193, 0.10);
+    color: #6f42c1; /* Priestly - Purple */
 }
 
 body.study-mode .source-D {
-    background-color: rgba(150, 200, 150, 0.10);
+    color: #198754; /* Deuteronomist - Green */
 }
 
 body.study-mode .source-R {
-    background-color: rgba(255, 200, 130, 0.10);
+    color: #fd7e14; /* Redactor - Orange */
 }
 
 /* JEDP Legend */
@@ -668,15 +667,15 @@ body.study-mode .source-R {
     transform: translateY(-50%) !important;
     width: 32px !important;
     height: 64px !important;
-    background: rgba(245, 241, 232, 0.95) !important;
-    border: 1px solid rgba(232, 227, 216, 0.8) !important;
+    background: rgba(44, 42, 39, 0.85) !important;
+    border: 1px solid rgba(44, 42, 39, 0.9) !important;
     border-right: none !important;
     border-radius: 8px 0 0 8px !important;
     cursor: pointer !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    color: var(--text-secondary) !important;
+    color: rgba(255, 255, 255, 0.9) !important;
     transition: all 0.2s ease !important;
     z-index: 9999 !important;
     opacity: 1 !important;
@@ -696,9 +695,9 @@ body.study-mode .sidebar-toggle {
 }
 
 .sidebar-toggle:hover {
-    background: rgba(139, 115, 85, 0.95);
-    color: white;
-    width: 36px;
+    background: rgba(44, 42, 39, 0.95) !important;
+    color: white !important;
+    width: 36px !important;
 }
 
 .sidebar-toggle svg {
@@ -1110,6 +1109,31 @@ body.study-mode .sidebar-toggle svg {
     display: none !important;
 }
 
+/* Mobile close button - positioned on left side of sidebar */
+.mobile-close-btn {
+    display: none;
+    position: absolute;
+    left: 1rem;
+    top: 1rem;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(44, 42, 39, 0.1);
+    border: none;
+    font-size: 1.5rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    z-index: 10;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.mobile-close-btn:hover {
+    background: rgba(44, 42, 39, 0.2);
+    color: var(--text-primary);
+}
+
 /* Mobile sidebar toggle button */
 .mobile-sidebar-toggle {
     display: none;
@@ -1161,6 +1185,11 @@ body.study-mode .sidebar-toggle svg {
 
     .mobile-sidebar-toggle.hidden {
         display: none;
+    }
+
+    /* Show mobile close button on left side of sidebar */
+    .mobile-close-btn {
+        display: flex;
     }
 
     /* Hide desktop study toggle on mobile */
