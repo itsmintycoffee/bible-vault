@@ -6,7 +6,7 @@
     <title>Bible Study Tool</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&family=Noto+Sans+Hebrew:wght@400;500;600;700&family=Literata:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <script src="https://pixijs.download/release/pixi.js"></script>
 </head>
@@ -14,36 +14,46 @@
     <div id="pixi-container"></div>
 
     <div class="app-container">
-        <!-- Left Sidebar -->
-        <aside class="sidebar">
-            <div class="logo">
-                <div class="logo-icon">📖</div>
-            </div>
-            <nav class="sidebar-nav">
-                <button class="nav-item active" title="Read">
-                    <span>📚</span>
-                </button>
-                <button class="nav-item" title="Search">
-                    <span>🔍</span>
-                </button>
-                <button class="nav-item" title="Bookmarks">
-                    <span>🔖</span>
-                </button>
-                <button class="nav-item" title="Settings">
-                    <span>⚙️</span>
-                </button>
-            </nav>
-        </aside>
-
         <!-- Main Content (Bible Text) -->
         <main class="main-content">
             <header class="content-header">
                 <div class="header-top">
-                    <h1>Bible Study</h1>
-                    <button id="chapter-selector-btn" class="chapter-selector-btn">
-                        <span id="current-chapter">Genesis 1</span>
-                        <span class="dropdown-arrow">▼</span>
-                    </button>
+                    <h2 id="header-chapter-title" class="header-chapter-title">Genesis 1</h2>
+                    <div class="reading-controls">
+                        <button id="chapter-selector-btn" class="control-btn chapter-selector-btn">
+                            <span id="current-chapter">Genesis 1</span>
+                            <span class="dropdown-arrow">▼</span>
+                        </button>
+
+                        <select id="translation-selector" class="control-btn translation-selector">
+                            <option value="esv">ESV</option>
+                            <option value="kjv">KJV</option>
+                            <option value="bulgarian">Bulgarian (1940)</option>
+                            <option value="wlca">Hebrew (WLC)</option>
+                            <option value="lxx">Greek (LXX)</option>
+                        </select>
+
+                        <button id="parallel-toggle" class="control-btn icon-btn" title="Compare Translations">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                <rect x="1" y="2" width="6" height="12" rx="1"/>
+                                <rect x="9" y="2" width="6" height="12" rx="1"/>
+                            </svg>
+                            <span class="btn-label">Compare</span>
+                        </button>
+
+                        <select id="parallel-translation-selector" class="control-btn translation-selector hidden">
+                            <option value="">Select translation...</option>
+                            <option value="esv">ESV</option>
+                            <option value="kjv">KJV</option>
+                            <option value="bulgarian">Bulgarian (1940)</option>
+                            <option value="wlca">Hebrew (WLC)</option>
+                            <option value="lxx">Greek (LXX)</option>
+                        </select>
+
+                        <button id="text-size-toggle" class="control-btn icon-btn" title="Text Size">
+                            <span class="text-size-icon">Aa</span>
+                        </button>
+                    </div>
                 </div>
                 <div class="search-section">
                     <input
@@ -53,25 +63,19 @@
                     >
                     <button id="search-btn">Go</button>
                 </div>
+
+                <!-- Text Size Controls (hidden by default) -->
+                <div id="text-size-controls" class="text-size-controls hidden">
+                    <button class="size-btn" data-size="small">A</button>
+                    <button class="size-btn active" data-size="medium">A</button>
+                    <button class="size-btn" data-size="large">A</button>
+                </div>
             </header>
 
             <div class="bible-content">
-                <div class="comparison-controls">
-                    <button id="toggle-comparison" class="comparison-btn">
-                        <span id="comparison-icon">⚖️</span> Compare Translations
-                    </button>
-                    <select id="translation-left" class="translation-select hidden">
-                        <option value="esv">English (ESV)</option>
-                        <option value="bulgarian">Bulgarian (1940)</option>
-                    </select>
-                    <select id="translation-right" class="translation-select hidden">
-                        <option value="bulgarian">Bulgarian (1940)</option>
-                        <option value="esv">English (ESV)</option>
-                    </select>
-                </div>
                 <div id="loading" class="hidden">Loading...</div>
                 <div id="error" class="hidden"></div>
-                <div id="verse-content" class="single-column"></div>
+                <div id="verse-content"></div>
             </div>
         </main>
 
@@ -80,7 +84,6 @@
             <div class="resize-handle" id="resize-handle"></div>
             <div class="panel-header">
                 <h2>Study Tools</h2>
-                <button class="mobile-close-btn" id="mobile-close-btn">&times;</button>
             </div>
 
             <div class="tool-section">
@@ -148,6 +151,13 @@
             </div>
         </aside>
 
+        <!-- Desktop Sidebar Toggle Button -->
+        <button class="sidebar-toggle" id="sidebar-toggle" title="Toggle sidebar">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M10 12L6 8l4-4"/>
+            </svg>
+        </button>
+
         <!-- Mobile Sidebar Toggle Button -->
         <button class="mobile-sidebar-toggle" id="mobile-sidebar-toggle">
             ☰
@@ -209,13 +219,14 @@
         console.log('[INDEX] Starting to load scripts...');
     </script>
     <script src="particles.js"></script>
+    <script src="bulgarian-bible-parser.js"></script>
+    <script src="translation-manager.js"></script>
+    <script src="reading-controls.js"></script>
     <script src="jedp-sources.js"></script>
     <script src="word-study.js"></script>
     <script>
         console.log('[INDEX] word-study.js loaded, makeWordsClickable available:', typeof makeWordsClickable !== 'undefined');
     </script>
-    <script src="bulgarian-bible-parser.js"></script>
-    <script src="translation-manager.js"></script>
     <script src="bible.js"></script>
     <script src="chapter-selector.js"></script>
     <script>
