@@ -97,8 +97,6 @@ class ChapterManager {
         const { start, end } = this.getVisibleRange();
         const visibleRefs = new Set(this.chapterOrder.slice(start, end + 1));
 
-        console.log(`[CLEANUP] currentChapter=${currentBook} ${currentChapter}, getCurrentChapterIndex=${this.getCurrentChapterIndex()}, visibleRange={start:${start}, end:${end}}, chapterOrder=${JSON.stringify(this.chapterOrder)}`);
-
         let removedCount = 0;
         let topSpacerHeight = 0;
         let bottomSpacerHeight = 0;
@@ -109,7 +107,6 @@ class ChapterManager {
 
                 // Remove from DOM but keep the reference in memory
                 if (chapter.element && chapter.element.parentNode) {
-                    console.log(`[CLEANUP] Removing ${ref} from DOM`);
                     chapter.element.remove();
                 }
 
@@ -210,10 +207,6 @@ async function displayVerse(data, append = false, prepend = false) {
             console.log('[BIBLE] Original data received. Sample rawText:', originalLanguageData?.verses?.[0]?.rawText?.substring(0, 100));
         } catch (error) {
             console.error('[BIBLE] Could not fetch original language data:', error);
-        }
-    } else {
-        if (append || prepend) {
-            console.log('[BIBLE] Skipping original language fetch for append/prepend chapter load');
         }
     }
 
@@ -765,11 +758,7 @@ async function loadPreviousChapter() {
 
 // Load next chapter and append to content
 async function loadNextChapter() {
-    console.log(`[LOAD] loadNextChapter called, isComparisonMode=${isComparisonMode}, isLoading=${isLoading}`);
-    if (isComparisonMode) {
-        console.log(`[LOAD] Skipping - in comparison mode`);
-        return;
-    }
+    if (isComparisonMode) return;
     if (isLoading) {
         console.log(`[LOAD] Already loading, skipping`);
         return;
@@ -820,8 +809,6 @@ function handleScroll() {
     const scrollPosition = scrollTop + mainContent.clientHeight;
     const scrollHeight = mainContent.scrollHeight;
 
-    console.log(`[SCROLL] scrollTop=${scrollTop}, scrollPosition=${scrollPosition}, scrollHeight=${scrollHeight}, progress=${((scrollPosition/scrollHeight)*100).toFixed(1)}%`);
-
     // Load previous chapter when near top (including accounting for top spacer)
     const topSpacerHeight = chapterManager.topSpacer ? parseInt(chapterManager.topSpacer.style.height) || 0 : 0;
     if (chapterManager.shouldLoadPrevious(scrollTop) || (topSpacerHeight > 0 && scrollTop < topSpacerHeight + 500)) {
@@ -830,7 +817,6 @@ function handleScroll() {
 
     // Load next chapter when 80% scrolled
     if (chapterManager.shouldLoadNext(scrollPosition, scrollHeight)) {
-        console.log(`[SCROLL] shouldLoadNext returned true, calling loadNextChapter()`);
         loadNextChapter();
     }
 
