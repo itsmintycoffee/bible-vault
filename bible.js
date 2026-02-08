@@ -192,8 +192,9 @@ async function displayVerse(data, append = false, prepend = false) {
     hideLoadingAndError();
 
     // Fetch Hebrew/Greek version for Strong's numbers (for Old/New Testament)
+    // ONLY for main chapter loads, not for append/prepend (for word study)
     let originalLanguageData = null;
-    if (typeof translationManager !== 'undefined') {
+    if (!append && !prepend && typeof translationManager !== 'undefined') {
         try {
             // Determine if OT or NT based on book
             const isOldTestament = currentBook && ['Genesis', 'Exodus', 'Leviticus', 'Numbers', 'Deuteronomy',
@@ -211,7 +212,9 @@ async function displayVerse(data, append = false, prepend = false) {
             console.error('[BIBLE] Could not fetch original language data:', error);
         }
     } else {
-        console.warn('[BIBLE] translationManager not available!');
+        if (append || prepend) {
+            console.log('[BIBLE] Skipping original language fetch for append/prepend chapter load');
+        }
     }
 
     // Create chapter element
@@ -281,7 +284,8 @@ async function displayVerse(data, append = false, prepend = false) {
     }
 
     // Apply JEDP source color-coding FIRST on plain text (before word study markup)
-    if (typeof loadJEDPData === 'function' && typeof applyJEDPSources === 'function') {
+    // ONLY for main chapter loads, not for background chapters
+    if (!append && !prepend && typeof loadJEDPData === 'function' && typeof applyJEDPSources === 'function') {
         console.log('Loading JEDP data and applying colors...');
         await loadJEDPData(currentBook);
 
@@ -291,17 +295,20 @@ async function displayVerse(data, append = false, prepend = false) {
     }
 
     // Then make words clickable for word study (after JEDP highlighting)
-    const verseTexts = chapterDiv.querySelectorAll('.verse-text');
-    console.log(`[BIBLE] Found ${verseTexts.length} verse texts to process`);
-    console.log(`[BIBLE] makeWordsClickable exists:`, typeof makeWordsClickable === 'function');
+    // ONLY for main chapter loads
+    if (!append && !prepend) {
+        const verseTexts = chapterDiv.querySelectorAll('.verse-text');
+        console.log(`[BIBLE] Found ${verseTexts.length} verse texts to process`);
+        console.log(`[BIBLE] makeWordsClickable exists:`, typeof makeWordsClickable === 'function');
 
-    if (typeof makeWordsClickable === 'function') {
-        // Determine the translation type for word study
-        const translationType = data.translation_id || 'english';
-        console.log(`[BIBLE] Calling makeWordsClickable with translation type: ${translationType}`);
+        if (typeof makeWordsClickable === 'function') {
+            // Determine the translation type for word study
+            const translationType = data.translation_id || 'english';
+            console.log(`[BIBLE] Calling makeWordsClickable with translation type: ${translationType}`);
 
-        for (const verseText of verseTexts) {
-            await makeWordsClickable(verseText, translationType);
+            for (const verseText of verseTexts) {
+                await makeWordsClickable(verseText, translationType);
+            }
         }
     }
 
