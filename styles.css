@@ -135,7 +135,7 @@ body {
 }
 
 .toolbar-logo {
-    height: 24px;
+    height: 18px;
     width: auto;
 }
 
@@ -199,6 +199,10 @@ body {
 .jedp-toggle-icon {
     font-size: 0.9rem;
     transition: color 0.2s;
+}
+
+#jedp-toggle {
+    display: none;
 }
 
 .btn-label {
@@ -1037,6 +1041,7 @@ body {
     .translation-selector,
     .chapter-selector-btn {
         flex-shrink: 0;
+        min-width: 0;
     }
 
     /* Parallel view on mobile - stack vertically */
