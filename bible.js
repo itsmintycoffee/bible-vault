@@ -925,6 +925,11 @@ if (translationRightSelect) {
 async function loadChapterInComparisonMode(reference) {
     try {
         console.log(`[COMPARE] Loading comparison: ${reference}, left=${leftTranslation}, right=${rightTranslation}`);
+
+        // Add comparison-mode class to widen layout and hide supplementary columns
+        const bibleContent = document.querySelector('.bible-content');
+        if (bibleContent) bibleContent.classList.add('comparison-mode');
+
         showLoading();
 
         // Check if translationManager is available

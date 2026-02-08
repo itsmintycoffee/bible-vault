@@ -311,6 +311,28 @@ body {
     position: relative;
 }
 
+/* Comparison Mode Layout */
+.bible-content.comparison-mode {
+    max-width: 1100px;
+}
+
+.bible-content.comparison-mode .chapter-illustrations {
+    display: none;
+}
+
+.bible-content.comparison-mode .chapter-body.with-illustrations {
+    display: block;
+}
+
+.bible-content.comparison-mode .chapter-body.with-illustrations .chapter-title {
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    padding-left: calc(50vw - 50%);
+    padding-right: calc(50vw - 50%);
+    text-align: center;
+    justify-content: center;
+}
+
 /* Parallel View Layout */
 .bible-content.parallel-view {
     max-width: none;

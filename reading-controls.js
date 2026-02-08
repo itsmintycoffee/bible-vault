@@ -121,7 +121,10 @@ class ReadingControls {
             // Switch back to single view
             isComparisonMode = false;
             const bibleContent = document.querySelector('.bible-content');
-            if (bibleContent) bibleContent.classList.remove('parallel-view');
+            if (bibleContent) {
+                bibleContent.classList.remove('parallel-view');
+                bibleContent.classList.remove('comparison-mode');
+            }
             fetchVerse(`${currentBook} ${currentChapter}`);
         }
 
