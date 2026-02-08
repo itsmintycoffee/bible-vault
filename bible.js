@@ -32,6 +32,11 @@ class ChapterManager {
     }
 
     initialize() {
+        // Reset state
+        this.chapters = new Map();
+        this.chapterOrder = [];
+        this.isLoadingPrevious = false;
+
         // Create top and bottom spacers
         this.topSpacer = document.createElement('div');
         this.topSpacer.id = 'top-spacer';
@@ -707,6 +712,7 @@ function getNextChapter() {
 
 // Load previous chapter and prepend to content
 async function loadPreviousChapter() {
+    if (isComparisonMode) return;
     if (chapterManager.isLoadingPrevious) return;
 
     const prevChapterRef = getPreviousChapter();
@@ -749,6 +755,7 @@ async function loadPreviousChapter() {
 
 // Load next chapter and append to content
 async function loadNextChapter() {
+    if (isComparisonMode) return;
     if (isLoading) {
         console.log(`[LOAD] Already loading, skipping`);
         return;
@@ -957,6 +964,10 @@ async function loadChapterInComparisonMode(reference) {
 // Display verses in comparison mode with aligned verse numbers
 async function displayComparisonVerse(leftData, rightData, append = false, prepend = false) {
     hideLoadingAndError();
+
+    // Ensure comparison-mode class is set
+    const bibleContent = document.querySelector('.bible-content');
+    if (bibleContent) bibleContent.classList.add('comparison-mode');
 
     // Fetch Hebrew/Greek version for Strong's numbers (for both columns)
     let originalLanguageData = null;
