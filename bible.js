@@ -97,6 +97,8 @@ class ChapterManager {
         const { start, end } = this.getVisibleRange();
         const visibleRefs = new Set(this.chapterOrder.slice(start, end + 1));
 
+        console.log(`[CLEANUP] currentChapter=${currentBook} ${currentChapter}, getCurrentChapterIndex=${this.getCurrentChapterIndex()}, visibleRange={start:${start}, end:${end}}, chapterOrder=${JSON.stringify(this.chapterOrder)}`);
+
         let removedCount = 0;
         let topSpacerHeight = 0;
         let bottomSpacerHeight = 0;
@@ -107,6 +109,7 @@ class ChapterManager {
 
                 // Remove from DOM but keep the reference in memory
                 if (chapter.element && chapter.element.parentNode) {
+                    console.log(`[CLEANUP] Removing ${ref} from DOM`);
                     chapter.element.remove();
                 }
 
