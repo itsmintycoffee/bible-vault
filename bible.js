@@ -755,7 +755,11 @@ async function loadPreviousChapter() {
 
 // Load next chapter and append to content
 async function loadNextChapter() {
-    if (isComparisonMode) return;
+    console.log(`[LOAD] loadNextChapter called, isComparisonMode=${isComparisonMode}, isLoading=${isLoading}`);
+    if (isComparisonMode) {
+        console.log(`[LOAD] Skipping - in comparison mode`);
+        return;
+    }
     if (isLoading) {
         console.log(`[LOAD] Already loading, skipping`);
         return;
@@ -806,6 +810,8 @@ function handleScroll() {
     const scrollPosition = scrollTop + mainContent.clientHeight;
     const scrollHeight = mainContent.scrollHeight;
 
+    console.log(`[SCROLL] scrollTop=${scrollTop}, scrollPosition=${scrollPosition}, scrollHeight=${scrollHeight}, progress=${((scrollPosition/scrollHeight)*100).toFixed(1)}%`);
+
     // Load previous chapter when near top (including accounting for top spacer)
     const topSpacerHeight = chapterManager.topSpacer ? parseInt(chapterManager.topSpacer.style.height) || 0 : 0;
     if (chapterManager.shouldLoadPrevious(scrollTop) || (topSpacerHeight > 0 && scrollTop < topSpacerHeight + 500)) {
@@ -814,6 +820,7 @@ function handleScroll() {
 
     // Load next chapter when 80% scrolled
     if (chapterManager.shouldLoadNext(scrollPosition, scrollHeight)) {
+        console.log(`[SCROLL] shouldLoadNext returned true, calling loadNextChapter()`);
         loadNextChapter();
     }
 
