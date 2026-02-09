@@ -455,6 +455,13 @@ const chapterTitleRevealObserver = new IntersectionObserver((entries) => {
         if (entry.isIntersecting) {
             entry.target.classList.add('reveal');
             chapterTitleRevealObserver.unobserve(entry.target);
+
+            // Reveal body text + illustrations after the title animation finishes
+            const section = entry.target.closest('.chapter-section');
+            if (section) {
+                const lineDelay = parseInt(entry.target.style.getPropertyValue('--line-delay')) || 400;
+                setTimeout(() => section.classList.add('content-reveal'), lineDelay + 300);
+            }
         }
     });
 }, { root: mainContent, threshold: 0.1 });

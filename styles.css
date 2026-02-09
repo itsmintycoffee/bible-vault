@@ -515,6 +515,21 @@ body {
     to   { transform: scaleX(1); }
 }
 
+/* Body text + illustrations: fade-in and slide-up after title reveals */
+.chapter-section .chapter-content,
+.chapter-section .chapter-illustrations {
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity 800ms cubic-bezier(0.19, 1, 0.22, 1),
+                transform 800ms cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.chapter-section.content-reveal .chapter-content,
+.chapter-section.content-reveal .chapter-illustrations {
+    opacity: 1;
+    transform: translateY(0);
+}
+
 /* First chapter title - large headline style */
 .chapter-section:first-child .chapter-title {
     font-size: 5rem;
