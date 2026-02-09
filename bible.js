@@ -271,19 +271,20 @@ function buildTitleRevealHtml(text) {
 async function displayVerse(data, append = false, prepend = false) {
     hideLoadingAndError();
 
+    // Determine if OT or NT based on book (used for Strong's prefix H vs G)
+    const otBooks = ['Genesis', 'Exodus', 'Leviticus', 'Numbers', 'Deuteronomy',
+        'Joshua', 'Judges', 'Ruth', '1 Samuel', '2 Samuel', '1 Kings', '2 Kings',
+        '1 Chronicles', '2 Chronicles', 'Ezra', 'Nehemiah', 'Esther', 'Job', 'Psalms',
+        'Proverbs', 'Ecclesiastes', 'Song of Solomon', 'Isaiah', 'Jeremiah', 'Lamentations',
+        'Ezekiel', 'Daniel', 'Hosea', 'Joel', 'Amos', 'Obadiah', 'Jonah', 'Micah',
+        'Nahum', 'Habakkuk', 'Zephaniah', 'Haggai', 'Zechariah', 'Malachi'];
+    const isOldTestament = currentBook && otBooks.includes(currentBook);
+
     // Fetch Hebrew/Greek version for Strong's numbers (for Old/New Testament)
     // ONLY for main chapter loads, not for append/prepend (for word study)
     let originalLanguageData = null;
     if (!append && !prepend && typeof translationManager !== 'undefined') {
         try {
-            // Determine if OT or NT based on book
-            const isOldTestament = currentBook && ['Genesis', 'Exodus', 'Leviticus', 'Numbers', 'Deuteronomy',
-                'Joshua', 'Judges', 'Ruth', '1 Samuel', '2 Samuel', '1 Kings', '2 Kings',
-                '1 Chronicles', '2 Chronicles', 'Ezra', 'Nehemiah', 'Esther', 'Job', 'Psalms',
-                'Proverbs', 'Ecclesiastes', 'Song of Solomon', 'Isaiah', 'Jeremiah', 'Lamentations',
-                'Ezekiel', 'Daniel', 'Hosea', 'Joel', 'Amos', 'Obadiah', 'Jonah', 'Micah',
-                'Nahum', 'Habakkuk', 'Zephaniah', 'Haggai', 'Zechariah', 'Malachi'].includes(currentBook);
-
             const originalTranslation = isOldTestament ? 'wlca' : 'lxx';
             console.log(`[BIBLE] Fetching original language: ${originalTranslation} for ${data.reference}`);
             originalLanguageData = await translationManager.fetchVerseForTranslation(data.reference, originalTranslation);
@@ -297,6 +298,7 @@ async function displayVerse(data, append = false, prepend = false) {
     const chapterDiv = document.createElement('div');
     chapterDiv.className = 'chapter-section';
     chapterDiv.dataset.reference = data.reference;
+    chapterDiv.dataset.isOt = isOldTestament ? '1' : '0';
 
     // Determine current translation for title and language class
     const activeTranslationId = data.translation_id || (typeof translationManager !== 'undefined' ? translationManager.currentTranslation : 'esv');
@@ -388,7 +390,7 @@ async function displayVerse(data, append = false, prepend = false) {
             console.log(`[BIBLE] Calling makeWordsClickable with translation type: ${translationType}`);
 
             for (const verseText of verseTexts) {
-                await makeWordsClickable(verseText, translationType);
+                await makeWordsClickable(verseText, translationType, isOldTestament);
             }
         }
     }

@@ -56,15 +56,79 @@ function hasDefinition(word) {
     return !!(concordanceIndex.hebrew[cleanWord] || concordanceIndex.greek[cleanWord]);
 }
 
-// Extract Strong's numbers from original language text
-function extractStrongsNumbers(rawText) {
+// Parse original language rawText into structured word-strongs pairs
+// rawText format from Bolls API: "בְרֵאשִׁית7225 בָּרָא1254 אֱלֹהִים430 ..."
+// (bare numbers, no H/G prefix)
+function parseOriginalWords(rawText, isOT = true) {
     if (!rawText) return [];
+    const prefix = isOT ? 'H' : 'G';
+    const pairs = [];
+    // Match: Hebrew/Greek word chars (with diacritics) followed by digits
+    // Hebrew range: \u0590-\u05FF, accents/marks: \u0300-\u036F, cantillation: \u0591-\u05AF
+    // Greek range: \u0370-\u03FF, \u1F00-\u1FFF
+    const pattern = /([\u0590-\u05FF\u0300-\u036F\u0370-\u03FF\u1F00-\u1FFF\u05B0-\u05BD\u05BF\u05C1\u05C2\u05C4\u05C5\u05C7\u200D־]+?)(\d{1,5})(?=\s|$|[\u0590-\u05FF\u0370-\u03FF])/g;
+    let match;
+    while ((match = pattern.exec(rawText)) !== null) {
+        pairs.push({ word: match[1], strongs: `${prefix}${match[2]}` });
+    }
+    // Also handle H####/G#### prefixed format as fallback
+    const prefixedPattern = /([\u0590-\u05FF\u0300-\u036F\u0370-\u03FF\u1F00-\u1FFF\u05B0-\u05BD\u05BF\u05C1\u05C2\u05C4\u05C5\u05C7\u200D־]+?)([HG]\d{1,5})(?=\s|$)/g;
+    if (pairs.length === 0) {
+        while ((match = prefixedPattern.exec(rawText)) !== null) {
+            pairs.push({ word: match[1], strongs: match[2] });
+        }
+    }
+    return pairs;
+}
 
-    // Pattern matches H#### or G#### (Hebrew or Greek Strong's numbers)
-    const strongsPattern = /[HG]\d{1,5}/g;
-    const matches = rawText.match(strongsPattern) || [];
+// Build a reverse map: English word -> {strongs, hebrewWord, entry}
+// Uses concordance definitions to match English translations to Hebrew/Greek originals
+async function buildVerseWordMap(pairs) {
+    const verseMap = new Map();
+    // Load all concordance entries in parallel
+    const entries = await Promise.all(pairs.map(p => loadConcordanceEntry(p.strongs)));
 
-    return matches;
+    for (let i = 0; i < pairs.length; i++) {
+        const entry = entries[i];
+        if (!entry) continue;
+        const pair = pairs[i];
+
+        // Extract English translation keywords from concordance entry
+        const keywords = new Set();
+        // From "word" field (e.g., "first: best" or "(Jerusalem of) the Lord")
+        if (entry.word) {
+            entry.word.split(/[,;:()\s]+/).forEach(w => {
+                w = w.toLowerCase().trim();
+                if (w && w.length > 1) keywords.add(w);
+            });
+        }
+        // From "kjvUsage" field
+        if (entry.kjvUsage) {
+            entry.kjvUsage.split(/[,;:()\s]+/).forEach(w => {
+                w = w.toLowerCase().trim();
+                if (w && w.length > 1) keywords.add(w);
+            });
+        }
+        // From "definition" - extract meaningful words
+        if (entry.definition) {
+            const defWords = entry.definition.match(/\b[a-zA-Z]{3,}\b/g);
+            if (defWords) {
+                defWords.forEach(w => keywords.add(w.toLowerCase()));
+            }
+        }
+
+        // Map each keyword to this Strong's entry (first match wins per word)
+        for (const kw of keywords) {
+            if (!verseMap.has(kw)) {
+                verseMap.set(kw, {
+                    strongs: pair.strongs,
+                    originalWord: pair.word,
+                    entry: entry
+                });
+            }
+        }
+    }
+    return verseMap;
 }
 
 // Get word info from concordance using Strong's number
@@ -132,166 +196,123 @@ const stopWords = new Set([
 ]);
 
 // Make verse text clickable with Strong's number mapping
-async function makeWordsClickable(verseElement, translationType = 'english') {
-    console.log('[WORD-STUDY] makeWordsClickable called');
-
+async function makeWordsClickable(verseElement, translationType = 'english', isOT = true) {
     // Get the verse number from this verse element
-    // Works for both single-view (.verse) and comparison mode (.verse-column)
     let verseNumberElem = verseElement.closest('.verse')?.querySelector('.verse-number');
     if (!verseNumberElem) {
-        // Try comparison mode structure
         verseNumberElem = verseElement.closest('.verse-column')?.querySelector('.verse-number');
     }
     const verseNumber = verseNumberElem ? parseInt(verseNumberElem.textContent) : null;
 
-    console.log(`[WORD-STUDY] Processing verse ${verseNumber} with translation type: ${translationType}`);
-
     // Get original language data from the chapter
     const chapterSection = verseElement.closest('.chapter-section');
-    let originalVerseData = null;
-    let strongsNumbers = [];
+    let verseWordMap = null; // Map of english word -> {strongs, originalWord, entry}
 
     // Determine if this is an original language text (Hebrew/Greek)
     const isOriginalLanguage = translationType === 'wlca' || translationType === 'lxx' ||
                                translationType === 'hebrew' || translationType === 'greek';
 
-    if (isOriginalLanguage) {
-        // For Hebrew/Greek, extract Strong's numbers from the verse text itself
-        const rawText = verseElement.textContent;
-        strongsNumbers = extractStrongsNumbers(rawText);
-        console.log(`Original language verse ${verseNumber} Strong's numbers:`, strongsNumbers);
-    } else if (chapterSection && chapterSection.dataset.originalLanguageData) {
-        // For translations (English, Bulgarian), use mapped Strong's numbers from original language
+    if (!isOriginalLanguage && chapterSection && chapterSection.dataset.originalLanguageData) {
+        // For translations: build reverse map from Hebrew/Greek original data
         try {
             const originalData = JSON.parse(chapterSection.dataset.originalLanguageData);
-            console.log(`[WORD-STUDY] V${verseNumber}: Found original data with ${originalData.verses?.length || 0} verses`);
-
-            // Find the verse with matching verse number
             if (originalData && originalData.verses) {
-                originalVerseData = originalData.verses.find(v => v.verse === verseNumber);
-                if (originalVerseData) {
-                    console.log(`[WORD-STUDY] V${verseNumber}: rawText sample:`, originalVerseData.rawText?.substring(0, 80));
-
-                    if (originalVerseData.rawText) {
-                        strongsNumbers = extractStrongsNumbers(originalVerseData.rawText);
-                        console.log(`[WORD-STUDY] V${verseNumber}: Extracted ${strongsNumbers.length} Strong's:`, strongsNumbers.slice(0, 10));
+                const originalVerseData = originalData.verses.find(v => v.verse === verseNumber);
+                if (originalVerseData && originalVerseData.rawText) {
+                    const pairs = parseOriginalWords(originalVerseData.rawText, isOT);
+                    if (pairs.length > 0) {
+                        verseWordMap = await buildVerseWordMap(pairs);
                     }
                 }
             }
         } catch (error) {
-            console.error('[WORD-STUDY] Error parsing original language data:', error);
+            console.error('[WORD-STUDY] Error building verse word map:', error);
         }
-    } else {
-        console.warn(`[WORD-STUDY] V${verseNumber}: No original data. Has chapter: ${!!chapterSection}, Has dataset: ${!!chapterSection?.dataset.originalLanguageData}`);
     }
 
     // Use TreeWalker to process text nodes while preserving JEDP highlighting
-    const walker = document.createTreeWalker(
-        verseElement,
-        NodeFilter.SHOW_TEXT,
-        null,
-        false
-    );
-
+    const walker = document.createTreeWalker(verseElement, NodeFilter.SHOW_TEXT, null, false);
     const textNodesToReplace = [];
     let textNode;
     while (textNode = walker.nextNode()) {
         textNodesToReplace.push(textNode);
     }
 
-    let wordIndex = 0; // Track word position for Strong's number mapping
-
     // Process text nodes in reverse to avoid invalidating walker
     for (let i = textNodesToReplace.length - 1; i >= 0; i--) {
         textNode = textNodesToReplace[i];
         const text = textNode.textContent;
-
         const fragment = document.createDocumentFragment();
 
         if (isOriginalLanguage) {
-            // For Hebrew/Greek: Extract words with embedded Strong's numbers
-            // Pattern: word followed by optional Strong's number (e.g., "בְּרֵאשִׁ֖יתH7225")
-            const wordPattern = /([^\s]+?)([HG]\d{1,5})?(\s+)/g;
-            let match;
+            // For Hebrew/Greek: parse words with their Strong's numbers from displayed text
+            const originalPairs = parseOriginalWords(text, isOT);
             let lastIndex = 0;
-
-            while ((match = wordPattern.exec(text)) !== null) {
-                const originalWord = match[1]; // The Hebrew/Greek word
-                const strongsNum = match[2] || null; // The Strong's number if present
-                const whitespace = match[3]; // Whitespace after the word
-
-                // Create clickable span for the original word
-                if (strongsNum) {
+            // Process each token in the text
+            const tokens = text.split(/(\s+)/);
+            for (const token of tokens) {
+                if (/^\s+$/.test(token)) {
+                    fragment.appendChild(document.createTextNode(token));
+                    continue;
+                }
+                // Find matching pair for this token (strip digits to match)
+                const cleanToken = token.replace(/\d+$/, '').replace(/[HG]\d+$/, '');
+                const pair = originalPairs.find(p => p.word === cleanToken);
+                if (pair) {
                     const span = document.createElement('span');
                     span.className = 'word';
-                    span.setAttribute('data-word', originalWord);
-                    span.setAttribute('data-strongs', strongsNum);
+                    span.setAttribute('data-word', cleanToken);
+                    span.setAttribute('data-strongs', pair.strongs);
                     span.setAttribute('data-original-language', 'true');
-                    span.textContent = originalWord; // Display only the word, not the Strong's number
+                    span.textContent = cleanToken;
                     fragment.appendChild(span);
                 } else {
-                    fragment.appendChild(document.createTextNode(originalWord));
+                    fragment.appendChild(document.createTextNode(token));
                 }
-
-                fragment.appendChild(document.createTextNode(whitespace));
-                lastIndex = wordPattern.lastIndex;
-            }
-
-            // Add any remaining text
-            if (lastIndex < text.length) {
-                fragment.appendChild(document.createTextNode(text.substring(lastIndex)));
             }
         } else {
-            // For translations (English, Bulgarian): Use position-based mapping
+            // For translations (English, Bulgarian): use verse word map for matching
             const tokens = text.split(/(\s+)/);
+            const isBulgarian = translationType === 'bulgarian' || translationType === 'bulgarian1940';
 
             for (const token of tokens) {
-                // If it's whitespace, keep as text node
                 if (/^\s+$/.test(token)) {
                     fragment.appendChild(document.createTextNode(token));
                     continue;
                 }
 
-                // Clean the word (remove punctuation for checking)
                 const cleanWord = token.toLowerCase().replace(/[.,;:!?'"()]/g, '');
-
-                // For Bulgarian, don't use stop words filter (it's in Cyrillic)
-                const isBulgarian = translationType === 'bulgarian' || translationType === 'bulgarian1940';
                 const isStopWord = !isBulgarian && (stopWords.has(cleanWord) || cleanWord.length <= 2);
 
-                // Get corresponding Strong's number if available (before stop word check)
-                const strongsNum = strongsNumbers[wordIndex] || null;
-
-                if (strongsNum) {
-                    console.log(`[WORD-STUDY] Word #${wordIndex}: "${token}" -> ${strongsNum}`);
-                }
-
                 if (isStopWord) {
-                    // Stop words don't have Hebrew/Greek equivalents, so don't increment index
                     fragment.appendChild(document.createTextNode(token));
                     continue;
                 }
 
-                // Make it clickable if we have a Strong's number OR if we have a definition in the index
-                if (strongsNum || (!isBulgarian && hasDefinition(cleanWord))) {
+                // Look up in verse-specific word map first, then fall back to concordance index
+                const mapEntry = verseWordMap ? verseWordMap.get(cleanWord) : null;
+
+                if (mapEntry) {
                     const span = document.createElement('span');
                     span.className = 'word';
-                    span.setAttribute('data-word', isBulgarian ? token : cleanWord);
-                    if (strongsNum) {
-                        span.setAttribute('data-strongs', strongsNum);
-                    }
+                    span.setAttribute('data-word', cleanWord);
+                    span.setAttribute('data-strongs', mapEntry.strongs);
+                    span.setAttribute('data-hebrew', mapEntry.originalWord);
+                    span.textContent = token;
+                    fragment.appendChild(span);
+                } else if (!isBulgarian && hasDefinition(cleanWord)) {
+                    // Fallback to generic concordance index
+                    const span = document.createElement('span');
+                    span.className = 'word';
+                    span.setAttribute('data-word', cleanWord);
                     span.textContent = token;
                     fragment.appendChild(span);
                 } else {
                     fragment.appendChild(document.createTextNode(token));
                 }
-
-                // Only increment index for non-stop words (words that have Hebrew/Greek equivalents)
-                wordIndex++;
             }
         }
 
-        // Replace text node with fragment
         textNode.parentNode.replaceChild(fragment, textNode);
     }
 }
@@ -349,10 +370,11 @@ function initWordStudy() {
             const word = e.target.dataset.word;
             const strongsNumber = e.target.dataset.strongs || null;
             const isOriginalLanguage = e.target.dataset.originalLanguage === 'true';
+            const hebrewWord = e.target.dataset.hebrew || null;
 
             // Add a small delay before showing (200ms) to avoid accidental triggers
             tooltipShowTimeout = setTimeout(async () => {
-                await showTooltip(word, e, strongsNumber, isOriginalLanguage);
+                await showTooltip(word, e, strongsNumber, isOriginalLanguage, hebrewWord);
             }, 200);
         }
     }, true); // Use capture phase to catch events on dynamically added elements
@@ -419,17 +441,14 @@ async function fetchWordFromAPI(word) {
 }
 
 // Show tooltip
-async function showTooltip(word, event, strongsNumber = null, isOriginalLanguage = false) {
+async function showTooltip(word, event, strongsNumber = null, isOriginalLanguage = false, hebrewWord = null) {
     currentTooltipWord = word;
 
-    // For original language, show the word as the "original spelling"
-    const displayWord = isOriginalLanguage ? 'Original Word' : word;
-
     // Show loading state
-    tooltip.querySelector('#tooltip-word').textContent = displayWord;
+    tooltip.querySelector('#tooltip-word').textContent = isOriginalLanguage ? 'Original Word' : word;
     tooltip.querySelector('#tooltip-strongs').textContent = strongsNumber ? `(${strongsNumber})` : '';
     tooltip.querySelector('#tooltip-language').textContent = 'Loading...';
-    tooltip.querySelector('#tooltip-original').textContent = isOriginalLanguage ? word : '';
+    tooltip.querySelector('#tooltip-original').textContent = isOriginalLanguage ? word : (hebrewWord || '');
     tooltip.querySelector('#tooltip-transliteration').textContent = '';
     tooltip.querySelector('#tooltip-definition').textContent = 'Fetching word data...';
 
@@ -441,13 +460,13 @@ async function showTooltip(word, event, strongsNumber = null, isOriginalLanguage
 
     // Update tooltip with actual data (only if still showing same word)
     if (currentTooltipWord === word) {
-        // For original language, show the actual word as the original spelling
         if (isOriginalLanguage) {
             tooltip.querySelector('#tooltip-word').textContent = 'Original Word';
             tooltip.querySelector('#tooltip-original').textContent = word;
         } else {
             tooltip.querySelector('#tooltip-word').textContent = wordInfo.english;
-            tooltip.querySelector('#tooltip-original').textContent = wordInfo.original;
+            // Prefer the actual Hebrew word from the verse over the concordance's generic spelling
+            tooltip.querySelector('#tooltip-original').textContent = hebrewWord || wordInfo.original;
         }
 
         tooltip.querySelector('#tooltip-strongs').textContent = wordInfo.strongsNumber ? `(${wordInfo.strongsNumber})` : '';
