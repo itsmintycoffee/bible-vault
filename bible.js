@@ -25,7 +25,7 @@ class ChapterManager {
     constructor() {
         this.chapters = new Map(); // Map of "Book Chapter" -> {data, element, height}
         this.chapterOrder = []; // Ordered array of chapter references
-        this.maxVisibleChapters = 3; // Current + 1 ahead + 1 behind
+        this.maxVisibleChapters = 7; // Current + 3 ahead + 3 behind
         this.topSpacer = null;
         this.bottomSpacer = null;
         this.isLoadingPrevious = false;
@@ -86,9 +86,9 @@ class ChapterManager {
         const currentIndex = this.getCurrentChapterIndex();
         if (currentIndex === -1) return { start: 0, end: 0 };
 
-        // Keep current chapter + 1 before + 1 after
-        const start = Math.max(0, currentIndex - 1);
-        const end = Math.min(this.chapterOrder.length - 1, currentIndex + 1);
+        // Keep current chapter + 3 before + 3 after
+        const start = Math.max(0, currentIndex - 3);
+        const end = Math.min(this.chapterOrder.length - 1, currentIndex + 3);
 
         return { start, end };
     }
@@ -151,33 +151,97 @@ class ChapterManager {
     }
 
     shouldLoadPrevious(scrollTop) {
-        // Load previous chapter when within 800px of top (increased for better UX)
-        return scrollTop < 800 && !this.isLoadingPrevious;
+        // Load previous chapter when within 1500px of top
+        return scrollTop < 1500 && !this.isLoadingPrevious;
     }
 
     shouldLoadNext(scrollPosition, scrollHeight) {
-        // Load next chapter when 80% scrolled
-        return scrollPosition >= scrollHeight * 0.8;
+        // Load next chapter when 60% scrolled (trigger earlier for smoother experience)
+        return scrollPosition >= scrollHeight * 0.6;
     }
 }
 
 const chapterManager = new ChapterManager();
+
+// API response cache - keeps fetched chapter data in memory so re-fetching is instant
+const chapterCache = new Map(); // "Book Chapter" -> API response data
+
+function getCacheKey(reference) {
+    return reference.trim().replace(/\s+/g, ' ');
+}
+
+async function fetchChapterData(reference) {
+    const cacheKey = getCacheKey(reference);
+    if (chapterCache.has(cacheKey)) {
+        return chapterCache.get(cacheKey);
+    }
+    const formattedReference = reference.trim().replace(/\s+/g, '+');
+    const response = await fetch(`${API_BASE_URL}/${formattedReference}`);
+    if (!response.ok) {
+        throw new Error(`Failed to fetch: ${response.statusText}`);
+    }
+    const data = await response.json();
+    chapterCache.set(cacheKey, data);
+    return data;
+}
+
+// Prefetch upcoming chapters into cache without rendering
+let prefetchInFlight = new Set();
+
+function prefetchChapters() {
+    // Prefetch next 2 chapters from current position
+    let book = currentBook;
+    let chapter = currentChapter;
+
+    for (let i = 0; i < 2; i++) {
+        const ref = getNextChapterFrom(book, chapter);
+        if (!ref) break;
+        const cacheKey = getCacheKey(ref);
+        if (!chapterCache.has(cacheKey) && !prefetchInFlight.has(cacheKey)) {
+            prefetchInFlight.add(cacheKey);
+            fetchChapterData(ref)
+                .then(() => prefetchInFlight.delete(cacheKey))
+                .catch(() => prefetchInFlight.delete(cacheKey));
+        }
+        // Parse the ref to advance for the next iteration
+        const parts = ref.match(/^(.+?)\s+(\d+)$/);
+        if (parts) {
+            book = parts[1];
+            chapter = parseInt(parts[2]);
+        } else {
+            break;
+        }
+    }
+}
+
+// Get next chapter from an arbitrary book/chapter (not just currentBook/currentChapter)
+function getNextChapterFrom(book, chapter) {
+    if (typeof bibleBooks === 'undefined') return null;
+    let bookData = null;
+    let testament = null;
+    for (const test of ['old', 'new']) {
+        const b = bibleBooks[test].find(x => x.name === book);
+        if (b) { bookData = b; testament = test; break; }
+    }
+    if (!bookData) return null;
+    if (chapter < bookData.chapters) return `${book} ${chapter + 1}`;
+    const books = bibleBooks[testament];
+    const idx = books.findIndex(b => b.name === book);
+    if (idx < books.length - 1) return `${books[idx + 1].name} 1`;
+    if (testament === 'old' && bibleBooks.new.length > 0) return `${bibleBooks.new[0].name} 1`;
+    return null;
+}
 
 // Fetch verse from API
 async function fetchVerse(reference) {
     try {
         showLoading();
 
-        // Format the reference for the API (replace spaces with +)
-        const formattedReference = reference.trim().replace(/\s+/g, '+');
-        const response = await fetch(`${API_BASE_URL}/${formattedReference}`);
-
-        if (!response.ok) {
-            throw new Error('Verse not found. Please check your reference and try again.');
-        }
-
-        const data = await response.json();
+        const data = await fetchChapterData(reference);
         await displayVerse(data);
+
+        // Start prefetching upcoming chapters right after initial load
+        prefetchChapters();
 
     } catch (err) {
         showError(err.message);
@@ -223,11 +287,13 @@ async function displayVerse(data, append = false, prepend = false) {
 
     const illustrationsHtml = getChapterIllustrations(data.reference);
 
+    const titleRevealHtml = `<span class="title-mask"><span class="title-line">${formattedTitle}</span></span>`;
+
     if (illustrationsHtml) {
         chapterDiv.innerHTML = `
             <div class="chapter-body with-illustrations">
                 <div class="chapter-text-column">
-                    <div class="chapter-title">${formattedTitle}</div>
+                    <div class="chapter-title">${titleRevealHtml}</div>
                     <div class="chapter-content">${formatVerseText(data)}</div>
                 </div>
                 <aside class="chapter-illustrations">${illustrationsHtml}</aside>
@@ -235,7 +301,7 @@ async function displayVerse(data, append = false, prepend = false) {
         `;
     } else {
         chapterDiv.innerHTML = `
-            <div class="chapter-title">${formattedTitle}</div>
+            <div class="chapter-title">${titleRevealHtml}</div>
             <div class="chapter-content">${formatVerseText(data)}</div>
         `;
     }
@@ -275,6 +341,9 @@ async function displayVerse(data, append = false, prepend = false) {
         chapterManager.initialize();
         verseContent.insertBefore(chapterDiv, chapterManager.bottomSpacer);
     }
+
+    // Trigger reveal animation for chapter titles
+    observeChapterTitleReveal(chapterDiv);
 
     // Apply JEDP source color-coding FIRST on plain text (before word study markup)
     // ONLY for main chapter loads, not for background chapters
@@ -357,6 +426,21 @@ function setupFirstChapterObserver() {
 
     // Initial check
     checkStickyState();
+}
+
+// Observe chapter titles and trigger reveal animation when they enter the viewport
+const chapterTitleRevealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('reveal');
+            chapterTitleRevealObserver.unobserve(entry.target);
+        }
+    });
+}, { root: mainContent, threshold: 0.1 });
+
+function observeChapterTitleReveal(container) {
+    const titles = container.querySelectorAll('.chapter-title:not(.reveal)');
+    titles.forEach(title => chapterTitleRevealObserver.observe(title));
 }
 
 // Update current book and chapter from reference
@@ -721,27 +805,16 @@ async function loadPreviousChapter() {
     const prevChapterRef = getPreviousChapter();
     if (!prevChapterRef) return;
 
-    // Check if already loaded
-    if (chapterManager.chapters.has(prevChapterRef)) {
-        console.log(`Chapter ${prevChapterRef} already loaded`);
-        return;
-    }
+    // Check if already loaded in DOM
+    if (chapterManager.chapters.has(prevChapterRef)) return;
 
     chapterManager.isLoadingPrevious = true;
 
     try {
-        // Save current scroll position
         const currentScrollTop = mainContent.scrollTop;
         const currentScrollHeight = mainContent.scrollHeight;
 
-        const formattedReference = prevChapterRef.trim().replace(/\s+/g, '+');
-        const response = await fetch(`${API_BASE_URL}/${formattedReference}`);
-
-        if (!response.ok) {
-            throw new Error('Could not load previous chapter');
-        }
-
-        const data = await response.json();
+        const data = await fetchChapterData(prevChapterRef);
         await displayVerse(data, false, true); // prepend=true
 
         // Restore scroll position (compensate for new content)
@@ -759,47 +832,27 @@ async function loadPreviousChapter() {
 // Load next chapter and append to content
 async function loadNextChapter() {
     if (isComparisonMode) return;
-    if (isLoading) {
-        console.log(`[LOAD] Already loading, skipping`);
-        return;
-    }
+    if (isLoading) return;
 
     const nextChapterRef = getNextChapter();
-    console.log(`[LOAD] Next chapter: ${nextChapterRef}, current: ${currentBook} ${currentChapter}`);
+    if (!nextChapterRef) return;
 
-    if (!nextChapterRef) {
-        console.log(`[LOAD] No next chapter available`);
-        return;
-    }
-
-    // Check if already loaded
-    if (chapterManager.chapters.has(nextChapterRef)) {
-        console.log(`[LOAD] Chapter ${nextChapterRef} already loaded`);
-        return;
-    }
+    // Check if already loaded in DOM
+    if (chapterManager.chapters.has(nextChapterRef)) return;
 
     isLoading = true;
-    console.log(`[LOAD] Starting load of ${nextChapterRef}`);
 
     try {
-        const formattedReference = nextChapterRef.trim().replace(/\s+/g, '+');
-        console.log(`[LOAD] Fetching ${formattedReference}...`);
-        const response = await fetch(`${API_BASE_URL}/${formattedReference}`);
-
-        if (!response.ok) {
-            throw new Error(`Failed to fetch: ${response.statusText}`);
-        }
-
-        const data = await response.json();
-        console.log(`[LOAD] Received data for ${nextChapterRef}, chapters: ${data.verses?.length}`);
+        const data = await fetchChapterData(nextChapterRef);
         await displayVerse(data, true); // append=true
-        console.log(`[LOAD] Successfully loaded ${nextChapterRef}`);
+
+        // Prefetch upcoming chapters into cache
+        prefetchChapters();
 
     } catch (err) {
         console.error(`[LOAD] Error loading next chapter:`, err);
     } finally {
         isLoading = false;
-        console.log(`[LOAD] Finished loading, isLoading reset to false`);
     }
 }
 
@@ -815,10 +868,13 @@ function handleScroll() {
         loadPreviousChapter();
     }
 
-    // Load next chapter when 80% scrolled
+    // Load next chapter when 60% scrolled
     if (chapterManager.shouldLoadNext(scrollPosition, scrollHeight)) {
         loadNextChapter();
     }
+
+    // Keep prefetching ahead as the user scrolls
+    prefetchChapters();
 
     // Update current chapter based on visible content
     updateCurrentChapterFromScroll();
@@ -881,7 +937,7 @@ mainContent.addEventListener('scroll', () => {
     scrollTimeout = setTimeout(() => {
         handleScroll();
         updateChapterSelector();
-    }, 200);
+    }, 50);
 });
 
 // Comparison Mode Event Listeners
@@ -1011,7 +1067,8 @@ async function displayComparisonVerse(leftData, rightData, append = false, prepe
     // Create chapter title (use left translation's language)
     const chapterTitle = document.createElement('div');
     chapterTitle.className = 'chapter-title';
-    chapterTitle.textContent = formatChapterTitle(leftData.reference, leftData.translation_id || leftTranslation);
+    const compTitleText = formatChapterTitle(leftData.reference, leftData.translation_id || leftTranslation);
+    chapterTitle.innerHTML = `<span class="title-mask"><span class="title-line">${compTitleText}</span></span>`;
 
     // Create chapter content container
     const chapterContent = document.createElement('div');
