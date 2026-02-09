@@ -58,7 +58,7 @@ body {
 /* Main Content (Bible) */
 .main-content {
     flex: 1;
-    background: var(--bg-secondary);
+    background: transparent;
     overflow-y: auto;
     overflow-x: hidden;
     display: flex;

@@ -3,10 +3,10 @@
     const container = document.getElementById('pixi-container');
     if (!container) return;
 
-    // DEBUG: bright red for visibility testing
-    const colorR = 255,
-          colorG = 0,
-          colorB = 0;
+    // Dot color: #C2B9B6 → RGB(194, 185, 182)
+    const colorR = 194,
+          colorG = 185,
+          colorB = 182;
 
     const thickness = Math.pow(80, 2),
           spacing = 15,
