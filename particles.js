@@ -7,11 +7,11 @@
     const dotColor = 'rgb(170, 160, 155)',
           dotSize = 1.5;
 
-    const thickness = Math.pow(80, 2),
+    const thickness = Math.pow(150, 2),
           spacing = 15,
           margin = 15,
           drag = 0.5,
-          ease = 0.3;
+          ease = 0.2;
 
     let canvas, ctx, list, w, h, tog;
     let mx = 0, my = 0;
