@@ -281,9 +281,8 @@ async function displayVerse(data, append = false, prepend = false) {
     const isOldTestament = currentBook && otBooks.includes(currentBook);
 
     // Fetch Hebrew/Greek version for Strong's numbers (for Old/New Testament)
-    // ONLY for main chapter loads, not for append/prepend (for word study)
     let originalLanguageData = null;
-    if (!append && !prepend && typeof translationManager !== 'undefined') {
+    if (typeof translationManager !== 'undefined') {
         try {
             const originalTranslation = isOldTestament ? 'wlca' : 'lxx';
             console.log(`[BIBLE] Fetching original language: ${originalTranslation} for ${data.reference}`);
@@ -377,21 +376,12 @@ async function displayVerse(data, append = false, prepend = false) {
         applyJEDPSources(verses);
     }
 
-    // Then make words clickable for word study (after JEDP highlighting)
-    // ONLY for main chapter loads
-    if (!append && !prepend) {
-        const verseTexts = chapterDiv.querySelectorAll('.verse-text');
-        console.log(`[BIBLE] Found ${verseTexts.length} verse texts to process`);
-        console.log(`[BIBLE] makeWordsClickable exists:`, typeof makeWordsClickable === 'function');
-
-        if (typeof makeWordsClickable === 'function') {
-            // Determine the translation type for word study
-            const translationType = data.translation_id || 'english';
-            console.log(`[BIBLE] Calling makeWordsClickable with translation type: ${translationType}`);
-
-            for (const verseText of verseTexts) {
-                await makeWordsClickable(verseText, translationType, isOldTestament);
-            }
+    // Make words clickable for word study (after JEDP highlighting)
+    const verseTexts = chapterDiv.querySelectorAll('.verse-text');
+    if (typeof makeWordsClickable === 'function' && verseTexts.length > 0) {
+        const translationType = data.translation_id || 'english';
+        for (const verseText of verseTexts) {
+            await makeWordsClickable(verseText, translationType, isOldTestament);
         }
     }
 
