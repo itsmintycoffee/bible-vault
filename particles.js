@@ -3,10 +3,9 @@
     const container = document.getElementById('pixi-container');
     if (!container) return;
 
-    // Dot color: #C2B9B6 → RGB(194, 185, 182)
-    const colorR = 194,
-          colorG = 185,
-          colorB = 182;
+    // Dot color: darker for more contrast against #E9E5E3 background
+    const dotColor = 'rgb(170, 160, 155)',
+          dotSize = 1.5;
 
     const thickness = Math.pow(80, 2),
           spacing = 15,
@@ -46,7 +45,7 @@
     }
 
     function step() {
-        let i, p, d, f, t, n, dx, dy;
+        let i, p, d, f, t, dx, dy;
 
         if (tog = !tog) {
             for (i = 0; i < list.length; i++) {
@@ -65,19 +64,12 @@
                 p.y += (p.vy *= drag) + (p.oy - p.y) * ease;
             }
         } else {
-            const a = ctx.createImageData(w, h);
-            const b = a.data;
-
+            ctx.clearRect(0, 0, w, h);
+            ctx.fillStyle = dotColor;
             for (i = 0; i < list.length; i++) {
                 p = list[i];
-                n = (~~p.x + ~~p.y * w) * 4;
-                b[n]     = colorR;
-                b[n + 1] = colorG;
-                b[n + 2] = colorB;
-                b[n + 3] = 255;
+                ctx.fillRect(p.x - 0.75, p.y - 0.75, dotSize, dotSize);
             }
-
-            ctx.putImageData(a, 0, 0);
         }
 
         requestAnimationFrame(step);
