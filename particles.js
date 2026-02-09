@@ -68,11 +68,17 @@
 
             for (i = 0; i < list.length; i++) {
                 p = list[i];
-                n = (~~p.x + (~~p.y * w)) * 4;
-                b[n]     = colorR;
-                b[n + 1] = colorG;
-                b[n + 2] = colorB;
-                b[n + 3] = 255;
+                var px = ~~p.x, py = ~~p.y;
+                // Draw a 2x2 dot for visibility
+                for (var oy = 0; oy < 2; oy++) {
+                    for (var ox = 0; ox < 2; ox++) {
+                        n = ((px + ox) + (py + oy) * w) * 4;
+                        b[n]     = colorR;
+                        b[n + 1] = colorG;
+                        b[n + 2] = colorB;
+                        b[n + 3] = 255;
+                    }
+                }
             }
 
             ctx.putImageData(a, 0, 0);

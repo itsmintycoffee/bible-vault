@@ -250,7 +250,7 @@ async function fetchVerse(reference) {
 
 // Build per-character reveal HTML for chapter titles
 function buildTitleRevealHtml(text) {
-    const CHAR_DELAY = 250; // ms between each character
+    const CHAR_DELAY = 100; // ms between each character
     const chars = [...text].map((ch, i) => {
         if (ch === ' ') return '<span class="title-char" style="display:inline-block">&nbsp;</span>';
         return `<span class="title-char" style="animation-delay:${i * CHAR_DELAY}ms">${ch}</span>`;
