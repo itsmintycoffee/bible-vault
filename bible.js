@@ -164,23 +164,31 @@ class ChapterManager {
 const chapterManager = new ChapterManager();
 
 // API response cache - keeps fetched chapter data in memory so re-fetching is instant
-const chapterCache = new Map(); // "Book Chapter" -> API response data
+const chapterCache = new Map(); // "translation:Book Chapter" -> API response data
 
-function getCacheKey(reference) {
-    return reference.trim().replace(/\s+/g, ' ');
+function getCacheKey(reference, translationId) {
+    const tid = translationId || (typeof translationManager !== 'undefined' ? translationManager.currentTranslation : 'esv');
+    return `${tid}:${reference.trim().replace(/\s+/g, ' ')}`;
 }
 
-async function fetchChapterData(reference) {
-    const cacheKey = getCacheKey(reference);
+async function fetchChapterData(reference, translationId) {
+    const tid = translationId || (typeof translationManager !== 'undefined' ? translationManager.currentTranslation : 'esv');
+    const cacheKey = getCacheKey(reference, tid);
     if (chapterCache.has(cacheKey)) {
         return chapterCache.get(cacheKey);
     }
-    const formattedReference = reference.trim().replace(/\s+/g, '+');
-    const response = await fetch(`${API_BASE_URL}/${formattedReference}`);
-    if (!response.ok) {
-        throw new Error(`Failed to fetch: ${response.statusText}`);
+    let data;
+    if (typeof translationManager !== 'undefined') {
+        data = await translationManager.fetchVerseForTranslation(reference, tid);
+    } else {
+        // Fallback to bible-api.com if translationManager not available
+        const formattedReference = reference.trim().replace(/\s+/g, '+');
+        const response = await fetch(`${API_BASE_URL}/${formattedReference}`);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch: ${response.statusText}`);
+        }
+        data = await response.json();
     }
-    const data = await response.json();
     chapterCache.set(cacheKey, data);
     return data;
 }
@@ -201,7 +209,7 @@ function prefetchChapters() {
             prefetchInFlight.add(cacheKey);
             fetchChapterData(ref)
                 .then(() => prefetchInFlight.delete(cacheKey))
-                .catch(() => prefetchInFlight.delete(cacheKey));
+                .catch(()  => prefetchInFlight.delete(cacheKey));
         }
         // Parse the ref to advance for the next iteration
         const parts = ref.match(/^(.+?)\s+(\d+)$/);
@@ -961,9 +969,11 @@ if (toggleComparisonBtn) {
         isComparisonMode = !isComparisonMode;
 
         if (isComparisonMode) {
-            // Show translation selects
+            // Show translation selects and sync their values with globals
             translationLeftSelect.classList.remove('hidden');
             translationRightSelect.classList.remove('hidden');
+            if (translationLeftSelect) translationLeftSelect.value = leftTranslation;
+            if (translationRightSelect) translationRightSelect.value = rightTranslation;
             verseContent.classList.add('comparison-mode');
 
             // Reload current chapter in comparison mode

@@ -25,8 +25,10 @@
         tog = true;
         list = [];
 
-        const cols = Math.ceil((container.clientWidth - margin * 2) / spacing);
-        const rows = Math.ceil((container.clientHeight - margin * 2) / spacing);
+        const cw = container.clientWidth || window.innerWidth;
+        const ch = container.clientHeight || window.innerHeight;
+        const cols = Math.ceil((cw - margin * 2) / spacing);
+        const rows = Math.ceil((ch - margin * 2) / spacing);
         const nbOfParticles = rows * cols;
 
         w = canvas.width = cols * spacing + margin * 2;
@@ -97,8 +99,13 @@
         my = 0;
     });
 
-    init();
-    step();
+    // Defer init until DOM is laid out so container has dimensions
+    function start() { init(); step(); }
+    if (document.readyState === 'complete') {
+        start();
+    } else {
+        window.addEventListener('load', start);
+    }
 
     // Rebuild on resize
     let resizeTimer;

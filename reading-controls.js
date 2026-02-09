@@ -107,6 +107,11 @@ class ReadingControls {
                 isComparisonMode = true;
                 leftTranslation = currentTranslationId;
                 rightTranslation = autoCompareTranslation;
+                // Sync compare mode dropdowns if they exist
+                const leftSelect = document.getElementById('translation-left');
+                const rightSelect = document.getElementById('translation-right');
+                if (leftSelect) leftSelect.value = leftTranslation;
+                if (rightSelect) rightSelect.value = rightTranslation;
                 console.log(`[PARALLEL] Starting comparison: left=${leftTranslation}, right=${rightTranslation}, ref=${currentBook} ${currentChapter}`);
                 loadChapterInComparisonMode(`${currentBook} ${currentChapter}`);
             } catch (err) {
