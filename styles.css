@@ -449,9 +449,9 @@ body {
     position: sticky;
     top: 0;
     z-index: 50;
-    background: rgba(253, 250, 244, 0.85);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
     height: auto;
     display: flex;
     flex-direction: column;
@@ -541,9 +541,9 @@ body {
     padding-bottom: 1rem;
     margin-top: -1rem;
     margin-bottom: 2.5rem;
-    background: rgba(253, 250, 244, 0.85);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
     box-shadow: none;
 }
 
