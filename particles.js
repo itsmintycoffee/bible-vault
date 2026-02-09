@@ -3,10 +3,10 @@
     const container = document.getElementById('pixi-container');
     if (!container) return;
 
-    // Dot color: #C2B9B6 → RGB(194, 185, 182)
-    const colorR = 194,
-          colorG = 185,
-          colorB = 182;
+    // DEBUG: bright red for visibility testing
+    const colorR = 255,
+          colorG = 0,
+          colorB = 0;
 
     const thickness = Math.pow(80, 2),
           spacing = 15,
@@ -69,9 +69,9 @@
             for (i = 0; i < list.length; i++) {
                 p = list[i];
                 var px = ~~p.x, py = ~~p.y;
-                // Draw a 2x2 dot for visibility
-                for (var oy = 0; oy < 2; oy++) {
-                    for (var ox = 0; ox < 2; ox++) {
+                // Draw a 3x3 dot for debug visibility
+                for (var oy = 0; oy < 3; oy++) {
+                    for (var ox = 0; ox < 3; ox++) {
                         n = ((px + ox) + (py + oy) * w) * 4;
                         b[n]     = colorR;
                         b[n + 1] = colorG;
