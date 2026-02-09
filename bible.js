@@ -248,6 +248,17 @@ async function fetchVerse(reference) {
     }
 }
 
+// Build per-character reveal HTML for chapter titles
+function buildTitleRevealHtml(text) {
+    const CHAR_DELAY = 250; // ms between each character
+    const chars = [...text].map((ch, i) => {
+        if (ch === ' ') return '<span class="title-char" style="display:inline-block">&nbsp;</span>';
+        return `<span class="title-char" style="animation-delay:${i * CHAR_DELAY}ms">${ch}</span>`;
+    }).join('');
+    const lineDelay = (text.length - 1) * CHAR_DELAY + 600; // last char start + animation duration
+    return { html: `<span class="title-mask">${chars}</span>`, lineDelay };
+}
+
 // Display verse content
 async function displayVerse(data, append = false, prepend = false) {
     hideLoadingAndError();
@@ -287,13 +298,13 @@ async function displayVerse(data, append = false, prepend = false) {
 
     const illustrationsHtml = getChapterIllustrations(data.reference);
 
-    const titleRevealHtml = `<span class="title-mask"><span class="title-line">${formattedTitle}</span></span>`;
+    const titleReveal = buildTitleRevealHtml(formattedTitle);
 
     if (illustrationsHtml) {
         chapterDiv.innerHTML = `
             <div class="chapter-body with-illustrations">
                 <div class="chapter-text-column">
-                    <div class="chapter-title">${titleRevealHtml}</div>
+                    <div class="chapter-title" style="--line-delay:${titleReveal.lineDelay}ms">${titleReveal.html}</div>
                     <div class="chapter-content">${formatVerseText(data)}</div>
                 </div>
                 <aside class="chapter-illustrations">${illustrationsHtml}</aside>
@@ -301,7 +312,7 @@ async function displayVerse(data, append = false, prepend = false) {
         `;
     } else {
         chapterDiv.innerHTML = `
-            <div class="chapter-title">${titleRevealHtml}</div>
+            <div class="chapter-title" style="--line-delay:${titleReveal.lineDelay}ms">${titleReveal.html}</div>
             <div class="chapter-content">${formatVerseText(data)}</div>
         `;
     }
@@ -1068,7 +1079,9 @@ async function displayComparisonVerse(leftData, rightData, append = false, prepe
     const chapterTitle = document.createElement('div');
     chapterTitle.className = 'chapter-title';
     const compTitleText = formatChapterTitle(leftData.reference, leftData.translation_id || leftTranslation);
-    chapterTitle.innerHTML = `<span class="title-mask"><span class="title-line">${compTitleText}</span></span>`;
+    const compTitleReveal = buildTitleRevealHtml(compTitleText);
+    chapterTitle.style.setProperty('--line-delay', compTitleReveal.lineDelay + 'ms');
+    chapterTitle.innerHTML = compTitleReveal.html;
 
     // Create chapter content container
     const chapterContent = document.createElement('div');

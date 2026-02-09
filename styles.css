@@ -477,15 +477,15 @@ body {
     overflow: hidden;
 }
 
-.title-line {
+.title-char {
     display: inline-block;
     opacity: 0;
     transform: translateY(100%);
     will-change: opacity, transform;
 }
 
-.chapter-title.reveal .title-line {
-    animation: revealText 800ms cubic-bezier(0.7, 0, 0.3, 1) forwards;
+.chapter-title.reveal .title-char {
+    animation: revealText 600ms cubic-bezier(0.7, 0, 0.3, 1) forwards;
 }
 
 .chapter-title::after {
@@ -502,7 +502,7 @@ body {
 }
 
 .chapter-title.reveal::after {
-    animation: revealLine 600ms cubic-bezier(0.19, 1, 0.22, 1) forwards 400ms;
+    animation: revealLine 600ms cubic-bezier(0.19, 1, 0.22, 1) forwards var(--line-delay, 400ms);
 }
 
 @keyframes revealText {
