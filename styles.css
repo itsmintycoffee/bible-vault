@@ -581,6 +581,11 @@ body {
     gap: 3rem;
 }
 
+/* Even chapters: illustrations on the left */
+.chapter-body.with-illustrations.illustrations-left {
+    flex-direction: row-reverse;
+}
+
 .chapter-text-column {
     flex: 1;
     min-width: 0;
@@ -596,6 +601,11 @@ body {
     margin-top: 0;
     text-align: left;
     justify-content: flex-start;
+}
+
+.chapter-body.with-illustrations.illustrations-left .chapter-title {
+    text-align: right;
+    justify-content: flex-end;
 }
 
 .chapter-illustrations {

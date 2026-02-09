@@ -305,18 +305,19 @@ async function displayVerse(data, append = false, prepend = false) {
     // Format the chapter title in the active translation's language
     const formattedTitle = formatChapterTitle(data.reference, activeTranslationId);
 
-    const illustrationsHtml = getChapterIllustrations(data.reference);
+    const illustrations = getChapterIllustrations(data.reference);
 
     const titleReveal = buildTitleRevealHtml(formattedTitle);
 
-    if (illustrationsHtml) {
+    if (illustrations) {
+        const sideClass = illustrations.side === 'left' ? 'illustrations-left' : '';
         chapterDiv.innerHTML = `
-            <div class="chapter-body with-illustrations">
+            <div class="chapter-body with-illustrations ${sideClass}">
                 <div class="chapter-text-column">
                     <div class="chapter-title" style="--line-delay:${titleReveal.lineDelay}ms">${titleReveal.html}</div>
                     <div class="chapter-content">${formatVerseText(data)}</div>
                 </div>
-                <aside class="chapter-illustrations">${illustrationsHtml}</aside>
+                <aside class="chapter-illustrations">${illustrations.html}</aside>
             </div>
         `;
     } else {
@@ -634,6 +635,21 @@ function formatVerseText(data) {
     return `${data.text}`;
 }
 
+// Chapter illustration definitions per book/chapter
+// Each entry: array of {src, alt} objects
+const chapterIllustrations = {
+    genesis: {
+        1: [
+            { src: 'chapters/genesis/resources/day01.png', alt: 'Day 1 – Light' },
+            { src: 'chapters/genesis/resources/day02.png', alt: 'Day 2 – Sky' },
+            { src: 'chapters/genesis/resources/day03.png', alt: 'Day 3 – Land and Seas' },
+            { src: 'chapters/genesis/resources/day04.png', alt: 'Day 4 – Sun, Moon, Stars' },
+            { src: 'chapters/genesis/resources/day05.png', alt: 'Day 5 – Sea and Sky Creatures' },
+            { src: 'chapters/genesis/resources/day06.png', alt: 'Day 6 – Land Animals and Man' },
+        ],
+    },
+};
+
 // Get chapter illustration HTML if available
 function getChapterIllustrations(reference) {
     const match = reference.match(/^(.+?)\s+(\d+)/);
@@ -642,21 +658,16 @@ function getChapterIllustrations(reference) {
     const bookName = match[1].trim().toLowerCase();
     const chapterNum = parseInt(match[2]);
 
-    if (bookName === 'genesis' && chapterNum === 1) {
-        const basePath = 'chapters/genesis/resources';
-        return `
-            <div class="illustration-grid">
-                <img src="${basePath}/day01.png" alt="Day 1 – Light">
-                <img src="${basePath}/day02.png" alt="Day 2 – Sky">
-                <img src="${basePath}/day03.png" alt="Day 3 – Land and Seas">
-                <img src="${basePath}/day04.png" alt="Day 4 – Sun, Moon, Stars">
-                <img src="${basePath}/day05.png" alt="Day 5 – Sea and Sky Creatures">
-                <img src="${basePath}/day06.png" alt="Day 6 – Land Animals and Man">
-            </div>
-        `;
-    }
+    const bookIllustrations = chapterIllustrations[bookName];
+    if (!bookIllustrations || !bookIllustrations[chapterNum]) return null;
 
-    return null;
+    const images = bookIllustrations[chapterNum];
+    const imgsHtml = images.map(img => `<img src="${img.src}" alt="${img.alt}">`).join('\n                ');
+
+    return {
+        html: `<div class="illustration-grid">${imgsHtml}</div>`,
+        side: chapterNum % 2 === 0 ? 'left' : 'right'
+    };
 }
 
 // UI Helper functions
