@@ -16,7 +16,7 @@
     let canvas, ctx, list, w, h, tog;
     let mx = 0, my = 0;
 
-    const particle = { vx: 0, vy: 0, x: 0, y: 0, ox: 0, oy: 0 };
+    const particle = { vx: 0, vy: 0, x: 0, y: 0, ox: 0, oy: 0, alpha: 1 };
 
     function init() {
         canvas = document.createElement('canvas');
@@ -37,6 +37,7 @@
             const p = Object.create(particle);
             p.x = p.ox = margin + spacing * (i % cols);
             p.y = p.oy = margin + spacing * Math.floor(i / cols);
+            p.alpha = 0.1 + Math.random() * 0.9;
             list[i] = p;
         }
 
@@ -68,8 +69,10 @@
             ctx.fillStyle = dotColor;
             for (i = 0; i < list.length; i++) {
                 p = list[i];
+                ctx.globalAlpha = p.alpha;
                 ctx.fillRect(p.x - 0.75, p.y - 0.75, dotSize, dotSize);
             }
+            ctx.globalAlpha = 1;
         }
 
         requestAnimationFrame(step);
